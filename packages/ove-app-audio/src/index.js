@@ -54,7 +54,7 @@ setTimeout(function () {
     });
 }, Constants.SOCKET_READY_WAIT_TIME);
 
-let operationsList = Constants.Operation.array.join('|');
+let operationsList = Object.values(Constants.Operation).join('|');
 app.get('/operation/:name(' + operationsList + ')', function (req, res) {
     let name = req.params.name;
     let sectionId = req.query.oveSectionId;

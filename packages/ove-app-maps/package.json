@@ -14,6 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "@ove/ove-lib-appbase": "^0.1.0",
-    "request": "2.88.0"
+    "request": "2.88.0",
+    "jquery": "3.3.1"
   }
 }
