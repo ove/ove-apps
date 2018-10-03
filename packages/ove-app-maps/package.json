@@ -1,5 +1,6 @@
 {
   "name": "@ove/ove-app-maps",
+  "private": true,
   "version": "0.1.0",
   "main": "dist/index.js",
   "scripts": {
@@ -13,7 +14,7 @@
   "author": "Senaka Fernando <senaka.fernando15@imperial.ac.uk>",
   "license": "MIT",
   "dependencies": {
-    "@ove/ove-lib-appbase": "^0.1.0",
+    "@ove-lib/appbase": "^0.1.0",
     "request": "2.88.0",
     "jquery": "3.3.1"
   }
