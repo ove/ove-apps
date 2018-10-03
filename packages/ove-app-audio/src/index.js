@@ -1,7 +1,7 @@
 const { Constants } = require('./client/constants/audio');
 const HttpStatus = require('http-status-codes');
 const path = require('path');
-const { express, app, log, nodeModules, Utils } = require('@ove/ove-lib-appbase')(__dirname, Constants.APP_NAME);
+const { express, app, log, nodeModules, Utils } = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const server = require('http').createServer(app);
 
 for (const mod of ['howler']) {

@@ -1,6 +1,6 @@
 const { Constants } = require('./client/constants/images');
 const path = require('path');
-const { express, app, log, nodeModules } = require('@ove/ove-lib-appbase')(__dirname, Constants.APP_NAME);
+const { express, app, log, nodeModules } = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const server = require('http').createServer(app);
 
 log.debug('Using module:', 'openseadragon');
