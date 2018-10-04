@@ -7,6 +7,6 @@ initView = function () {
 beginInitialization = function () {
     log.debug('Starting viewer initialization');
     OVE.Utils.initView(initView, loadVega, function () {
-        OVE.Utils.resizeController(Constants.CONTENT_DIV);
+        OVE.Utils.resizeViewer(Constants.CONTENT_DIV);
     });
 };
