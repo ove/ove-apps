@@ -8,7 +8,7 @@ const Constants = {
     /**************************************************************
                               Controller
     **************************************************************/
-    DEFAULT_STATE_NAME: 'Blockchain',
+    DEFAULT_STATE_NAME: 'Highsmith',
     OSD_MONITORED_EVENTS: ['resize', 'zoom', 'pan'],
 
     /**************************************************************
