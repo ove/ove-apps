@@ -28,12 +28,6 @@
             }
         },
         {
-            "files": [ "**/common/*.js" ],
-            "rules": {
-                "no-eval": ["off"]
-            }
-        },
-        {
             "files": [ "**/*.js" ],
             "globals": {
                 "beginInitialization": true,

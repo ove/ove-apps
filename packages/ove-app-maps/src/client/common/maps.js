@@ -33,7 +33,7 @@ initCommon = function () {
                     e.source.type, ', using config:', e);
                 const TileConfig = {
                     visible: e.visible,
-                    source: eval('new window.' + e.source.type + '(' + JSON.stringify(e.source.config) + ')') // jshint ignore:line
+                    source: new window.ol.source[e.source.type.substring('ol.source.'.length)](e.source.config)
                 };
                 if (e.source.type === 'ol.source.BingMaps') {
                     TileConfig.preload = Infinity;
@@ -68,7 +68,7 @@ initCommon = function () {
             context.layers.forEach(function (e, i) {
                 if (e.bingMapsSource && e.getSource().getState() !== 'ready') {
                     log.warn('Reloading BingMaps layer id:', i);
-                    e.setSource(eval('new window.ol.source.BingMaps(' + JSON.stringify(e.bingMapsSource.config) + ')')); // jshint ignore:line
+                    e.setSource(new window.ol.source.BingMaps(JSON.stringify(e.bingMapsSource.config)));
                 }
             });
         }, Constants.BING_MAPS_RELOAD_INTERVAL);

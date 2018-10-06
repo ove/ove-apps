@@ -22,7 +22,7 @@ loadOSD = function (state) {
         config.animationTime = 0;
         if (config.tileSources && config.tileSources.getTileUrl) {
             config.tileSources.getTileUrl =
-            eval('(' + config.tileSources.getTileUrl + ')'); // jshint ignore:line
+                new Function('level', 'x', 'y', 'return ' + config.tileSources.getTileUrl + ';'); // jshint ignore:line
         }
         try {
             log.info('Loading OpenSeadragon with config:', config);
