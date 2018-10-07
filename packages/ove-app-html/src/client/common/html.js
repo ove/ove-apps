@@ -17,6 +17,7 @@ updateURL = function () {
         log.debug('Creating content iFrame');
         $('<iframe>', {
             class: Constants.HTML_FRAME.substring(1),
+            allowtransparency: true,
             frameborder: 0,
             scrolling: 'no'
         }).css(getCSS()).appendTo(Constants.CONTENT_DIV);

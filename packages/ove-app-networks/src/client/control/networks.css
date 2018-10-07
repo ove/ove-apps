@@ -2,3 +2,6 @@
     display: table;
     position: absolute;
 }
+body {
+    background: #222;
+}

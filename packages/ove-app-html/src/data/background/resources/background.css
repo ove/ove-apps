@@ -7,5 +7,10 @@
 }
 body {
     color: #FFF;
-    font-family: helvetica;
+    margin: 0px;
+    overflow: hidden;
+}
+.spacer {
+    height: 100%;
+    width: 100%;
 }

@@ -6,3 +6,6 @@
     display: table-cell;
     vertical-align: middle;
 }
+body {
+    background: #222;
+}
