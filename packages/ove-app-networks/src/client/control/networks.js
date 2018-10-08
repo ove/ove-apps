@@ -10,6 +10,10 @@ initControl = function (data) {
     OVE.Utils.broadcastState();
 };
 
+getClientSpecificURL = function (url) {
+    return url; // View-only operation
+};
+
 beginInitialization = function () {
     log.debug('Starting controller initialization');
     OVE.Utils.initControl(Constants.DEFAULT_STATE_NAME, initControl);
