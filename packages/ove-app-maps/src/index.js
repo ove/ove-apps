@@ -1,6 +1,6 @@
 const { Constants } = require('./client/constants/maps');
 const path = require('path');
-const { express, app, log, config } = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
+const { express, app, log, nodeModules, config } = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const request = require('request');
 const server = require('http').createServer(app);
 
@@ -24,7 +24,7 @@ app.get('/layers.json', function (_req, res) {
     res.send(JSON.stringify(layers));
 });
 log.debug('Using module:', 'OpenLayers');
-app.use('/', express.static(path.join(__dirname, 'ol3-cesium-v1.6')));
+app.use('/', express.static(path.join(nodeModules, 'openlayers', 'dist')));
 
 const port = process.env.PORT || 8080;
 server.listen(port);
