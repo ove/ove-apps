@@ -25,12 +25,6 @@
             }
         },
         {
-            "files": [ "**/common/*.js" ],
-            "rules": {
-                "no-eval": ["off"]
-            }
-        },
-        {
             "files": [ "**/*.js" ],
             "globals": {
                 "changeEvent": true,

@@ -87,12 +87,9 @@ uploadMapPosition = function () {
 };
 
 changeEvent = function () {
-    // We need to reset center if we change zoom-level as the map resizes itself.
-    setTimeout(function () {
-        log.debug('Resetting center of map');
-        window.ove.context.map.getView().setCenter(window.ove.context.map.getView().getCenter());
-    }, Constants.OL_CHANGE_CENTER_AFTER_UPDATE_WAIT_TIME);
-    uploadMapPosition();
+    // it takes a while for the all attributes of the map to be updated, especially after
+    // a resolution/zoom-level change.
+    setTimeout(uploadMapPosition, Constants.OL_CHANGE_CENTER_AFTER_UPDATE_WAIT_TIME);
 };
 
 beginInitialization = function () {

@@ -31,14 +31,16 @@ loadSigma = function () {
     // sigma.js supports two content formats, GEXF (Gephi) and JSON. The format is chosen based
     // on the type of url specified in the state configuration.
     if (window.ove.state.current.jsonURL) {
-        log.info('Loading content of format:', 'JSON', ', URL:', window.ove.state.current.jsonURL);
-        sigma.parsers.json(window.ove.state.current.jsonURL, context.sigma, function (sigma) {
+        let url = getClientSpecificURL(window.ove.state.current.jsonURL);
+        log.info('Loading content of format:', 'JSON', ', URL:', url);
+        sigma.parsers.json(url, context.sigma, function (sigma) {
             log.debug('Refreshing Sigma');
             sigma.refresh();
         });
     } else if (window.ove.state.current.gexfURL) {
-        log.info('Loading content of format:', 'GEXF', ', URL:', window.ove.state.current.jsonURL);
-        sigma.parsers.gexf(window.ove.state.current.gexfURL, context.sigma, function (sigma) {
+        let url = getClientSpecificURL(window.ove.state.current.gexfURL);
+        log.info('Loading content of format:', 'GEXF', ', URL:', url);
+        sigma.parsers.gexf(url, context.sigma, function (sigma) {
             log.debug('Refreshing Sigma');
             sigma.refresh();
         });

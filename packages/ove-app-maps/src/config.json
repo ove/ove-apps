@@ -1,5 +1,30 @@
 {
-  "layers": "http://gdo-apps.dsi.ic.ac.uk/demos/maps/MapLayers.json",
+  "layers": [
+    { 
+      "type": "ol.layer.Tile",
+      "visible": false,
+      "wms": false,
+      "source": {
+        "type": "ol.source.OSM",
+        "config": {
+          "crossOrigin": null,
+          "url": "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.jpg"
+        }
+      }
+    },
+    { 
+      "type": "ol.layer.Tile",
+      "visible": false,
+      "wms": false,
+      "source": {
+        "type": "ol.source.OSM",
+        "config": {
+          "crossOrigin": null,
+          "url": "https://{a-c}.tile.thunderforest.com/transport/{z}/{x}/{y}.png"
+        }
+      }
+    }
+  ],
   "states": {
     "China": {
       "center": ["12583620.753127817", "3559924.3994327313"],
