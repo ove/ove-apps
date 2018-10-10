@@ -87,6 +87,18 @@
           "PORT": "8088",
           "OVE_HOST": "localhost:8080"
       }
+    },
+    {
+      "name": "@ove/ove-app-svg",
+      "cwd": "./packages/ove-app-svg",
+      "kill_timeout": 3000,
+      "restart_delay": 3000,
+      "script": "dist/index.js",
+      "env": {
+          "PORT": "8089",
+          "OVE_HOST": "localhost:8080",
+          "TUORIS_HOST": "localhost:7080"
+      }
     }
   ]
 }
