@@ -3,7 +3,6 @@
     "globals": {
         "$": true,
         "Constants": true,
-        "location": true,
         "OVE": true
     },
     "overrides": [
@@ -26,7 +25,7 @@
             "globals": {
                 "getCSS": true,
                 "beginInitialization": true,
-                "updateURL": true
+                "loadSVGFrame": true
             }
         }
     ],
