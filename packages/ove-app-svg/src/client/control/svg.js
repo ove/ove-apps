@@ -22,7 +22,7 @@ initControl = function (data) {
             $(Constants.SVG_FRAME).attr('src', '//' + Constants.TUORIS_HOST + '/control');
             window.ove.context.isInitialized = true;
             log.debug('Application is initialized:', window.ove.context.isInitialized);
-        }, 350);
+        }, Constants.TUORIS_LOAD_DELAY);
     }).catch(log.error);
 };
 
