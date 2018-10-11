@@ -22,9 +22,9 @@ body {
 }
 .html_frame {
     position: absolute;
-    -moz-transform-origin: 0% 0%;
-    -o-transform-origin: 0% 0%;
-    -webkit-transform-origin: 0% 0%;
-    transform-origin: 0% 0%;
+    -moz-transform-origin: top left;
+    -o-transform-origin: top left;
+    -webkit-transform-origin: top left;
+    transform-origin: top left;
     zoom: 1;
 }

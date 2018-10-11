@@ -19,7 +19,6 @@ getCSS = function () {
 
 beginInitialization = function () {
     log.debug('Starting viewer initialization');
-    // Nothing to run post-init.
     OVE.Utils.initView(initView, function () {
         loadSVGFrame();
         $(Constants.SVG_FRAME).attr('src', '//' + Constants.TUORIS_HOST);

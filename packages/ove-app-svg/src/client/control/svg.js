@@ -3,18 +3,20 @@ initControl = function (data) {
     log.debug('Application is initialized:', window.ove.context.isInitialized);
     log.debug('Restoring state:', data);
     window.ove.state.current = data;
+
+    // If a URL was passed, the URL of the loaded state is overridden.
+    // Note that state is synchronised by the Tuoris service, rather than being broadcast
+    // directly to the viewers.
     let url = OVE.Utils.getQueryParam('url');
     if (url) {
         log.debug('New URL at controller:', url);
-        // If a URL was passed, the URL of the loaded state would be overridden.
         window.ove.state.current.url = url;
         log.debug('Caching state');
         window.ove.state.cache();
-        // This app does not broadcast state to viewers like most other apps. The state
-        // is synchronised by the Tuoris service.
     } else {
         url = data.url;
     }
+
     loadSVGFrame();
     log.info('Loading URL:', url);
     $.get({ url: '//' + Constants.TUORIS_HOST + '/command?mount=' + url }).done(function () {
