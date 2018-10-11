@@ -22,6 +22,10 @@ The build system is based on [Lerna](https://lernajs.io/) using [Babel](http://b
 
 Setup the Tuoris service (dependency of SVG application):
 
+<!---
+Victor still has not accepted a PR https://github.com/fvictor/tuoris/pull/1, which is required for OVE, and hence a fork is being cloned for now.
+--->
+
 * `git clone https://github.com/senakafdo/tuoris`
 * `cd tuoris`
 * `npm install`
