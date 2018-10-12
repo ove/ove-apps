@@ -11,11 +11,11 @@ initControl = function (data) {
     if (url) {
         log.debug('New URL at controller:', url);
         window.ove.state.current.url = url;
-        log.debug('Caching state');
-        window.ove.state.cache();
     } else {
         url = data.url;
     }
+    log.debug('Caching state');
+    window.ove.state.cache();
 
     loadSVGFrame();
     log.info('Loading URL:', url);
@@ -24,6 +24,7 @@ initControl = function (data) {
             $(Constants.SVG_FRAME).attr('src', '//' + Constants.TUORIS_HOST + '/control');
             window.ove.context.isInitialized = true;
             log.debug('Application is initialized:', window.ove.context.isInitialized);
+            window.ove.socket.send({ refreshClients: true });
         }, Constants.TUORIS_LOAD_DELAY);
     }).catch(log.error);
 };
