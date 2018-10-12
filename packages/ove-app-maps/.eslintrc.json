@@ -4,7 +4,6 @@
         "$": true,
         "Constants": true,
         "fetch": true,
-        "location": true,
         "OVE": true
     },
     "overrides": [

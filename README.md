@@ -16,8 +16,20 @@ The build system is based on [Lerna](https://lernajs.io/) using [Babel](http://b
 * [npx](https://www.npmjs.com/package/npx) `npm install -global npx`
 * [PM2](http://pm2.keymetrics.io/) `npm install -global pm2`
 * [Lerna](https://lernajs.io/)  `npm install -global lerna`
+* [Tuoris](https://github.com/fvictor/tuoris)
 
 ### Build
+
+Setup the Tuoris service (dependency of SVG application):
+
+<!---
+Victor still has not accepted a PR https://github.com/fvictor/tuoris/pull/1, which is required for OVE, and hence a fork is being cloned for now.
+--->
+
+* `git clone https://github.com/senakafdo/tuoris`
+* `cd tuoris`
+* `npm install`
+* `pm2 start index.js -f -n "tuoris" -- -p 7080 -i 1`
 
 Setup the lerna environment:
 

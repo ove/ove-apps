@@ -3,7 +3,6 @@
     "globals": {
         "$": true,
         "Constants": true,
-        "location": true,
         "log": true,
         "OVE": true
     },

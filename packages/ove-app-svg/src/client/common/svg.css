@@ -10,7 +10,7 @@ body {
     margin: 0px;
     overflow: hidden;
 }
-.wrapper, .html_frame {
+.wrapper, .svg_frame {
     top: 0;
     left: 0;
     border: 0 none;
@@ -20,7 +20,7 @@ body {
 .wrapper {
     position: fixed;
 }
-.html_frame {
+.svg_frame {
     position: absolute;
     -moz-transform-origin: top left;
     -o-transform-origin: top left;
