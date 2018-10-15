@@ -21,7 +21,7 @@ initControl = function (data) {
     log.info('Loading URL:', url);
     $.get({ url: '//' + Constants.TUORIS_HOST + '/command?mount=' + url }).done(function () {
         setTimeout(function () {
-            $(Constants.SVG_FRAME).attr('src', '//' + Constants.TUORIS_HOST + '/control');
+            $(Constants.SVG_FRAME).attr('src', '//' + Constants.TUORIS_HOST + '/control/');
             window.ove.context.isInitialized = true;
             log.debug('Application is initialized:', window.ove.context.isInitialized);
             window.ove.socket.send({ refreshClients: true });
