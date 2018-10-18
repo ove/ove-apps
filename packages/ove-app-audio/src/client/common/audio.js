@@ -33,9 +33,8 @@ initCommon = function () {
             setTimeout(function () {
                 switch (op.name) {
                     case Constants.Operation.PLAY:
-                        log.info('Starting audio playback ' + (op.loop ? 'with' : 'without') + ' loop'
-                                                            + (op.volume === undefined ? 'without' : 'with '+op.volume) + ' volume ');
-                        context.player.play(op.loop,op.volume);
+                        log.info('Starting audio playback ' + (op.loop ? 'with' : 'without') + ' loop' + (op.volume === undefined ? 'without' : 'with ' + op.volume) + ' volume ');
+                        context.player.play(op.loop, op.volume);
                         break;
                     case Constants.Operation.PAUSE:
                         log.info('Pausing audio playback');
@@ -62,8 +61,8 @@ initCommon = function () {
                         context.player.setVolume(op.volume);
                         break;
                     case Constants.Operation.SETPOSITION:
-                        log.info('Setting audio position x:' + op.x+ ' y:'+op.y+ ' z:'+op.z);
-                        context.player.setPosition(op.x,op.y,op.z);
+                        log.info('Setting audio position x:' + op.x + ' y:' + op.y + ' z:' + op.z);
+                        context.player.setPosition(op.x, op.y, op.z);
                         break;
                     case Constants.Operation.VOLUMEUP:
                         log.info('increasing volume');
@@ -76,7 +75,7 @@ initCommon = function () {
                     default:
                         log.warn('Ignoring unknown operation:', op.name);
                 }
-            // Run operation precisely at the same time
+                // Run operation precisely at the same time
             }, op.executionTime - new Date().getTime());
         }
     });
