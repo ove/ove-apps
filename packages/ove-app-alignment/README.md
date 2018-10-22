@@ -8,7 +8,6 @@ When installing monitors to create a tiled display, the aim is typically to phys
 However, in practice it is difficult to achieve a perfect alignment and monitors have bezels with non-zero widths.
 To compensate for this, adjustments can be made to the coordinates recorded for the layout in the``Clients.json`` file.
 
-
 ## Use
 
 It enables the display of one of two patterns (a grid of vertical and horizontal lines, or a series of parallel diagonal lines) that span an entire space.
