@@ -7,7 +7,6 @@ $(function () {
         log.debug('Starting application');
         window.ove = new OVE(Constants.APP_NAME);
         log.debug('Completed loading OVE');
-        window.ove.context.eventHandlers = {};
         window.ove.context.isInitialized = false;
         beginInitialization();
     });
@@ -18,7 +17,7 @@ updateURL = function () {
         log.debug('Creating content iFrame');
         const pathname = new URL(window.location.href).pathname;
         $('<iframe>', {
-            name: pathname.substring(1, pathname.length - '.html'.length),
+            name: pathname.substring(1, pathname.length - '.html'.length) + '-' + OVE.Utils.getSectionId(),
             class: Constants.HTML_FRAME.substring(1),
             allowtransparency: true,
             frameborder: 0,
