@@ -8,8 +8,7 @@
       "script": "npm",
       "args": "run start",
       "env": {
-          "PORT": "8081",
-          "OVE_HOST": "localhost:8080"
+          "PORT": "8081"
       }
     },
     {
@@ -20,8 +19,7 @@
       "script": "npm",
       "args": "run start",
       "env": {
-          "PORT": "8082",
-          "OVE_HOST": "localhost:8080"
+          "PORT": "8082"
       }
     },
     {
@@ -32,8 +30,7 @@
       "script": "npm",
       "args": "run start",
       "env": {
-          "PORT": "8083",
-          "OVE_HOST": "localhost:8080"
+          "PORT": "8083"
       }
     },
     {
@@ -44,8 +41,7 @@
       "script": "npm",
       "args": "run start",
       "env": {
-          "PORT": "8084",
-          "OVE_HOST": "localhost:8080"
+          "PORT": "8084"
       }
     },
     {
@@ -56,8 +52,7 @@
       "script": "npm",
       "args": "run start",
       "env": {
-          "PORT": "8085",
-          "OVE_HOST": "localhost:8080"
+          "PORT": "8085"
       }
     },
     {
@@ -68,8 +63,7 @@
       "script": "npm",
       "args": "run start",
       "env": {
-          "PORT": "8086",
-          "OVE_HOST": "localhost:8080"
+          "PORT": "8086"
       }
     },
     {
@@ -80,8 +74,7 @@
       "script": "npm",
       "args": "run start",
       "env": {
-          "PORT": "8087",
-          "OVE_HOST": "localhost:8080"
+          "PORT": "8087"
       }
     },
     {
@@ -92,8 +85,7 @@
       "script": "npm",
       "args": "run start",
       "env": {
-          "PORT": "8088",
-          "OVE_HOST": "localhost:8080"
+          "PORT": "8088"
       }
     },
     {
@@ -104,9 +96,7 @@
       "script": "npm",
       "args": "run start",
       "env": {
-          "PORT": "8089",
-          "OVE_HOST": "localhost:8080",
-          "TUORIS_HOST": "localhost:7080"
+          "PORT": "8089"
       }
     }
   ]
