@@ -30,6 +30,13 @@ updateMap = function () {
     // If the map has already been initialized what changes is the center and/or the
     // resolution.
     if (!context.isInitialized) {
+        const scripts = window.ove.state.current;
+        if (scripts && scripts.length !== 0) {
+            const first = $('script:first');
+            scripts.forEach(function (e) {
+                $('<script>', { src: e }).insertBefore(first);
+            });
+        }
         initMap({
             center: center,
             resolution: +(p.resolution),
