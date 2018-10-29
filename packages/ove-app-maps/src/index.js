@@ -7,7 +7,16 @@ const server = require('http').createServer(app);
 let layers = [];
 // The map layers can be provided as an embedded JSON data structure or as a URL pointing
 // to a location at which it is stored externally.
-if (typeof config.layers === 'string') {
+if (process.env.OVE_MAPS_LAYERS) {
+    log.info('Loading map layers from environment variable:', process.env.OVE_MAPS_LAYERS);
+    request(process.env.OVE_MAPS_LAYERS, { json: true }, function (err, _res, body) {
+        if (err) {
+            log.error('Failed to load map layers:', err);
+        } else {
+            layers = body;
+        }
+    });
+} else if (typeof config.layers === 'string') {
     log.info('Loading map layers from URL:', config.layers);
     request(config.layers, { json: true }, function (err, _res, body) {
         if (err) {
