@@ -1,7 +1,7 @@
 version: '3'
 services:
-  ove-apps-latest:
-    image: ove/ove-apps:latest
+  ove-apps:
+    image: ovehub/ove-apps:${SERVICE_VERSION}
     build: .
     ports:
     - "8081:8081"
