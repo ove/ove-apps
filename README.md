@@ -60,11 +60,16 @@ It is recommended to use OVE with Google Chrome, as this is the web browser used
 
 ## Docker
 
-Alternatively, you can use docker:
+Alternatively, you can use docker to build this image:
 
 ```sh
-docker build -t ove-apps -f Dockerfile .
-docker run -d -p 8081-8090:8081-8090 --name ove-apps ove-apps
+./build.sh
+```
+
+In order to run the image, you can customize the docker-compose file or run the default configuration:
+
+```sh
+SERVICE_VERSION="latest" docker-compose up -d
 ```
 
 The apps are now running in the port range of 8081 to 8090 on localhost.
