@@ -25,9 +25,6 @@ function OVEHTML5VideoPlayer () {
         }, Constants.VIDEO_READY_TIMEOUT);
     };
 
-    // The ready function is similar to the stop function in this case.
-    this.ready = this.stop;
-
     this.play = function (loop) {
         log.debug('Playing video', 'loop:', loop);
         getPlayer().loop = loop;
@@ -51,6 +48,9 @@ function OVEHTML5VideoPlayer () {
         this.pause();
         this.seekTo(Constants.STARTING_TIME);
     };
+
+    // The ready function is similar to the stop function in this case.
+    this.ready = this.stop;
 
     this.isVideoLoaded = function () {
         return getPlayer() && getPlayer().duration > 0;

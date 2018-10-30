@@ -28,12 +28,12 @@ initControl = function (data) {
             // is used to determine the option.
             resolution: +(data.resolution) *
                 (data.scaled ? Math.sqrt(l.section.w * l.section.h /
-                    (parseInt($('.outer').css('width')) * parseInt($('.outer').css('height')))) : 1.0),
-            zoom: parseInt(data.zoom),
+                    (parseInt($('.outer').css('width'), 10) * parseInt($('.outer').css('height'), 10))) : 1.0),
+            zoom: parseInt(data.zoom, 10),
             enableRotation: false
         });
         // We force the setting of the zoom.
-        const zoom = parseInt(data.zoom);
+        const zoom = parseInt(data.zoom, 10);
         log.debug('Setting zoom to:', zoom);
         context.map.getView().setZoom(zoom);
         uploadMapPosition();

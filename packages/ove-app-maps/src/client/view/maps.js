@@ -33,7 +33,7 @@ updateMap = function () {
         initMap({
             center: center,
             resolution: +(p.resolution),
-            zoom: parseInt(p.zoom),
+            zoom: parseInt(p.zoom, 10),
             enableRotation: false });
         context.isInitialized = true;
     }

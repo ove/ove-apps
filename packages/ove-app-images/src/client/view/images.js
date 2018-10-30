@@ -46,8 +46,13 @@ setPosition = function () {
         context.osd.viewport.panTo(
             new OpenSeadragon.Point(center[0], center[1]), true).zoomTo(v.zoom * l.section.w / l.w);
         if (!context.osd.isVisible()) {
-            log.debug('Making OpenSeadragon visible');
-            context.osd.setVisible(true);
+            setTimeout(function () {
+                log.debug('Making OpenSeadragon visible');
+                context.osd.setVisible(true);
+            // Wait sufficiently long enough for the positions to be broadcast and then
+            // make the image visible. This will minimise the possibility of seeing several
+            // smaller-sized replicas of the image during the launch.
+            }, Constants.OSD_POSITION_UPDATE_FREQUENCY * 3);
         }
     }
 };

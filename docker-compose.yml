@@ -1,0 +1,13 @@
+version: '3'
+services:
+  ove-apps:
+    image: ovehub/ove-apps:${SERVICE_VERSION}
+    build: .
+    ports:
+    - "8081-8089:8081-8089"
+    environment:
+      # this is not going to work because localhost is reserved for the local docker network
+      # in order to make this work you should either replace localhost with the hostname
+      # or place the ove-core in the same docker compose file as ove-apps
+      OVE_HOST: "localhost:8080"
+      TUORIS_HOST: "localhost:7080"

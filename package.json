@@ -2,17 +2,28 @@
   "name": "ove",
   "private": true,
   "license": "MIT",
+   "scripts": {
+    "install": "lerna bootstrap --hoist",
+    "install:prod": "lerna bootstrap --hoist -- --production --no-optional",
+    "clean": "lerna run clean",
+    "build": "lerna run build",
+    "build:clean": "lerna run clean && lerna run build",
+    "test": "lerna run test",
+    "start": "OVE_HOST='localhost:8080' TUORIS_HOST='localhost:7080' pm2 start pm2.json",
+    "start:windows": "OVE_HOST='localhost:8080' TUORIS_HOST='localhost:7080' pm2 start pm2-windows.json",
+    "start:dev": "OVE_HOST='localhost:8080' TUORIS_HOST='localhost:7080' lerna run start:dev"
+  },
   "devDependencies": {
     "babel-cli": "6.26.0",
-    "eslint": "5.6.1",
+    "eslint": "5.7.0",
     "eslint-config-standard": "12.0.0",
     "eslint-plugin-import": "2.14.0",
     "eslint-plugin-node": "7.0.1",
     "eslint-plugin-promise": "4.0.1",
     "eslint-plugin-standard": "4.0.0",
-    "remark": "9.0.0",
+    "remark": "10.0.0",
     "remark-preset-lint-recommended": "3.0.2",
-    "lerna": "3.4.2",
+    "lerna": "3.4.3",
     "rimraf": "2.6.2"
   }
 }
