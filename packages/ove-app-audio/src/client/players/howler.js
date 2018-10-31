@@ -13,11 +13,13 @@ function OVEHowler () {
 
     this.load = function (config) {
         log.debug('Loading audio at URL:', config.url);
-        // todo set up volume from state
-        // todo set up xyz positionality
+        
         this.player = new Howl({
             src: [config.url]
         });
+        if (typeof config.volume !== 'undefined') {
+            this.setVolume(parseFloat(config.volume));
+        }
     };
 
     this.ready = function () {
@@ -50,24 +52,38 @@ function OVEHowler () {
 
     this.setVolume = function (volume) {
         log.debug('setting volume to');
-        this.player.volume(volume);
+        this.player.volume(parseFloat(volume));
     };
 
     this.volUp = function () {
-        log.debug('increasing volume');
-        let newVol = this.player.volume * Constants.VOLUMEUP_MULTIPLIER;
-        this.player.volume(newVol > 1 ? 1 : newVol);
+        let newVol = this.player.volume() * Constants.VOLUMEUP_MULTIPLIER;
+        newVol = newVol > 1 ? 1 : newVol;
+        log.debug('increasing volume to '+newVol);
+        this.player.volume(newVol);
     };
 
     this.volDown = function () {
-        log.debug('decreasing volume');
-        let newVol = this.player.volume * Constants.VOLUMEDOWN_MULTIPLIER;
-        this.player.volume(newVol < 0 ? 0 : newVol);
+        let newVol = this.player.volume() * Constants.VOLUMEDOWN_MULTIPLIER;
+        newVol = newVol < 0 ? 0 : newVol;
+        log.debug('decreasing volume to '+newVol);
+        this.player.volume(newVol);
     };
 
     this.setPosition = function (x, y, z) {
+        let sectionWidth = window.ove.layout.section.w;
+        let sectionHeight = window.ove.layout.section.h;
+        log.debug("Section Width "+sectionWidth+" Height "+sectionHeight);
+        let layoutX = window.ove.layout.x;
+        let layoutY = window.ove.layout.y;
+        log.debug("Layout X "+layoutX+" Y "+layoutY);
+        let layoutW = window.ove.layout.w;
+        let layoutH = window.ove.layout.h;
+        log.debug("Layout W "+layoutW+" H "+layoutH);
+        let frameW = window.innerWidth;
+        let frameH = window.innerHeight;
+        log.debug("frame W "+frameW+" H "+frameH);
         log.debug('setting audio position to x:', x, ' y:', y, ' z:', z);
-        this.player.stereo(x);
+        this.player.pos(parseFloat(x), parseFloat(y), parseFloat(z));
     };
 
     this.stop = function () {
