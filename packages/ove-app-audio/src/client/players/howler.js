@@ -1,5 +1,6 @@
 // requires howler
 // API doc @ https://github.com/goldfire/howler.js/
+// class used in common/audio.js
 function OVEHowler () {
     const log = OVE.Utils.Logger('Howler');
 
@@ -13,7 +14,8 @@ function OVEHowler () {
 
     this.load = function (config) {
         log.debug('Loading audio at URL:', config.url);
-        
+
+        // Howl is imported in the html page
         this.player = new Howl({
             src: [config.url]
         });
@@ -58,30 +60,18 @@ function OVEHowler () {
     this.volUp = function () {
         let newVol = this.player.volume() * Constants.VOLUMEUP_MULTIPLIER;
         newVol = newVol > 1 ? 1 : newVol;
-        log.debug('increasing volume to '+newVol);
+        log.debug('increasing volume to ' + newVol);
         this.player.volume(newVol);
     };
 
     this.volDown = function () {
         let newVol = this.player.volume() * Constants.VOLUMEDOWN_MULTIPLIER;
         newVol = newVol < 0 ? 0 : newVol;
-        log.debug('decreasing volume to '+newVol);
+        log.debug('decreasing volume to ' + newVol);
         this.player.volume(newVol);
     };
 
     this.setPosition = function (x, y, z) {
-        let sectionWidth = window.ove.layout.section.w;
-        let sectionHeight = window.ove.layout.section.h;
-        log.debug("Section Width "+sectionWidth+" Height "+sectionHeight);
-        let layoutX = window.ove.layout.x;
-        let layoutY = window.ove.layout.y;
-        log.debug("Layout X "+layoutX+" Y "+layoutY);
-        let layoutW = window.ove.layout.w;
-        let layoutH = window.ove.layout.h;
-        log.debug("Layout W "+layoutW+" H "+layoutH);
-        let frameW = window.innerWidth;
-        let frameH = window.innerHeight;
-        log.debug("frame W "+frameW+" H "+frameH);
         log.debug('setting audio position to x:', x, ' y:', y, ' z:', z);
         this.player.pos(parseFloat(x), parseFloat(y), parseFloat(z));
     };
@@ -105,6 +95,6 @@ function OVEHowler () {
     };
 
     this.getLoadedDuration = function () {
-        return getPlayer().duration * this.getLoadedPercentage() / 100;
+        return this.player.durationSeconds * this.getLoadedPercentage() / 100;
     };
 }
