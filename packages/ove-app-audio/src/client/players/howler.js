@@ -1,7 +1,7 @@
 // requires howler
 // API doc @ https://github.com/goldfire/howler.js/
 // class used in common/audio.js
-function OVEHowler () {
+function OVEHowlerPlayer () {
     const log = OVE.Utils.Logger('Howler');
 
     this.player = null;

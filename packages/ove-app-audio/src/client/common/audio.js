@@ -118,7 +118,7 @@ handleStateChange = function (state) {
 
         if (!context.isInitialized) {
             // load a player
-            context.player = new window.OVEHowler();
+            context.player = new window.OVEHowlerPlayer();
 
             context.player.initialize().then(function () {
                 context.isInitialized = true;
