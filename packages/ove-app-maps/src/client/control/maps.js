@@ -26,6 +26,7 @@ initControl = function (data) {
             data.scripts.forEach(function (e) {
                 $('<script>', { src: e }).insertBefore(first);
             });
+            window.ove.state.current.scripts = data.scripts;
         }
         initMap({
             center: [+(data.center[0]), +(data.center[1])],
