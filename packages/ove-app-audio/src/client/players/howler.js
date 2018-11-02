@@ -29,7 +29,7 @@ function OVEHowlerPlayer () {
     };
 
     this.play = function (loop, volume) {
-        log.debug('Playing audio', 'loop:', loop, 'volume:', volume);
+        log.debug('Playing audio ', ' loop:', loop, ' volume:', volume);
         this.player.loop(loop);
         if (volume !== undefined) {
             this.player.volume(volume);
@@ -53,19 +53,19 @@ function OVEHowlerPlayer () {
     };
 
     this.setVolume = function (volume) {
-        log.debug('setting volume to');
+        log.debug('setting volume to ' + volume);
         this.player.volume(parseFloat(volume));
     };
 
     this.volUp = function () {
-        let newVol = this.player.volume() * Constants.VOLUMEUP_MULTIPLIER;
+        let newVol = this.player.volume() * Constants.VOLUME_MULTIPLIER;
         newVol = newVol > 1 ? 1 : newVol;
         log.debug('increasing volume to ' + newVol);
         this.player.volume(newVol);
     };
 
     this.volDown = function () {
-        let newVol = this.player.volume() * Constants.VOLUMEDOWN_MULTIPLIER;
+        let newVol = this.player.volume() * (1.0 / Constants.VOLUME_MULTIPLIER);
         newVol = newVol < 0 ? 0 : newVol;
         log.debug('decreasing volume to ' + newVol);
         this.player.volume(newVol);

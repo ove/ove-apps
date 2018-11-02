@@ -92,8 +92,7 @@ app.get('/operation/:name(' + operationsList + ')', function (req, res) {
         if (name === Constants.Operation.SEEK) {
             // We assume that the seek time is properly set instead of enforcing any strict type checks.
             message.operation.time = req.query.time;
-        }
-        if (name === Constants.Operation.PLAY) {
+        } else if (name === Constants.Operation.PLAY) {
             // Checks whether the loop parameter is defined and it equals to true.
             // The typeof check is better than an equals check since undefined can
             // be overridden.
@@ -103,11 +102,9 @@ app.get('/operation/:name(' + operationsList + ')', function (req, res) {
             if (typeof req.query.volume !== 'undefined') {
                 message.operation.volume = req.query.volume;
             }
-        }
-        if (name === Constants.Operation.SETVOLUME) {
+        } else if (name === Constants.Operation.SET_VOLUME) {
             message.operation.volume = req.query.volume;
-        }
-        if (name === Constants.Operation.SETPOSITION) {
+        } else if (name === Constants.Operation.SET_POSITION) {
             message.operation.x = req.query.x;
             message.operation.y = req.query.y;
             message.operation.z = req.query.z;

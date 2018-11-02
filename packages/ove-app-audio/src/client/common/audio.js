@@ -56,19 +56,19 @@ initCommon = function () {
                         log.info('unmuting audio playback');
                         context.player.unmute();
                         break;
-                    case Constants.Operation.SETVOLUME:
+                    case Constants.Operation.SET_VOLUME:
                         log.info('Setting volume  ' + op.volume);
                         context.player.setVolume(op.volume);
                         break;
-                    case Constants.Operation.SETPOSITION:
+                    case Constants.Operation.SET_POSITION:
                         log.info('Setting audio position x:' + op.x + ' y:' + op.y + ' z:' + op.z);
                         context.player.setPosition(op.x, op.y, op.z);
                         break;
-                    case Constants.Operation.VOLUMEUP:
+                    case Constants.Operation.VOLUME_UP:
                         log.info('increasing volume');
                         context.player.volUp();
                         break;
-                    case Constants.Operation.VOLUMEDOWN:
+                    case Constants.Operation.VOLUME_DOWN:
                         log.info('decreasing volume');
                         context.player.volDown();
                         break;

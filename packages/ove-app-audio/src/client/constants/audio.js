@@ -13,8 +13,7 @@ const Constants = {
     /**************************************************************
      Audio Player
      **************************************************************/
-    VOLUMEUP_MULTIPLIER: 1.2,
-    VOLUMEDOWN_MULTIPLIER: 0.8,
+    VOLUME_MULTIPLIER: 1.25,
     AUDIO_READY_TIMEOUT: 500, // Unit: milliseconds
     STARTING_TIME: 0, // Unit: seconds
     STANDARD_RATE: 1,
@@ -47,10 +46,10 @@ Constants.Operation = {
     BUFFER_STATUS: 'bufferStatus',
     MUTE: 'mute',
     UNMUTE: 'unmute',
-    SETVOLUME: 'setVolume',
-    SETPOSITION: 'setPosition',
-    VOLUMEUP: 'volUp',
-    VOLUMEDOWN: 'volDown'
+    SET_VOLUME: 'setVolume',
+    SET_POSITION: 'setPosition',
+    VOLUME_UP: 'volUp',
+    VOLUME_DOWN: 'volDown'
 };
 
 Constants.BufferStatus = {
