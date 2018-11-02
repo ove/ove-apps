@@ -33,7 +33,7 @@ initCommon = function () {
             setTimeout(function () {
                 switch (op.name) {
                     case Constants.Operation.PLAY:
-                        log.info('Starting audio playback ' + (op.loop ? 'with' : 'without') + ' loop' + (op.volume === undefined ? 'without' : 'with ' + op.volume) + ' volume ');
+                        log.info('Starting audio playback ' + (op.loop ? 'with' : 'without') + ' loop and ' + (op.volume === undefined ? 'without' : 'with ' + op.volume) + ' volume ');
                         context.player.play(op.loop, op.volume);
                         break;
                     case Constants.Operation.PAUSE:
