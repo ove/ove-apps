@@ -21,6 +21,13 @@ initControl = function (data) {
             log.debug('Setting visible for layer:', e);
             context.layers[e].setVisible(true);
         });
+        if (data.scripts && data.scripts.length !== 0) {
+            const first = $('script:first');
+            data.scripts.forEach(function (e) {
+                $('<script>', { src: e }).insertBefore(first);
+            });
+            window.ove.state.current.scripts = data.scripts;
+        }
         initMap({
             center: [+(data.center[0]), +(data.center[1])],
             // The resolution can be scaled to match the section's dimensions, or it could be
