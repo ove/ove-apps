@@ -6,6 +6,12 @@ const Constants = {
     DEFAULT_STATE_NAME: 'Matrix',
 
     /**************************************************************
+                               Back-end
+    **************************************************************/
+    HTTP_HEADER_CONTENT_TYPE: 'Content-Type',
+    HTTP_CONTENT_TYPE_JS: 'application/javascript',
+
+    /**************************************************************
                                 Common
     **************************************************************/
     HTML_FRAME: '.html-frame',

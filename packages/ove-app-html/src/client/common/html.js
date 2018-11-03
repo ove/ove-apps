@@ -15,7 +15,9 @@ $(function () {
 updateURL = function () {
     if (!window.ove.context.isInitialized) {
         log.debug('Creating content iFrame');
+        const pathname = new URL(window.location.href).pathname;
         $('<iframe>', {
+            name: pathname.substring(1, pathname.length - '.html'.length) + '-' + OVE.Utils.getSectionId(),
             class: Constants.HTML_FRAME.substring(1),
             allowtransparency: true,
             frameborder: 0,
