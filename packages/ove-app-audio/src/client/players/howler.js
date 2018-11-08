@@ -91,7 +91,7 @@ function OVEHowlerPlayer () {
     };
 
     this.getLoadedPercentage = function () {
-        return this.isAudioLoaded ? 100 : 0;
+        return this.isAudioLoaded() ? 100 : 0;
     };
 
     this.getLoadedDuration = function () {
