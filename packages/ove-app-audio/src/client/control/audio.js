@@ -13,7 +13,8 @@ initControl = function (data) {
     loadURL();
 };
 
-refresh = function () { }; // View-only operation
+refresh = function () {
+}; // View-only operation
 
 requestRegistration = function () {
     // Broadcast a registration request along with a state update such that viewers
@@ -23,7 +24,8 @@ requestRegistration = function () {
     OVE.Utils.broadcastState({ state: window.ove.state.current });
 };
 
-doRegistration = function () { }; // View-only operation
+doRegistration = function () {
+}; // View-only operation
 
 beginInitialization = function () {
     log.debug('Starting controller initialization');

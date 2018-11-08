@@ -1,6 +1,8 @@
-const { Constants } = require('./client/constants/audio');
 const HttpStatus = require('http-status-codes');
 const path = require('path');
+
+const { Constants } = require('./client/constants/audio');
+
 const { express, app, log, nodeModules, Utils } = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const server = require('http').createServer(app);
 
@@ -9,8 +11,8 @@ for (const mod of ['howler']) {
     app.use('/', express.static(path.join(nodeModules, mod, 'dist')));
 }
 
-var ws;
-var bufferStatus = [];
+let ws;
+let bufferStatus = [];
 setTimeout(function () {
     log.debug('Establishing WebSocket connection with:', 'ws://' + process.env.OVE_HOST);
     ws = new (require('ws'))('ws://' + process.env.OVE_HOST);
@@ -18,8 +20,8 @@ setTimeout(function () {
         let m = JSON.parse(msg);
         if (m.appId === Constants.APP_NAME && m.message.bufferStatus) {
             // The handling of the buffer status updates operates similarly to the video app,
-            // however the underlying library only provides a boolean buffer status so this app will 
-            // work with a 100% buffered model. 
+            // however the underlying library only provides a boolean buffer status so this app will
+            // work with a 100% buffered model.
             //   1. One or more peers in a group receives a new audio URL
             //   2. They then send a request for registration to all peers belonging to the same
             //      section.
@@ -79,32 +81,33 @@ app.get('/operation/:name(' + operationsList + ')', function (req, res) {
         }
         res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JSON).send(
             JSON.stringify({ status: (isComplete ? Constants.BufferStatus.COMPLETE : Constants.BufferStatus.BUFFERING) }));
-
     } else {
         // other commands receive additional query parameters.
-        let message = { operation: { name: name, executionTime: (new Date().getTime() + Constants.OPERATION_SYNC_DELAY) } };
+        let message = {
+            operation: {
+                name: name,
+                executionTime: (new Date().getTime() + Constants.OPERATION_SYNC_DELAY)
+            }
+        };
         if (name === Constants.Operation.SEEK) {
             // We assume that the seek time is properly set instead of enforcing any strict type checks.
             message.operation.time = req.query.time;
-        } 
-        if (name === Constants.Operation.PLAY) {
+        } else if (name === Constants.Operation.PLAY) {
             // Checks whether the loop parameter is defined and it equals to true.
             // The typeof check is better than an equals check since undefined can
             // be overridden.
             message.operation.loop = (typeof req.query.loop !== 'undefined' &&
                 JSON.parse(String(req.query.loop).toLowerCase()));
-            // you may set a volume 
+            // you may set a volume
             if (typeof req.query.volume !== 'undefined') {
                 message.operation.volume = req.query.volume;
             }
-        }
-        if (name === Constants.Operation.SETVOLUME) {
+        } else if (name === Constants.Operation.SET_VOLUME) {
             message.operation.volume = req.query.volume;
-        }
-        if (name === Constants.Operation.SETPOSITION) {
-            message.operation.x= req.query.x;
-            message.operation.y= req.query.y;
-            message.operation.z= req.query.z;
+        } else if (name === Constants.Operation.SET_POSITION) {
+            message.operation.x = req.query.x;
+            message.operation.y = req.query.y;
+            message.operation.z = req.query.z;
         }
         // If the section id is not set the message will be available to all the sections.
         if (sectionId) {

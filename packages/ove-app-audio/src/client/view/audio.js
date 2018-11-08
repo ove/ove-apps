@@ -28,7 +28,8 @@ initView = function () {
                     context.bufferStatus.self = status;
                 }
             }
-        } catch (e) { } // Random player errors
+        } catch (e) {
+        } // Random player errors
     };
     setInterval(broadcastBufferStatus, Constants.BUFFER_STATUS_BROADCAST_FREQUENCY);
 };
@@ -80,7 +81,7 @@ beginInitialization = function () {
         $(Constants.CONTENT_DIV).css({
             zoom: 1,
             transformOrigin: 100 * l.x / (l.section.w - l.section.w / context.scale) + '% ' +
-                             100 * l.y / (l.section.h - l.section.h / context.scale) + '%',
+                100 * l.y / (l.section.h - l.section.h / context.scale) + '%',
             transform: 'scale(' + context.scale + ')',
             width: width,
             height: height

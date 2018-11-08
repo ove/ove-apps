@@ -33,9 +33,8 @@ initCommon = function () {
             setTimeout(function () {
                 switch (op.name) {
                     case Constants.Operation.PLAY:
-                        log.info('Starting audio playback ' + (op.loop ? 'with' : 'without') + ' loop'
-                                                            + (op.volume === undefined ? 'without' : 'with '+op.volume) + ' volume ');
-                        context.player.play(op.loop,op.volume);
+                        log.info('Starting audio playback ' + (op.loop ? 'with' : 'without') + ' loop and ' + (op.volume === undefined ? 'without' : 'with ' + op.volume) + ' volume ');
+                        context.player.play(op.loop, op.volume);
                         break;
                     case Constants.Operation.PAUSE:
                         log.info('Pausing audio playback');
@@ -57,26 +56,26 @@ initCommon = function () {
                         log.info('unmuting audio playback');
                         context.player.unmute();
                         break;
-                    case Constants.Operation.SETVOLUME:
+                    case Constants.Operation.SET_VOLUME:
                         log.info('Setting volume  ' + op.volume);
                         context.player.setVolume(op.volume);
                         break;
-                    case Constants.Operation.SETPOSITION:
-                        log.info('Setting audio position x:' + op.x+ ' y:'+op.y+ ' z:'+op.z);
-                        context.player.setPosition(op.x,op.y,op.z);
+                    case Constants.Operation.SET_POSITION:
+                        log.info('Setting audio position x:' + op.x + ' y:' + op.y + ' z:' + op.z);
+                        context.player.setPosition(op.x, op.y, op.z);
                         break;
-                    case Constants.Operation.VOLUMEUP:
+                    case Constants.Operation.VOLUME_UP:
                         log.info('increasing volume');
                         context.player.volUp();
                         break;
-                    case Constants.Operation.VOLUMEDOWN:
+                    case Constants.Operation.VOLUME_DOWN:
                         log.info('decreasing volume');
                         context.player.volDown();
                         break;
                     default:
                         log.warn('Ignoring unknown operation:', op.name);
                 }
-            // Run operation precisely at the same time
+                // Run operation precisely at the same time
             }, op.executionTime - new Date().getTime());
         }
     });
@@ -119,7 +118,7 @@ handleStateChange = function (state) {
 
         if (!context.isInitialized) {
             // load a player
-            context.player = new window.OVEHowler();
+            context.player = new window.OVEHowlerPlayer();
 
             context.player.initialize().then(function () {
                 context.isInitialized = true;
