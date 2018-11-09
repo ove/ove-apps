@@ -41,7 +41,7 @@ Build and start runtime:
 
 * `lerna run clean`
 * `lerna run build`
-* `pm2 start pm2.json`
+* `OVE_HOST="localhost:8080" TUORIS_HOST="localhost:7080" pm2 start pm2.json`
 
 ### Run
 
