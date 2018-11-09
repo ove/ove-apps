@@ -76,4 +76,4 @@ The apps are now running in the port range of 8081 to 8090 on localhost.
 
 ### Development
 
-If you are a developer who has made changes to your local copy of OVE apps, and want to quickly rebuild it with the **build.sh** script and run the app with the **docker-compose** file. The docker-compose.yml file can be customized to reflect local changes.
+If you are a developer who has made changes to your local copy of OVE apps, you can quickly rebuild it with the **build.sh** script and then run the app with the **docker-compose** file. The **docker-compose.yml** file can be customized to reflect local changes.
