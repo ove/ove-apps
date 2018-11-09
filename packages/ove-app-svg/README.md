@@ -1,0 +1,51 @@
+# SVG App
+
+This app supports visualisation of SVG using the OVE framework. It is based on [Tuoris](https://github.com/fvictor/tuoris), a middleware for distributed SVG visualisation.
+
+The SVG app depends on an additional environment variable named `TUORIS_HOST`, that points to the URL at which the Tuoris instance runs.
+
+## Application State
+
+The state of this app has a format similar to what is provided below:
+
+```json
+{
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6c/Trajans-Column-lower-animated.svg"
+}
+```
+
+## Loading the App
+
+An SVG can be loaded using the OVE APIs:
+
+Windows:
+
+```sh
+curl --header "Content-Type: application/json" --request POST --data "{\"h\": 500, \"app\": {\"url\": \"http://OVE_APP_SVG_HOST:PORT\", \"states\": {\"load\": {\"url\": \"https://upload.wikimedia.org/wikipedia/commons/6/6c/Trajans-Column-lower-animated.svg\"}}}, \"space\": \"LocalNine\", \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
+```
+
+Linux/Mac:
+
+```sh
+curl --header "Content-Type: application/json" --request POST --data '{"h": 500, "app": {"url": "http://OVE_APP_SVG_HOST:PORT","states": {"load": {"url": "https://upload.wikimedia.org/wikipedia/commons/6/6c/Trajans-Column-lower-animated.svg"}}}, "space": "LocalNine", "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
+```
+
+The SVG app has a transparent background. If required, a background colour of choice can be set using the OVE APIs:
+
+Windows:
+
+```sh
+curl --header "Content-Type: application/json" --request POST --data "{\"h\": 500, \"app\": {\"url\": \"http://OVE_APP_HTML_HOST:PORT\", \"states\": {\"load\": {\"url\": \"/data/background/index.html?background=COLOUR\"}}}, \"space\": \"LocalNine\", \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
+```
+
+Linux/Mac:
+
+```sh
+curl --header "Content-Type: application/json" --request POST --data '{"h": 500, "app": {"url": "http://OVE_APP_HTML_HOST:PORT","states": {"load": {"url": "/data/background/index.html?background=COLOUR"}}}, "space": "LocalNine", "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
+```
+
+The background colour can be specified either as [a keyword or hexadecimal value](https://developer.mozilla.org/en-US/docs/Web/CSS/background-color) such as `Black` or `#f0f0f0`.
+
+## Controlling the App
+
+Once the app is loaded, it can be controlled via the URL `http://OVE_APP_SVG_HOST:PORT/control.html?oveSectionId=0`.
