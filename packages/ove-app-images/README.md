@@ -1,6 +1,6 @@
 # Images App
 
-This app supports visualisation of images using the OVE framework. It is based on [OpenSeadragon](https://openseadragon.github.io/) and supports high resolution zoomable images. These images can be of any format OpenSeadragon supports such as [DZI](https://openseadragon.github.io/examples/tilesource-dzi/) or [Simple Image](https://openseadragon.github.io/examples/tilesource-image/).
+This app supports the display of images using the OVE framework. It is based on [OpenSeadragon](https://openseadragon.github.io/) and supports high resolution zoomable images. These images can be of any format OpenSeadragon supports such as [DZI](https://openseadragon.github.io/examples/tilesource-dzi/) or [Simple Image](https://openseadragon.github.io/examples/tilesource-image/).
 
 ## Application State
 
@@ -20,16 +20,16 @@ The app also supports alternative types of content using other types of [tile so
 
 An image can be loaded using the OVE APIs:
 
-Windows:
-
-```sh
-curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_IMAGES_HOST:PORT\", \"states\": {\"load\": {\"tileSources\": \"https://openseadragon.github.io/example-images/highsmith/highsmith.dzi\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
-```
-
 Linux/Mac:
 
 ```sh
 curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_IMAGES_HOST:PORT","states": {"load": {"tileSources": "https://openseadragon.github.io/example-images/highsmith/highsmith.dzi"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
+```
+
+Windows:
+
+```sh
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_IMAGES_HOST:PORT\", \"states\": {\"load\": {\"tileSources\": \"https://openseadragon.github.io/example-images/highsmith/highsmith.dzi\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 The images app has a transparent background. If required, a background colour of choice can be set using the [Background Utility](../ove-app-html/docs/UTIL_BACKGROUND.md) provided by OVE.

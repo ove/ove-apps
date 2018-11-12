@@ -18,7 +18,7 @@ The state of this app has a format similar to:
 }
 ```
 
-The `center`, `resolution` and `zoom` parameters are mandatory. Optionally, there can be one or more enabled layers and one or more scripts to load custom overlays as seen above.
+The `center`, `resolution` and `zoom` parameters are mandatory. Optionally, there can be one or more enabled layers and one or more scripts to load custom overlays as seen above. The `enabledLayers` parameter accepts a list of integer values. These integer values correspond to the order (starting from 0) in which the layers were defined on the *Map Layers* configuration. The `scripts` parameter accepts a list of URLs of JavaScript files.
 
 ## Designing Custom Overlays
 
@@ -79,16 +79,16 @@ let transformURL;
 
 A map can be loaded using the OVE APIs:
 
-Windows:
-
-```sh
-curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_MAPS_HOST:PORT\", \"states\": {\"load\": {\"center\": [\"-11137.70850550061\", \"6710544.04980525\"], \"resolution\": \"77\", \"zoom\": \"12\", \"enabledLayers\":[\"23\"], \"scripts\":[\"http://my.domain/customLayer.js\"]}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
-```
-
 Linux/Mac:
 
 ```sh
 curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_MAPS_HOST:PORT","states": {"load": {"center": ["-11137.70850550061", "6710544.04980525"], "resolution": "77", "zoom": "12", "enabledLayers":["23"], "scripts":["http://my.domain/customLayer.js"]}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
+```
+
+Windows:
+
+```sh
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_MAPS_HOST:PORT\", \"states\": {\"load\": {\"center\": [\"-11137.70850550061\", \"6710544.04980525\"], \"resolution\": \"77\", \"zoom\": \"12\", \"enabledLayers\":[\"23\"], \"scripts\":[\"http://my.domain/customLayer.js\"]}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 ## Controlling the App

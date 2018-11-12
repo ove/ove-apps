@@ -18,16 +18,16 @@ The state of this app has a format similar to:
 
 An SVG can be loaded using the OVE APIs:
 
-Windows:
-
-```sh
-curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_SVG_HOST:PORT\", \"states\": {\"load\": {\"url\": \"https://upload.wikimedia.org/wikipedia/commons/6/6c/Trajans-Column-lower-animated.svg\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
-```
-
 Linux/Mac:
 
 ```sh
 curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_SVG_HOST:PORT","states": {"load": {"url": "https://upload.wikimedia.org/wikipedia/commons/6/6c/Trajans-Column-lower-animated.svg"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
+```
+
+Windows:
+
+```sh
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_SVG_HOST:PORT\", \"states\": {\"load\": {\"url\": \"https://upload.wikimedia.org/wikipedia/commons/6/6c/Trajans-Column-lower-animated.svg\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 The SVG app has a transparent background. If required, a background colour of choice can be set using the [Background Utility](../ove-app-html/docs/UTIL_BACKGROUND.md) provided by OVE.

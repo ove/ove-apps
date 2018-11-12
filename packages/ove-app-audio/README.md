@@ -1,6 +1,6 @@
 # Audio App
 
-This app supports the playing of audio files within the OVE Framework. The audio app is powered by the [Howler.js](https://howlerjs.com/) audio library, thus it supports Web Audio API by default and falls back to HTML5 Audio if required. This app is intended to provide a distributed layer on top of the Howler Library.  
+This app supports the playing of audio files within the OVE Framework. It is powered by the Howler.js audio library, so supports the Web Audio API by default and falls back to HTML5 Audio if required. This app is intended to provide a distributed layer on top of the Howler Library.
 
 The Audio App does not display any visible content and will, by default, play audio on all browsers a section covers. You may select where within the section the audio plays by using the setPosition method (implementation pending [blocker](https://github.com/ove/ove-apps/issues/33)). Currently supported Audio files include `webm`, `mp3` and `sound.wav`.
 
@@ -18,16 +18,16 @@ The state of this app has a format similar to:
 
 An audio file can be loaded using the OVE APIs:
 
-Windows:
-
-```sh
-curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_AUDIO_HOST:PORT\", \"states\": {\"load\": {\"url\": \"https://upload.wikimedia.org/wikipedia/commons/b/bd/%22Going_Home%22%2C_performed_by_the_United_States_Air_Force_Band.oga\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
-```
-
 Linux/Mac:
 
 ```sh
 curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_AUDIO_HOST:PORT","states": {"load": {"url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/%22Going_Home%22%2C_performed_by_the_United_States_Air_Force_Band.oga"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
+```
+
+Windows:
+
+```sh
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_AUDIO_HOST:PORT\", \"states\": {\"load\": {\"url\": \"https://upload.wikimedia.org/wikipedia/commons/b/bd/%22Going_Home%22%2C_performed_by_the_United_States_Air_Force_Band.oga\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 ## Controlling the App
