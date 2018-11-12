@@ -93,7 +93,7 @@ curl --header "Content-Type: application/json" --request POST --data '{"app": {"
 
 ## Controlling the App
 
-Once the app is loaded, it can be controlled via the URL `http://OVE_APP_MAPS_HOST:PORT/control.html?oveSectionId=SECTION_ID&layers=23`. The `layers` parameter in the URL is optional and can have more than one value at a time separated by commas. The controller supports panning and zooming of maps.
+The controller of the app can be loaded by accessing the URL `http://OVE_APP_MAPS_HOST:PORT/control.html?oveSectionId=SECTION_ID&layers=23`. The `layers` parameter in the URL is optional and can have more than one value at a time separated by commas. The controller supports panning and zooming of maps.
 
 ## Key considerations when using the App
 

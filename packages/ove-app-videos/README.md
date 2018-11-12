@@ -32,7 +32,7 @@ curl --header "Content-Type: application/json" --request POST --data '{"app": {"
 
 ## Controlling the App
 
-Once the app is loaded, it can be controlled via the URL `http://OVE_APP_VIDEOS_HOST:PORT/control.html?oveSectionId=SECTION_ID`.
+The controller of the app can be loaded by accessing the URL `http://OVE_APP_VIDEOS_HOST:PORT/control.html?oveSectionId=SECTION_ID`.
 
 The app also exposes controls as a part of its [API](http://OVE_APP_VIDEOS_HOST:PORT/api-docs#operation). The API exposes operations such as `play`, `pause`, `stop`, `seekTo` and `bufferStatus`. These operations can be executed on a per-video basis or across all videos.
 

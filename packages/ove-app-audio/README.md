@@ -2,7 +2,7 @@
 
 This app supports the playing of audio files within the OVE Framework. The audio app is powered by the [Howler.js](https://howlerjs.com/) audio library, thus it supports Web Audio API by default and falls back to HTML5 Audio if required. This app is intended to provide a distributed layer on top of the Howler Library.  
 
-The Audio App does not display any visible content and will, by default, play audio on all browsers a section covers. You may select where within the section the audio plays by using the setPosition method (implementation pending [blocker](https://github.com/ove/ove/issues/25 ) ). Currently supported Audio files include `webm`, `mp3` and `sound.wav`.
+The Audio App does not display any visible content and will, by default, play audio on all browsers a section covers. You may select where within the section the audio plays by using the setPosition method (implementation pending [blocker](https://github.com/ove/ove-apps/issues/33)). Currently supported Audio files include `webm`, `mp3` and `sound.wav`.
 
 ## Application State
 
@@ -32,7 +32,7 @@ curl --header "Content-Type: application/json" --request POST --data '{"app": {"
 
 ## Controlling the App
 
-Once the app is loaded, it can be controlled via the URL `http://OVE_APP_AUDIO_HOST:PORT/control.html?oveSectionId=SECTION_ID`.
+The controller of the app can be loaded by accessing the URL `http://OVE_APP_AUDIO_HOST:PORT/control.html?oveSectionId=SECTION_ID`.
 
 The app also exposes controls as a part of its [API](http://OVE_APP_AUDIO_HOST:PORT/api-docs#operation). The API exposes operations such as `play`, `pause`, `stop`, `seekTo` and `bufferStatus` related to playback. Volume may be controlled by operations such as `mute`, `unmute`, `volUp`, `volDown`. These operations can be executed on a per-section basis or across all sections.
 

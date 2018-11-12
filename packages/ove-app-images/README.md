@@ -36,4 +36,4 @@ The images app has a transparent background. If required, a background colour of
 
 ## Controlling the App
 
-Once the app is loaded, it can be controlled via the URL `http://OVE_APP_IMAGES_HOST:PORT/control.html?oveSectionId=0`. The controller supports panning and zooming of images.
+The controller of the app can be loaded by accessing the URL `http://OVE_APP_IMAGES_HOST:PORT/control.html?oveSectionId=0`. The controller supports panning and zooming of images.
