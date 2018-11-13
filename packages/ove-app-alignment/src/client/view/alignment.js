@@ -150,7 +150,7 @@ function createTriangles () {
         const id = OVE.Utils.getSpace();
 
         // Construct list of points at the midpoint of the right edge of each screen
-        // l is a parameter that sets the size of triangle that will be drawn on each edge
+        // l is a property that sets the size of triangle that will be drawn on each edge
         let rightMiddlePoints = clients[id].map(function (d) {
             return { cx: d.x + d.w, cy: d.y + d.h / 2, l: d.h / 2 };
         });

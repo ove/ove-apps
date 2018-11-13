@@ -18,7 +18,7 @@ The state of this app has a format similar to:
 }
 ```
 
-The `spec` field points to either a URL of, or contains an embedded [Vega-Embed specification](https://vega.github.io/vega/docs/#specification).
+The `spec` property points to either a URL of, or contains an embedded [Vega-Embed specification](https://vega.github.io/vega/docs/#specification).
 
 ## Loading the App
 

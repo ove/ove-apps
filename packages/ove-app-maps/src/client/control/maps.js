@@ -31,7 +31,7 @@ initControl = function (data) {
         initMap({
             center: [+(data.center[0]), +(data.center[1])],
             // The resolution can be scaled to match the section's dimensions, or it could be
-            // the original resolution intended for the controller. The data.scaled parameter
+            // the original resolution intended for the controller. The data.scaled property
             // is used to determine the option.
             resolution: +(data.resolution) *
                 (data.scaled ? Math.sqrt(l.section.w * l.section.h /

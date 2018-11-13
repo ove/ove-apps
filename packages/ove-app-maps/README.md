@@ -2,7 +2,7 @@
 
 This app supports visualisation of dynamic maps using the OVE framework. It is based on [OpenLayers](https://openlayers.org/) and supports tiled map layers (from Bing, OSM, etc), vector data described in formats such as [GeoJSON](http://geojson.org/) and custom overlays built using JavaScript libraries such as [D3.js](https://d3js.org/).
 
-The maps app depends on a *Map Layers* configuration that can be provided within the `config.json` file (either embedded or as a URL) or as an environment variable named `OVE_MAPS_LAYERS`, that points to a URL.
+The maps app depends on a [Map Layers configuration](../ove-app-maps/docs/MAP_LAYERS_JSON.md) that can be provided within the `config.json` file (either embedded or as a URL) or as an environment variable named `OVE_MAPS_LAYERS`, that points to a URL.
 
 ## Application State
 
@@ -18,7 +18,7 @@ The state of this app has a format similar to:
 }
 ```
 
-The `center`, `resolution` and `zoom` parameters are mandatory. Optionally, there can be one or more enabled layers and one or more scripts to load custom overlays as seen above. The `enabledLayers` parameter accepts a list of integer values. These integer values correspond to the order (starting from 0) in which the layers were defined on the *Map Layers* configuration. The `scripts` parameter accepts a list of URLs of JavaScript files.
+The `center`, `resolution` and `zoom` properties are mandatory. Optionally, there can be one or more enabled layers and one or more scripts to load custom overlays as seen above. The `enabledLayers` property accepts a list of integer values. These integer values correspond to the order (starting from 0) in which the layers were defined on the [Map Layers configuration](../ove-app-maps/docs/MAP_LAYERS_JSON.md). The `scripts` property accepts a list of URLs of JavaScript files.
 
 ## Designing Custom Overlays
 
@@ -101,4 +101,4 @@ All considerations when using this app are directly related to its reliability a
 
 1. The maps app tends to load many tiles on screens with higher resolutions and tile servers that are slow and remote tend to perform very poorly compared to servers that are much faster and locally hosted.
 2. JavaScript executed to load custom overlays must not introduce any performance bottlenecks or execute code that has a negative impact on the reliability of OVE.
-3. The Map Layers configuration must be available (unless it is embedded in `config.json`) before the server-side of this app is launched using PM2 or Docker.
+3. If the [Map Layers configuration](../ove-app-maps/docs/MAP_LAYERS_JSON.md) is specified as a URL (rather than being directly embedded in the `config.json` file), then this must be available before the server-side of this app is launched using PM2 or Docker.
