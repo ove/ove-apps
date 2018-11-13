@@ -20,7 +20,7 @@ setTimeout(function () {
         let m = JSON.parse(msg);
         if (m.appId === Constants.APP_NAME && m.message.bufferStatus) {
             // The handling of the buffer status updates operates similarly to the video app,
-            // however the underlying library only provides a boolean buffer status so this app will
+            // however the underlying library only provides a Boolean buffer status so this app will
             // work with a 100% buffered model.
             //   1. One or more peers in a group receives a new audio URL
             //   2. They then send a request for registration to all peers belonging to the same

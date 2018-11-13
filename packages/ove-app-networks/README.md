@@ -18,7 +18,7 @@ The state of this app has a format similar to:
 }
 ```
 
-The `jsonURL` field should be replaced with with `gexfURL` field depending on the format in which the dataset is specified. Information on all available `settings` can be found in [Sigma documentation](https://github.com/jacomyal/sigma.js/wiki/Settings). The `renderer` field is optional and defaults to `webgl`.
+The `jsonURL` property should be replaced with with `gexfURL` property depending on the format in which the dataset is specified. Information on all available `settings` can be found in [Sigma documentation](https://github.com/jacomyal/sigma.js/wiki/Settings). The `renderer` property is optional and defaults to `webgl`.
 
 ## Loading the App
 
