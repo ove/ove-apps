@@ -26,7 +26,7 @@ app.get('/operation/:name(' + operationsList + ')', function (req, res) {
     const nodeColor = req.query.color;
     const edgeColor = req.query.edgeColor;
     const nodeName = req.query.node;
-    const nodeLabel = req.query.attribute;
+    const nodeLabel = req.query.property;
 
     let message = { operation: operation };
     // The search operation sets either or both of the node and edge filters. The color

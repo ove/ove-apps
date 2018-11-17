@@ -46,7 +46,7 @@ Constants.Evaluation = {
     DIVIDE: 'div',
     MODULO: 'mod',
 
-    // The ODATA specification requires lower-case function names.
+    // The OData specification requires lower-case function names.
     Function: {
         SUBSTRING: 'substring',
         SUBSTRING_OF: 'substringOf'.toLowerCase(),
