@@ -14,12 +14,85 @@ $(function () {
 });
 
 runOperation = function (message) {
+    // Helper method to retrieve a property from an element
+    const getFromElement = function (e, x) {
+        let m;
+        let n;
+        if (!x || x.indexOf('.') === -1) {
+            n = x;
+        } else {
+            m = x.substring(x.indexOf('.') + 1);
+            n = x.substring(0, x.indexOf('.'));
+        }
+        const p = e[n] || (e.attributes ? e.attributes[n] : undefined);
+        return m ? getFromElement(p, m) : p;
+    };
+
+    // Helper method to retrieve a property from a message
+    const getFromMessage = function (message, p1, p2) {
+        return message[p1] ? message[p1][p2] : undefined;
+    };
+
+    // IMPORTANT: There are no logs within the filter evaluation operations to ensure
+    // the most optimum performance. The logs corresponding to the operation carried out
+    // can be used for debugging purposes.
     const evaluate = function (element, filter) {
+        // Evaluate as a number
+        const evaluateN = function (element, filter) {
+            return +(evaluate(element, filter));
+        };
+        // Evaluate as a string
+        const evaluateS = function (element, filter) {
+            return evaluate(element, filter).toString();
+        };
+        // Evaluate a function
+        const evaluateF = function (element, func, args) {
+            switch (func) {
+                case Constants.Evaluation.Function.SUBSTRING:
+                    if (args.length > 2) {
+                        return evaluateS(element, args[0]).substring(
+                            evaluateN(element, args[1]), evaluateN(element, args[2]));
+                    }
+                    return evaluateS(element, args[0]).substring(evaluateN(element, args[1]));
+                case Constants.Evaluation.Function.SUBSTRING_OF:
+                    return evaluateS(element, args[1]).indexOf(evaluateS(element, args[0])) !== -1;
+                case Constants.Evaluation.Function.ENDS_WITH:
+                    return evaluateS(element, args[0]).endsWith(evaluateS(element, args[1]));
+                case Constants.Evaluation.Function.STARTS_WITH:
+                    return evaluateS(element, args[0]).startsWith(evaluateS(element, args[1]));
+                case Constants.Evaluation.Function.LENGTH:
+                    return evaluateS(element, args[0]).length;
+                case Constants.Evaluation.Function.INDEX_OF:
+                    return evaluateS(element, args[0]).indexOf(evaluateS(element, args[1]));
+                case Constants.Evaluation.Function.REPLACE:
+                    return evaluateS(element, args[0]).replace(
+                        evaluateS(element, args[1]), evaluateS(element, args[2]));
+                case Constants.Evaluation.Function.TO_LOWER:
+                    return evaluateS(element, args[0]).toLowerCase();
+                case Constants.Evaluation.Function.TO_UPPER:
+                    return evaluateS(element, args[0]).toUpperCase();
+                case Constants.Evaluation.Function.TRIM:
+                    return evaluateS(element, args[0]).trim();
+                case Constants.Evaluation.Function.CONCAT:
+                    return evaluateS(element, args[0]) + evaluateS(element, args[1]);
+                default:
+                    // The specification is large and we don't support all types of
+                    // operators/functions
+                    const err = 'Unable to evaluate unknown function: ' + func;
+                    log.error(err);
+                    throw Error(err);
+            }
+        };
+
+        // Evaluate all known types of operators/functions. Some operators only makes
+        // sense for numbers, hence the transformation.
         switch (filter.type) {
             case Constants.Evaluation.PROPERTY:
-                return element[filter.name] || (element.attributes ? element.attributes[filter.name] : undefined);
+                return getFromElement(element, filter.name);
             case Constants.Evaluation.LITERAL:
                 return filter.value;
+            case Constants.Evaluation.FUNCTION_CALL:
+                return evaluateF(element, filter.func, filter.args);
             case Constants.Evaluation.EQUALS:
                 // We don't want to force type comparisons in this case.
                 return evaluate(element, filter.left) == evaluate(element, filter.right); // eslint-disable-line
@@ -27,13 +100,13 @@ runOperation = function (message) {
                 // We don't want to force type comparisons in this case.
                 return evaluate(element, filter.left) != evaluate(element, filter.right); // eslint-disable-line
             case Constants.Evaluation.LESS_THAN:
-                return +evaluate(element, filter.left) < +evaluate(element, filter.right);
+                return evaluateN(element, filter.left) < evaluateN(element, filter.right);
             case Constants.Evaluation.GREATER_THAN:
-                return +evaluate(element, filter.left) > +evaluate(element, filter.right);
+                return evaluateN(element, filter.left) > evaluateN(element, filter.right);
             case Constants.Evaluation.LESS_THAN_OR_EQUALS:
-                return +evaluate(element, filter.left) <= +evaluate(element, filter.right);
+                return evaluateN(element, filter.left) <= evaluateN(element, filter.right);
             case Constants.Evaluation.GREATER_THAN_OR_EQUALS:
-                return +evaluate(element, filter.left) >= +evaluate(element, filter.right);
+                return evaluateN(element, filter.left) >= evaluateN(element, filter.right);
             case Constants.Evaluation.AND:
                 return evaluate(element, filter.left) && evaluate(element, filter.right);
             case Constants.Evaluation.OR:
@@ -46,43 +119,79 @@ runOperation = function (message) {
                 }
                 return left + right;
             case Constants.Evaluation.SUBTRACT:
-                return +evaluate(element, filter.left) - +evaluate(element, filter.right);
+                return evaluateN(element, filter.left) - evaluateN(element, filter.right);
             case Constants.Evaluation.MULTIPLY:
-                return +evaluate(element, filter.left) * +evaluate(element, filter.right);
+                return evaluateN(element, filter.left) * evaluateN(element, filter.right);
             case Constants.Evaluation.DIVIDE:
-                return +evaluate(element, filter.left) / +evaluate(element, filter.right);
+                return evaluateN(element, filter.left) / evaluateN(element, filter.right);
             case Constants.Evaluation.MODULO:
-                return +evaluate(element, filter.left) % +evaluate(element, filter.right);
+                return evaluateN(element, filter.left) % evaluateN(element, filter.right);
             default:
-                log.error('Unable to evaluate:', filter.type);
-                throw Error('Unable to evaluate: ' + filter.type);
+                // The specification is large and we don't support all types of
+                // operators/functions
+                const err = 'Unable to evaluate unknown type: ' + filter.type;
+                log.error(err);
+                throw Error(err);
         }
     };
 
-    const nodeFilter = message.node ? message.node.$filter : undefined;
-    const edgeFilter = message.edge ? message.edge.$filter : undefined;
-    const nodeColor = message.node ? message.node.color : undefined;
-    const edgeColor = message.edge ? message.edge.color : undefined;
-    const nodeName = message.node ? message.node.name : undefined;
+    (function () {
+        // This function resets colors and labels to the original state before
+        // running any further filtering. Edges don't have labels by default and
+        // reducing the parsing overhead can improve performance for some graphs.
+        const reset = function (n, hasLabels) {
+            let ln = n.length;
+            while (ln--) {
+                if (n[ln].origColor === undefined) {
+                    n[ln].origColor = n[ln].color ? n[ln].color : null;
+                } else if (n[ln].origColor === null) {
+                    delete n[ln].color;
+                } else {
+                    n[ln].color = n[ln].origColor;
+                }
+                if (hasLabels) {
+                    if (n[ln].origLabel === undefined) {
+                        n[ln].origLabel = n[ln].label ? n[ln].label : null;
+                    } else if (n[ln].origLabel === null) {
+                        delete n[ln].label;
+                    } else {
+                        n[ln].label = n[ln].origLabel;
+                    }
+                }
+            }
+        };
+        const g = window.ove.context.sigma.graph;
+        reset(g.nodes(), true);
+        reset(g.edges(), false);
+    })();
 
-    let filter = (new sigma.plugins.filter(window.ove.context.sigma)).undo();
+    // The decision for making edge/node operations are dependent on the presence of the
+    // corresponding filter
+    const nodeFilter = getFromMessage(message, 'node', '$filter');
+    const edgeFilter = getFromMessage(message, 'edge', '$filter');
+
+    let f = (new sigma.plugins.filter(window.ove.context.sigma)).undo();
     switch (message.operation) {
         case Constants.Operation.SEARCH:
             if (nodeFilter) {
-                filter = filter.nodesBy(function (n) {
+                log.debug('Filtering nodes using filter:', nodeFilter);
+                f = f.nodesBy(function (n) {
                     return evaluate(n, nodeFilter);
                 });
             }
             if (edgeFilter) {
-                filter.edgesBy(function (n) {
+                log.debug('Filtering edges using filter:', edgeFilter);
+                f.edgesBy(function (n) {
                     return evaluate(n, edgeFilter);
                 });
             }
-            filter.apply();
+            f.apply();
             break;
         case Constants.Operation.COLOR:
             if (nodeFilter) {
-                filter = filter.nodesBy(function (n) {
+                const nodeColor = getFromMessage(message, 'node', 'color');
+                log.debug('Applying color:', nodeColor, 'on all nodes matching filter:', nodeFilter);
+                f = f.nodesBy(function (n) {
                     if (evaluate(n, nodeFilter)) {
                         n.color = nodeColor;
                     }
@@ -90,17 +199,45 @@ runOperation = function (message) {
                 });
             }
             if (edgeFilter) {
-                filter.edgesBy(function (n) {
+                const edgeColor = getFromMessage(message, 'edge', 'color');
+                log.debug('Applying color:', edgeColor, 'on all edges matching filter:', edgeFilter);
+                f.edgesBy(function (n) {
                     if (evaluate(n, edgeFilter)) {
                         n.color = edgeColor;
                     }
                     return true;
                 });
             }
-            filter.apply();
+            f.apply();
+            break;
+        case Constants.Operation.LABEL:
+            if (nodeFilter) {
+                const nodeLabel = getFromMessage(message, 'node', 'label');
+                log.debug('Applying label:', nodeLabel, 'on all nodes matching filter:', nodeFilter);
+                f = f.nodesBy(function (n) {
+                    if (evaluate(n, nodeFilter)) {
+                        n.label = getFromElement(n, nodeLabel);
+                    }
+                    return true;
+                });
+            } else {
+                const nodeLabel = getFromMessage(message, 'node', 'label');
+                log.debug('Applying label:', nodeLabel, 'on all nodes');
+                f = f.nodesBy(function (n) {
+                    n.label = getFromElement(n, nodeLabel);
+                    return true;
+                });
+            }
+            f.apply();
             break;
         case Constants.Operation.NEIGHBORS_OF:
-            filter.neighborsOf(nodeName).apply();
+            const nodeName = getFromMessage(message, 'node', 'name');
+            log.debug('Displaying neighbors of node:', nodeName);
+            f.neighborsOf(nodeName).apply();
+            break;
+        default:
+            // This can only happen due to a user error
+            log.warn('Unknown operation:', message.operation);
     }
 };
 

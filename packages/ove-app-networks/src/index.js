@@ -15,51 +15,71 @@ setTimeout(function () {
 }, Constants.SOCKET_READY_WAIT_TIME);
 
 let operationsList = Constants.Operation.SEARCH + '|' + Constants.Operation.COLOR + '|' +
-    Constants.Operation.NEIGHBORS_OF;
+    Constants.Operation.LABEL + '|' + Constants.Operation.NEIGHBORS_OF;
 app.get('/operation/:name(' + operationsList + ')', function (req, res) {
     const sectionId = req.query.oveSectionId;
     const operation = req.params.name;
 
-    const nodeFilter = req.query.nodeFilter;
+    // The various query parameters accepted by the operations
+    const nodeFilter = req.query.filter;
     const edgeFilter = req.query.edgeFilter;
-    const nodeColor = req.query.nodeColor;
+    const nodeColor = req.query.color;
     const edgeColor = req.query.edgeColor;
     const nodeName = req.query.node;
+    const nodeLabel = req.query.attribute;
 
     let message = { operation: operation };
+    // The search operation sets either or both of the node and edge filters. The color
+    // operation also sets the colors in addition to the filters, it is possible to have
+    // separate node and edge colors. The neighborsOf operation sets the name of the
+    // node in focus. The parser ensures all filters are compatible with the OData v3.0
+    // $filter specification.
     switch (operation) {
         case Constants.Operation.SEARCH:
             if (sectionId) {
-                log.info('Performing search operation with filters for nodes:', nodeFilter,
-                    'and edges:', edgeFilter, ', on section:', sectionId);
+                log.info('Performing search operation on section:', sectionId);
             } else {
-                log.info('Performing search operation with filters for nodes:', nodeFilter,
-                    'and edges:', edgeFilter);
+                log.info('Performing search operation');
             }
             if (nodeFilter) {
+                log.debug('Using node filter:', nodeFilter);
                 message.node = parser.parse('$filter=' + nodeFilter);
             }
             if (edgeFilter) {
+                log.debug('Using edge filter:', edgeFilter);
                 message.edge = parser.parse('$filter=' + edgeFilter);
             }
             break;
         case Constants.Operation.COLOR:
             if (sectionId) {
-                log.info('Performing recolor operation with filters for nodes:', nodeFilter,
-                    'and edges:', edgeFilter, 'and colors for nodes:', nodeColor, 'and edges',
-                    edgeColor, ', on section:', sectionId);
+                log.info('Performing color operation on section:', sectionId);
             } else {
-                log.info('Performing recolor operation with filters for nodes:', nodeFilter,
-                    'and edges:', edgeFilter, 'and colors for nodes:', nodeColor, 'and edges',
-                    edgeColor);
+                log.info('Performing color operation');
             }
             if (nodeFilter) {
+                log.debug('Using node filter:', nodeFilter, 'and color:', nodeColor);
                 message.node = parser.parse('$filter=' + nodeFilter);
                 message.node.color = nodeColor;
             }
             if (edgeFilter) {
+                log.debug('Using edge filter:', edgeFilter, 'and color:', edgeColor);
                 message.edge = parser.parse('$filter=' + edgeFilter);
                 message.edge.color = edgeColor;
+            }
+            break;
+        case Constants.Operation.LABEL:
+            if (sectionId) {
+                log.info('Displaying node labels on section:', sectionId);
+            } else {
+                log.info('Displaying node labels');
+            }
+            if (nodeFilter) {
+                log.debug('Using node filter:', nodeFilter, 'and label property:', nodeLabel);
+                message.node = parser.parse('$filter=' + nodeFilter);
+                message.node.label = nodeLabel;
+            } else {
+                log.debug('Using label property:', nodeLabel);
+                message.node = { label: nodeLabel };
             }
             break;
         case Constants.Operation.NEIGHBORS_OF:
