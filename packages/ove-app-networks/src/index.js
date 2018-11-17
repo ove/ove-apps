@@ -10,8 +10,17 @@ app.use('/', express.static(path.join(nodeModules, 'sigma', 'build')));
 
 var ws;
 setTimeout(function () {
-    log.debug('Establishing WebSocket connection with:', 'ws://' + process.env.OVE_HOST);
-    ws = new (require('ws'))('ws://' + process.env.OVE_HOST);
+    const getSocket = function () {
+        const socketURL = 'ws://' + process.env.OVE_HOST;
+        log.debug('Establishing WebSocket connection with:', socketURL);
+        ws = new (require('ws'))(socketURL);
+        ws.on('close', function () {
+            log.warn('Lost websocket connection attempting to reconnect');
+            // If the socket is closed, we try to refresh it.
+            setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
+        });
+    };
+    getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);
 
 let operationsList = Constants.Operation.SEARCH + '|' + Constants.Operation.COLOR + '|' +
