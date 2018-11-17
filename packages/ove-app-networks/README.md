@@ -42,7 +42,7 @@ The networks app has a transparent background. If required, a background colour 
 
 The controller of the app can be loaded by accessing the URL `http://OVE_APP_NETWORKS_HOST:PORT/control.html?oveSectionId=SECTION_ID`.
 
-The app also exposes controls as a part of its [API](http://OVE_APP_NETWORKS_HOST:PORT/api-docs#operation). The API exposes operations such as `search`, `color`, `labelNodes`, `neighborsOf`. These operations can be executed on a per-network basis or across all networks. The filters used for nodes and edges confirm to the [ODATA v3.0 specification](https://www.odata.org/documentation/odata-version-3-0/odata-version-3-0-core-protocol/#thefiltersystemqueryoption) and the colors used must have the format `rgb(x, y, z)`.
+The app also exposes controls as a part of its [API](http://OVE_APP_NETWORKS_HOST:PORT/api-docs#operation). The API exposes operations such as `search`, `color`, `labelNodes`, `neighborsOf`. These operations can be executed on a per-network basis or across all networks. The filters used for nodes and edges confirm to the [OData v3.0 specification](https://www.odata.org/documentation/odata-version-3-0/odata-version-3-0-core-protocol/#thefiltersystemqueryoption) and the colors used must have the format `rgb(x, y, z)`.
 
 To search for nodes having a size greater than or equal to 2, using OVE APIs:
 
