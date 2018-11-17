@@ -1,7 +1,15 @@
 initView = function () {
-    window.ove.context.isInitialized = false;
+    const context = window.ove.context;
+    context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
-    OVE.Utils.setOnStateUpdate(loadSigma);
+    window.ove.socket.on(function (message) {
+        if (message.operation) {
+            runOperation(message);
+        } else {
+            window.ove.state.current = message;
+            loadSigma();
+        }
+    });
 };
 
 getClientSpecificURL = function (url) {

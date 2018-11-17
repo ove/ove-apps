@@ -8,6 +8,11 @@ initControl = function (data) {
     loadSigma();
     log.debug('Broadcasting state');
     OVE.Utils.broadcastState();
+    window.ove.socket.on(function (message) {
+        if (message.operation) {
+            runOperation(message);
+        }
+    });
 };
 
 getClientSpecificURL = function (url) {
