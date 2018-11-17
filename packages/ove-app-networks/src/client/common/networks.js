@@ -141,7 +141,8 @@ runOperation = function (message) {
         // reducing the parsing overhead can improve performance for some graphs.
         const reset = function (n, hasLabels) {
             let ln = n.length;
-            while (ln--) {
+            while (ln) {
+                ln--;
                 if (n[ln].origColor === undefined) {
                     n[ln].origColor = n[ln].color ? n[ln].color : null;
                 } else if (n[ln].origColor === null) {
