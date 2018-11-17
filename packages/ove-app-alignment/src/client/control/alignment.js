@@ -221,5 +221,5 @@ displayJSON = function () {
     const layoutJSON = JSON.stringify(newLayout);
 
     d3.select('#clients-json')
-        .text(layoutJSON.substr(1, layoutJSON.length - 2));
+        .text(layoutJSON.substring(1, layoutJSON.length - 2));
 };

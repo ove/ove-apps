@@ -20,7 +20,7 @@ buildClientsURL = function () {
     const scripts = document.getElementsByTagName('script');
     for (let i = 0; i < scripts.length; i++) {
         if (scripts[i].src.indexOf('ove.js') > 0) {
-            serverURL = scripts[i].src.substr(0, scripts[i].src.lastIndexOf('/') + 1);
+            serverURL = scripts[i].src.substring(0, scripts[i].src.lastIndexOf('/') + 1);
         }
     }
     return serverURL + 'clients';
