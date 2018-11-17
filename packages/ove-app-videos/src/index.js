@@ -12,7 +12,7 @@ setTimeout(function () {
         ws = new (require('ws'))(socketURL);
         ws.on('close', function () {
             log.warn('Lost websocket connection attempting to reconnect');
-            // If the socket is closed, we try to refresh it. This fixes frozen pages after a restart
+            // If the socket is closed, we try to refresh it.
             setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
         });
         ws.on('message', function (msg) {
