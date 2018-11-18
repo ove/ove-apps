@@ -22,7 +22,7 @@ $(function () {
                     setTimeout(context.eventHandlers[op.name], op.runAt - new Date().getTime());
                     break;
                 case window.Distributed.INTERVAL:
-                    setTimeout(function() {
+                    setTimeout(function () {
                         setInterval(context.eventHandlers[op.name], op.timeout);
                     }, op.runAt - new Date().getTime());
                     break;
@@ -32,12 +32,11 @@ $(function () {
         }
     };
 
-    const distribute = function(callback, type, timeout) {
-        const op = { 
+    const distribute = function (callback, type, timeout) {
+        const op = {
             name: callback.name,
             type: arguments.length > 1 ? type : window.Distributed.SCHEDULE,
-            runAt: (arguments.length > 2 && type === window.Distributed.TIMEOUT ?
-                    new Date().getTime() + timeout : new Date().getTime()) + Constants.CALL_OVERHEAD,
+            runAt: (arguments.length > 2 && type === window.Distributed.TIMEOUT ? new Date().getTime() + timeout : new Date().getTime()) + Constants.CALL_OVERHEAD,
             timeout: arguments.length > 2 ? timeout : 0
         };
         log.debug('Forwarding event:', op);
@@ -61,7 +60,7 @@ $(function () {
         context.isController = (window.name.split('-')[0] === Constants.CONTROLLER_WINDOW_NAME);
         if (context.isController) {
             context.isInitialized = false;
-            setTimeout(function() {
+            setTimeout(function () {
                 // We wait until the entire system is ready for a distributed operation.
                 while (context.operations.length > 0) {
                     const op = context.operations.shift();
@@ -70,7 +69,7 @@ $(function () {
                 context.isInitialized = true;
                 log.debug('Application is initialized:', context.isInitialized);
             }, Constants.CONTROL_ACTIVATION_DELAY);
-            setInterval(function() {
+            setInterval(function () {
                 // State is broadcast if there were any updates.
                 const state = window.ove.state.current;
                 if (!OVE.Utils.JSON.equals(state, context.state)) {
@@ -115,12 +114,13 @@ window.Distributed = {
  */
 window.setDistributed = function (callback, type, timeout) {
     const Constants = {
-        OVE_LOADED_DELAY: 50, // Unit: milliseconds
+        OVE_LOADED_DELAY: 50 // Unit: milliseconds
     };
 
     if (callback === undefined) {
-        log.error('Callback function not provided');
-        throw 'Callback function not provided';
+        const err = 'Callback function not provided';
+        log.error(err);
+        throw Error(err);
     }
     const __self = {
         callback: callback,
@@ -159,15 +159,16 @@ window.setDistributed = function (callback, type, timeout) {
  * @param {object} property  Getter/Setter related to property in the { get: fn(), set: fn() } format
  * @param {number} frequency Frequency in milliseconds - set this to zero/null or do not pass this to stop watching
  */
-window.watch = function(name, property, frequency) {
+window.watch = function (name, property, frequency) {
     const Constants = {
-        OVE_LOADED_DELAY: 50, // Unit: milliseconds
+        OVE_LOADED_DELAY: 50 // Unit: milliseconds
     };
 
     if (name === undefined) {
-        log.error('Name of property not provided');
-        throw 'Name of property not provided';
-    } 
+        const err = 'Name of property not provided';
+        log.error(err);
+        throw Error(err);
+    }
 
     const __self = {
         name: name,
@@ -184,7 +185,7 @@ window.watch = function(name, property, frequency) {
                     resolve('ove initialized');
                 }
             }, Constants.OVE_LOADED_DELAY);
-        }).then(function() {
+        }).then(function () {
             const context = window.ove.context;
             // Update watch when it is reset.
             if (context.eventHandlers.hasOwnProperty(__self.name)) {
@@ -195,11 +196,12 @@ window.watch = function(name, property, frequency) {
                     return;
                 }
             } else if (!__self.frequency) {
-                log.error('Invalid frequency');
-                throw 'Invalid frequency';
+                const err = 'Invalid frequency';
+                log.error(err);
+                throw Error(err);
             }
             log.debug('Started watching:', __self.name, 'with frequency:', __self.frequency);
-            context.watching[__self.name] = setInterval(function() {
+            context.watching[__self.name] = setInterval(function () {
                 if (context.isController) {
                     window.ove.state.current[__self.name] = __self.property.get();
                 } else {

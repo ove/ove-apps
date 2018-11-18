@@ -4,7 +4,8 @@
         "$": true,
         "Constants": true,
         "location": true,
-        "OVE": true
+        "OVE": true,
+        "THREE": true
     },
     "overrides": [
         {
