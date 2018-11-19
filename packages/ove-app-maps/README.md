@@ -66,7 +66,7 @@ let transformURL;
                 if (scripts[i].src.indexOf(scriptName) > 0) {
                     return scripts[i].src.substring(
                         withScheme ? 0 : scripts[i].src.indexOf('//') + 2,
-                        scripts[i].src.lastIndexOf('/') - (withScheme ? 0 : scripts[i].src.indexOf('//') + 2));
+                        scripts[i].src.lastIndexOf('/'));
                 }
             }
             return undefined;
