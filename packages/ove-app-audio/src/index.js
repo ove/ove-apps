@@ -19,7 +19,7 @@ setTimeout(function () {
         log.debug('Establishing WebSocket connection with:', socketURL);
         ws = new (require('ws'))(socketURL);
         ws.on('close', function () {
-            log.warn('Lost websocket connection attempting to reconnect');
+            log.warn('Lost websocket connection: will attempt to reconnect in ' + Constants.SOCKET_REFRESH_DELAY + 'ms'  );
             // If the socket is closed, we try to refresh it.
             setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
         });
