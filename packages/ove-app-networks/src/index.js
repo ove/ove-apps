@@ -14,11 +14,13 @@ setTimeout(function () {
         const socketURL = 'ws://' + process.env.OVE_HOST;
         log.debug('Establishing WebSocket connection with:', socketURL);
         ws = new (require('ws'))(socketURL);
-        ws.on('close', function () {
-            log.warn('Lost websocket connection attempting to reconnect');
+        ws.on('close', function (code) {
+            log.warn('Lost websocket connection: closed with code:', code);
+            log.warn('Attempting to reconnect in ' + Constants.SOCKET_REFRESH_DELAY + 'ms');
             // If the socket is closed, we try to refresh it.
             setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
         });
+        ws.on('error', log.error);
     };
     getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);
