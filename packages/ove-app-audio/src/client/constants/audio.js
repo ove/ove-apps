@@ -21,6 +21,7 @@ const Constants = {
     /**************************************************************
      Back-end
      **************************************************************/
+    SOCKET_REFRESH_DELAY: 5000, // Unit: milliseconds
     SOCKET_READY_WAIT_TIME: 3000, // Unit: milliseconds
     OPERATION_SYNC_DELAY: 350, // Unit: milliseconds
     HTTP_HEADER_CONTENT_TYPE: 'Content-Type',

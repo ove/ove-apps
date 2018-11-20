@@ -6,45 +6,56 @@ const server = require('http').createServer(app);
 var ws;
 var bufferStatus = [];
 setTimeout(function () {
-    log.debug('Establishing WebSocket connection with:', 'ws://' + process.env.OVE_HOST);
-    ws = new (require('ws'))('ws://' + process.env.OVE_HOST);
-    ws.on('message', function (msg) {
-        let m = JSON.parse(msg);
-        if (m.appId === Constants.APP_NAME && m.message.bufferStatus) {
-            // The handling of the buffer status updates operates in a model as noted below. This
-            // same as the model followed by browser-based viewers and controllers.
-            //   1. One or more peers in a group receives a new video URL
-            //   2. They then send a request for registration to all peers belonging to the same
-            //      section.
-            //   3. When one or more peers respond, their responses will then be received as
-            //      registration responses. If a peer does not respond, the rest of the system
-            //      will not wait. If a peer is late to respond, they may join the group later on,
-            //      but this will not stop a video that is already playing.
-            //   4. After the above steps are completed peers start broadcasting their buffer statuses.
-            //   5. If at least 15% of a video is buffered across all peers synchronized playback
-            //      can begin and the video will be displayed.
-            let status = m.message.bufferStatus;
-            let bufferIsEmpty = Utils.isNullOrEmpty(bufferStatus[m.sectionId]);
-            if (status.type.registration) {
-                if (bufferIsEmpty) {
-                    bufferStatus[m.sectionId] = { clients: [] };
-                    bufferStatus[m.sectionId].clients.push(status.clientId);
-                } else if (!bufferStatus[m.sectionId].clients.includes(status.clientId)) {
-                    bufferStatus[m.sectionId].clients.push(status.clientId);
-                }
-            } else if (status.type.update && !bufferIsEmpty &&
-                bufferStatus[m.sectionId].clients.includes(status.clientId)) {
-                if (status.percentage >= Constants.MIN_BUFFERED_PERCENTAGE ||
-                    status.duration >= Constants.MIN_BUFFERED_DURATION) {
-                    bufferStatus[m.sectionId].clients.splice(bufferStatus[m.sectionId].clients.indexOf(status.clientId), 1);
-                    if (bufferStatus[m.sectionId].clients.length === 0) {
-                        delete bufferStatus[m.sectionId];
-                        bufferStatus[m.sectionId] = {};
+    const getSocket = function () {
+        const socketURL = 'ws://' + process.env.OVE_HOST;
+        log.debug('Establishing WebSocket connection with:', socketURL);
+        ws = new (require('ws'))(socketURL);
+        ws.on('close', function (code) {
+            log.warn('Lost websocket connection: closed with code:', code);
+            log.warn('Attempting to reconnect in ' + Constants.SOCKET_REFRESH_DELAY + 'ms');
+            // If the socket is closed, we try to refresh it.
+            setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
+        });
+        ws.on('error', log.error);
+        ws.on('message', function (msg) {
+            let m = JSON.parse(msg);
+            if (m.appId === Constants.APP_NAME && m.message.bufferStatus) {
+                // The handling of the buffer status updates operates in a model as noted below. This
+                // same as the model followed by browser-based viewers and controllers.
+                //   1. One or more peers in a group receives a new video URL
+                //   2. They then send a request for registration to all peers belonging to the same
+                //      section.
+                //   3. When one or more peers respond, their responses will then be received as
+                //      registration responses. If a peer does not respond, the rest of the system
+                //      will not wait. If a peer is late to respond, they may join the group later on,
+                //      but this will not stop a video that is already playing.
+                //   4. After the above steps are completed peers start broadcasting their buffer statuses.
+                //   5. If at least 15% of a video is buffered across all peers synchronized playback
+                //      can begin and the video will be displayed.
+                let status = m.message.bufferStatus;
+                let bufferIsEmpty = Utils.isNullOrEmpty(bufferStatus[m.sectionId]);
+                if (status.type.registration) {
+                    if (bufferIsEmpty) {
+                        bufferStatus[m.sectionId] = { clients: [] };
+                        bufferStatus[m.sectionId].clients.push(status.clientId);
+                    } else if (!bufferStatus[m.sectionId].clients.includes(status.clientId)) {
+                        bufferStatus[m.sectionId].clients.push(status.clientId);
+                    }
+                } else if (status.type.update && !bufferIsEmpty &&
+                    bufferStatus[m.sectionId].clients.includes(status.clientId)) {
+                    if (status.percentage >= Constants.MIN_BUFFERED_PERCENTAGE ||
+                        status.duration >= Constants.MIN_BUFFERED_DURATION) {
+                        bufferStatus[m.sectionId].clients.splice(bufferStatus[m.sectionId].clients.indexOf(status.clientId), 1);
+                        if (bufferStatus[m.sectionId].clients.length === 0) {
+                            delete bufferStatus[m.sectionId];
+                            bufferStatus[m.sectionId] = {};
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+    };
+    getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);
 
 let operationsList = Constants.Operation.PLAY + '|' + Constants.Operation.PAUSE + '|' +
