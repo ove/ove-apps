@@ -15,17 +15,17 @@ $(function () {
 
 runOperation = function (message) {
     // Helper method to retrieve a property from an element
-    const getFromElement = function (e, x) {
-        let m;
-        let n;
-        if (!x || x.indexOf('.') === -1) {
-            n = x;
+    const getFromElement = function (element, propertyName) {
+        if (!propertyName || propertyName.indexOf('.') === -1) {
+            return element[propertyName] ||
+                (element.attributes ? element.attributes[propertyName] : undefined);
         } else {
-            m = x.substring(x.indexOf('.') + 1);
-            n = x.substring(0, x.indexOf('.'));
+            const firstPart = propertyName.substring(0, propertyName.indexOf('.'));
+            const otherParts = propertyName.substring(propertyName.indexOf('.') + 1);
+            const childElement = element[firstPart] ||
+                (element.attributes ? element.attributes[firstPart] : undefined);
+            return getFromElement(childElement, otherParts);
         }
-        const p = e[n] || (e.attributes ? e.attributes[n] : undefined);
-        return m ? getFromElement(p, m) : p;
     };
 
     // Helper method to retrieve a property from a message
@@ -47,34 +47,39 @@ runOperation = function (message) {
         };
         // Evaluate a function
         const evaluateF = function (element, func, args) {
+            const firstArg = evaluateS(element, args[0]);
+            const secondArg = args.length > 1 ? evaluateS(element, args[1]) : undefined;
+            const thirdArg = args.length > 2 ? evaluateS(element, args[2]) : undefined;
             switch (func) {
                 case Constants.Evaluation.Function.SUBSTRING:
+                    // Unable to use secondArg and thirdArg as the replace method expects
+                    // numeric arguments.
                     if (args.length > 2) {
-                        return evaluateS(element, args[0]).substring(
-                            evaluateN(element, args[1]), evaluateN(element, args[2]));
+                        return firstArg.substring(evaluateN(element, args[1]),
+                            evaluateN(element, args[2]));
                     }
-                    return evaluateS(element, args[0]).substring(evaluateN(element, args[1]));
+                    return firstArg.substring(evaluateN(element, args[1]));
                 case Constants.Evaluation.Function.SUBSTRING_OF:
-                    return evaluateS(element, args[1]).indexOf(evaluateS(element, args[0])) !== -1;
+                    // IMPORTANT: Order of arguments have been swapped in the specification.
+                    return secondArg.indexOf(firstArg) !== -1;
                 case Constants.Evaluation.Function.ENDS_WITH:
-                    return evaluateS(element, args[0]).endsWith(evaluateS(element, args[1]));
+                    return firstArg.endsWith(secondArg);
                 case Constants.Evaluation.Function.STARTS_WITH:
-                    return evaluateS(element, args[0]).startsWith(evaluateS(element, args[1]));
+                    return firstArg.startsWith(secondArg);
                 case Constants.Evaluation.Function.LENGTH:
-                    return evaluateS(element, args[0]).length;
+                    return firstArg.length;
                 case Constants.Evaluation.Function.INDEX_OF:
-                    return evaluateS(element, args[0]).indexOf(evaluateS(element, args[1]));
+                    return firstArg.indexOf(secondArg);
                 case Constants.Evaluation.Function.REPLACE:
-                    return evaluateS(element, args[0]).replace(
-                        evaluateS(element, args[1]), evaluateS(element, args[2]));
+                    return firstArg.replace(secondArg, thirdArg);
                 case Constants.Evaluation.Function.TO_LOWER:
-                    return evaluateS(element, args[0]).toLowerCase();
+                    return firstArg.toLowerCase();
                 case Constants.Evaluation.Function.TO_UPPER:
-                    return evaluateS(element, args[0]).toUpperCase();
+                    return firstArg.toUpperCase();
                 case Constants.Evaluation.Function.TRIM:
-                    return evaluateS(element, args[0]).trim();
+                    return firstArg.trim();
                 case Constants.Evaluation.Function.CONCAT:
-                    return evaluateS(element, args[0]) + evaluateS(element, args[1]);
+                    return firstArg + secondArg;
                 default:
                     // The specification is large and we don't support all types of
                     // operators/functions
@@ -84,8 +89,10 @@ runOperation = function (message) {
             }
         };
 
-        // Evaluate all known types of operators/functions. Some operators only makes
-        // sense for numbers, hence the transformation.
+        // We do three types of evaluation here:
+        //   1. Evaluation of properties, functions and literals
+        //   2. Evaluation related to values that can be numeric or non-numeric
+        //   3. Evaluation related to values that can only be numeric
         switch (filter.type) {
             case Constants.Evaluation.PROPERTY:
                 return getFromElement(element, filter.name);
@@ -93,52 +100,59 @@ runOperation = function (message) {
                 return filter.value;
             case Constants.Evaluation.FUNCTION_CALL:
                 return evaluateF(element, filter.func, filter.args);
+        }
+
+        let left = filter.left ? evaluate(element, filter.left) : undefined;
+        let right = filter.right ? evaluate(element, filter.right) : undefined;
+        switch (filter.type) {
             case Constants.Evaluation.EQUALS:
                 // We don't want to force type comparisons in this case.
-                return evaluate(element, filter.left) == evaluate(element, filter.right); // eslint-disable-line
+                return left == right; // eslint-disable-line
             case Constants.Evaluation.NOT_EQUALS:
                 // We don't want to force type comparisons in this case.
-                return evaluate(element, filter.left) != evaluate(element, filter.right); // eslint-disable-line
-            case Constants.Evaluation.LESS_THAN:
-                return evaluateN(element, filter.left) < evaluateN(element, filter.right);
-            case Constants.Evaluation.GREATER_THAN:
-                return evaluateN(element, filter.left) > evaluateN(element, filter.right);
-            case Constants.Evaluation.LESS_THAN_OR_EQUALS:
-                return evaluateN(element, filter.left) <= evaluateN(element, filter.right);
-            case Constants.Evaluation.GREATER_THAN_OR_EQUALS:
-                return evaluateN(element, filter.left) >= evaluateN(element, filter.right);
+                return left != right; // eslint-disable-line
             case Constants.Evaluation.AND:
-                return evaluate(element, filter.left) && evaluate(element, filter.right);
+                return left && right;
             case Constants.Evaluation.OR:
-                return evaluate(element, filter.left) || evaluate(element, filter.right);
+                return left || right;
             case Constants.Evaluation.ADD:
-                const left = evaluate(element, filter.left);
-                const right = evaluate(element, filter.right);
                 if (typeof left !== 'string' || typeof right !== 'string') {
                     return (+left) + (+right);
                 }
                 return left + right;
-            case Constants.Evaluation.SUBTRACT:
-                return evaluateN(element, filter.left) - evaluateN(element, filter.right);
-            case Constants.Evaluation.MULTIPLY:
-                return evaluateN(element, filter.left) * evaluateN(element, filter.right);
-            case Constants.Evaluation.DIVIDE:
-                return evaluateN(element, filter.left) / evaluateN(element, filter.right);
-            case Constants.Evaluation.MODULO:
-                return evaluateN(element, filter.left) % evaluateN(element, filter.right);
-            default:
-                // The specification is large and we don't support all types of
-                // operators/functions
-                const err = 'Unable to evaluate unknown type: ' + filter.type;
-                log.error(err);
-                throw Error(err);
         }
+
+        left = filter.left ? evaluateN(element, filter.left) : undefined;
+        right = filter.right ? evaluateN(element, filter.right) : undefined;
+        switch (filter.type) {
+            case Constants.Evaluation.LESS_THAN:
+                return left < right;
+            case Constants.Evaluation.GREATER_THAN:
+                return left > right;
+            case Constants.Evaluation.LESS_THAN_OR_EQUALS:
+                return left <= right;
+            case Constants.Evaluation.GREATER_THAN_OR_EQUALS:
+                return left >= right;
+            case Constants.Evaluation.SUBTRACT:
+                return left - right;
+            case Constants.Evaluation.MULTIPLY:
+                return left * right;
+            case Constants.Evaluation.DIVIDE:
+                return left / right;
+            case Constants.Evaluation.MODULO:
+                return left % right;
+        }
+
+        // The OData specification is large and we don't support all types of
+        // operators/functions
+        const err = 'Unable to evaluate unknown type: ' + filter.type;
+        log.error(err);
+        throw Error(err);
     };
 
     (function () {
         // This function resets colors and labels to the original state before
-        // running any further filtering. Edges don't have labels by default and
-        // reducing the parsing overhead can improve performance for some graphs.
+        // running any further filtering. We expect only nodes to have labels by default.
         const reset = function (n, hasLabels) {
             let ln = n.length;
             while (ln) {
@@ -161,9 +175,9 @@ runOperation = function (message) {
                 }
             }
         };
-        const g = window.ove.context.sigma.graph;
-        reset(g.nodes(), true);
-        reset(g.edges(), false);
+        const graph = window.ove.context.sigma.graph;
+        reset(graph.nodes(), true);
+        reset(graph.edges(), false);
     })();
 
     // The decision for making edge/node operations are dependent on the presence of the
@@ -171,70 +185,83 @@ runOperation = function (message) {
     const nodeFilter = getFromMessage(message, 'node', '$filter');
     const edgeFilter = getFromMessage(message, 'edge', '$filter');
 
-    let f = (new sigma.plugins.filter(window.ove.context.sigma)).undo();
+    let filter = (new sigma.plugins.filter(window.ove.context.sigma)).undo();
     switch (message.operation) {
         case Constants.Operation.SEARCH:
             if (nodeFilter) {
                 log.debug('Filtering nodes using filter:', nodeFilter);
-                f = f.nodesBy(function (n) {
+                filter = filter.nodesBy(function (n) {
                     return evaluate(n, nodeFilter);
                 });
             }
             if (edgeFilter) {
                 log.debug('Filtering edges using filter:', edgeFilter);
-                f.edgesBy(function (n) {
+                filter = filter.edgesBy(function (n) {
                     return evaluate(n, edgeFilter);
                 });
             }
-            f.apply();
+            filter.apply();
             break;
         case Constants.Operation.COLOR:
             if (nodeFilter) {
                 const nodeColor = getFromMessage(message, 'node', 'color');
-                log.debug('Applying color:', nodeColor, 'on all nodes matching filter:', nodeFilter);
-                f = f.nodesBy(function (n) {
+                log.debug('Changing color:', nodeColor, 'on all nodes matching filter:', nodeFilter);
+                filter = filter.nodesBy(function (n) {
                     if (evaluate(n, nodeFilter)) {
                         n.color = nodeColor;
                     }
+                    // We only want to change the color of some nodes in here.
+                    // We select all nodes, so none are hidden.
                     return true;
                 });
             }
             if (edgeFilter) {
                 const edgeColor = getFromMessage(message, 'edge', 'color');
-                log.debug('Applying color:', edgeColor, 'on all edges matching filter:', edgeFilter);
-                f.edgesBy(function (n) {
+                log.debug('Changing color:', edgeColor, 'on all edges matching filter:', edgeFilter);
+                filter = filter.edgesBy(function (n) {
                     if (evaluate(n, edgeFilter)) {
                         n.color = edgeColor;
                     }
+                    // We only want to change the color of some edges in here.
+                    // We select all edges, so none are hidden.
                     return true;
                 });
             }
-            f.apply();
+            filter.apply();
             break;
         case Constants.Operation.LABEL:
             if (nodeFilter) {
                 const nodeLabel = getFromMessage(message, 'node', 'label');
-                log.debug('Applying label:', nodeLabel, 'on all nodes matching filter:', nodeFilter);
-                f = f.nodesBy(function (n) {
+                log.debug('Changing label:', nodeLabel, 'on all nodes matching filter:', nodeFilter);
+                filter = filter.nodesBy(function (n) {
                     if (evaluate(n, nodeFilter)) {
                         n.label = getFromElement(n, nodeLabel);
                     }
+                    // We only want to change the label of some nodes in here.
+                    // We select all nodes, so none are hidden.
                     return true;
                 });
             } else {
                 const nodeLabel = getFromMessage(message, 'node', 'label');
-                log.debug('Applying label:', nodeLabel, 'on all nodes');
-                f = f.nodesBy(function (n) {
+                log.debug('Changing label:', nodeLabel, 'on all nodes');
+                filter = filter.nodesBy(function (n) {
                     n.label = getFromElement(n, nodeLabel);
+                    // We only want to change the label of all nodes in here.
+                    // We select all nodes, so none are hidden.
                     return true;
                 });
             }
-            f.apply();
+            filter.apply();
             break;
         case Constants.Operation.NEIGHBORS_OF:
             const nodeName = getFromMessage(message, 'node', 'name');
             log.debug('Displaying neighbors of node:', nodeName);
-            f.neighborsOf(nodeName).apply();
+            filter.neighborsOf(nodeName).apply();
+            break;
+        case Constants.Operation.RESET:
+            log.debug('Successfully reset graph');
+            filter.apply();
+            // Applying the empty filter means the graph is restored to what it was originally.
             break;
         default:
             // This can only happen due to a user error

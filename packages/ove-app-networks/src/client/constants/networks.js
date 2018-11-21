@@ -26,7 +26,8 @@ Constants.Operation = {
     SEARCH: 'search',
     COLOR: 'color',
     LABEL: 'labelNodes',
-    NEIGHBORS_OF: 'neighborsOf'
+    NEIGHBORS_OF: 'neighborsOf',
+    RESET: 'reset'
 };
 
 Constants.Evaluation = {

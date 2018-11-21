@@ -6,7 +6,7 @@ paths:
     get:
       tags:
       - "operation"
-      summary: "Searches for nodes or edges that match provider filters. Filters must be specified according to the OData v3.0 $filter specification."
+      summary: "Searches for nodes or edges that match the provider filters, and filters the display to hide nodes or edges that do not match the provided filters. Filters must be specified according to the OData v3.0 $filter specification."
       produces:
       - "application/json"
       parameters:
@@ -45,7 +45,7 @@ paths:
       - name: "color"
         in: "query"
         type: "string"
-        description: "New color for nodes in the format rgb(x, y, z)"
+        description: "New color for nodes in the format rgb(x, y, z) (where x, y, z are integers in the range 0-255)"
         required: false
       - name: "edgeFilter"
         in: "query"
@@ -55,7 +55,7 @@ paths:
       - name: "edgeColor"
         in: "query"
         type: "string"
-        description: "New color for edges in the format rgb(x, y, z)"
+        description: "New color for edges in the format rgb(x, y, z) (where x, y, z are integers in the range 0-255)"
         required: false
       - name: "oveSectionId"
         in: "query"

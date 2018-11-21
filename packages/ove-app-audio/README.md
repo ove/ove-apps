@@ -34,7 +34,7 @@ curl --header "Content-Type: application/json" --request POST --data "{\"app\": 
 
 The controller of the app can be loaded by accessing the URL `http://OVE_APP_AUDIO_HOST:PORT/control.html?oveSectionId=SECTION_ID`.
 
-The app also exposes controls as a part of its [API](http://OVE_APP_AUDIO_HOST:PORT/api-docs#operation). The API exposes operations such as `play`, `pause`, `stop`, `seekTo` and `bufferStatus` related to playback. Volume may be controlled by operations such as `mute`, `unmute`, `volUp`, `volDown`. These operations can be executed on a per-section basis or across all sections.
+The app's [API](http://OVE_APP_AUDIO_HOST:PORT/api-docs#operation) also exposes operations such as `play`, `pause`, `stop`, `seekTo` and `bufferStatus` related to playback. Volume may be controlled by operations such as `mute`, `unmute`, `volUp`, `volDown`. These operations can be executed on a per-section basis or across all sections.
 
 To play audio using OVE APIs:
 

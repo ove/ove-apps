@@ -63,7 +63,7 @@ app.get('/operation/:name(' + operationsList + ')', function (req, res) {
     if (sectionId) {
         log.info('Performing operation:', name, ', on section:', sectionId);
     } else {
-        log.info('Performing operation:', name);
+        log.info('Performing operation:', name, ', on all sections');
     }
     // If this is a buffer status check and depending on whether a sectionId is provided, below
     // code checks whether buffering is in progress.

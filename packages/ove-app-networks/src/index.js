@@ -25,8 +25,7 @@ setTimeout(function () {
     getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);
 
-let operationsList = Constants.Operation.SEARCH + '|' + Constants.Operation.COLOR + '|' +
-    Constants.Operation.LABEL + '|' + Constants.Operation.NEIGHBORS_OF;
+let operationsList = Object.values(Constants.Operation).join('|');
 app.get('/operation/:name(' + operationsList + ')', function (req, res) {
     const sectionId = req.query.oveSectionId;
     const operation = req.params.name;
@@ -50,7 +49,7 @@ app.get('/operation/:name(' + operationsList + ')', function (req, res) {
             if (sectionId) {
                 log.info('Performing search operation on section:', sectionId);
             } else {
-                log.info('Performing search operation');
+                log.info('Performing search operation on all sections');
             }
             if (nodeFilter) {
                 log.debug('Using node filter:', nodeFilter);
@@ -65,7 +64,7 @@ app.get('/operation/:name(' + operationsList + ')', function (req, res) {
             if (sectionId) {
                 log.info('Performing color operation on section:', sectionId);
             } else {
-                log.info('Performing color operation');
+                log.info('Performing color operation on all sections');
             }
             if (nodeFilter) {
                 log.debug('Using node filter:', nodeFilter, 'and color:', nodeColor);
@@ -82,7 +81,7 @@ app.get('/operation/:name(' + operationsList + ')', function (req, res) {
             if (sectionId) {
                 log.info('Displaying node labels on section:', sectionId);
             } else {
-                log.info('Displaying node labels');
+                log.info('Displaying node labels on all sections');
             }
             if (nodeFilter) {
                 log.debug('Using node filter:', nodeFilter, 'and label property:', nodeLabel);
@@ -97,9 +96,16 @@ app.get('/operation/:name(' + operationsList + ')', function (req, res) {
             if (sectionId) {
                 log.info('Displaying neighbors of node:', nodeName, ', on section:', sectionId);
             } else {
-                log.info('Displaying neighbors of node:', nodeName);
+                log.info('Displaying neighbors of node:', nodeName, ', on all sections');
             }
             message.node = { name: nodeName };
+            break;
+        case Constants.Operation.RESET:
+            if (sectionId) {
+                log.info('Resetting network on section:', sectionId);
+            } else {
+                log.info('Resetting networks on all sections');
+            }
             break;
     }
 
