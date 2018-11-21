@@ -58,15 +58,14 @@ setTimeout(function () {
     getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);
 
-let operationsList = Constants.Operation.PLAY + '|' + Constants.Operation.PAUSE + '|' +
-    Constants.Operation.STOP + '|' + Constants.Operation.SEEK + '|' + Constants.Operation.BUFFER_STATUS;
+let operationsList = Object.values(Constants.Operation).join('|');
 app.get('/operation/:name(' + operationsList + ')', function (req, res) {
     let name = req.params.name;
     let sectionId = req.query.oveSectionId;
     if (sectionId) {
         log.info('Performing operation:', name, ', on section:', sectionId);
     } else {
-        log.info('Performing operation:', name);
+        log.info('Performing operation:', name, ', on all sections');
     }
     // If this is a buffer status check and depending on whether a sectionId is provided, below
     // code checks whether buffering is in progress.

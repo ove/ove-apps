@@ -1,7 +1,21 @@
 initView = function () {
-    window.ove.context.isInitialized = false;
+    const context = window.ove.context;
+    context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
-    OVE.Utils.setOnStateUpdate(loadSigma);
+    window.ove.socket.on(function (message) {
+        if (message.operation) {
+            // We first of all need to know if the operation was known
+            if (Object.values(Constants.Operation).indexOf(message.operation) !== -1) {
+                runOperation(message);
+            } else {
+                // This can only happen due to a user error
+                log.warn('Unknown operation:', message.operation);
+            }
+        } else {
+            window.ove.state.current = message;
+            loadSigma();
+        }
+    });
 };
 
 getClientSpecificURL = function (url) {
