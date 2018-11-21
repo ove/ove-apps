@@ -263,9 +263,15 @@ runOperation = function (message) {
             filter.apply();
             // Applying the empty filter means the graph is restored to what it was originally.
             break;
-        default:
-            // This can only happen due to a user error
-            log.warn('Unknown operation:', message.operation);
+    }
+};
+
+refreshSigma = function (sigma) {
+    log.debug('Refreshing Sigma');
+    sigma.refresh();
+    // Rerun any operations if they were cached in the application state.
+    if (window.ove.state.current.operation) {
+        runOperation(window.ove.state.current.operation);
     }
 };
 
@@ -289,16 +295,10 @@ loadSigma = function () {
     if (window.ove.state.current.jsonURL) {
         let url = getClientSpecificURL(window.ove.state.current.jsonURL);
         log.info('Loading content of format:', 'JSON', ', URL:', url);
-        sigma.parsers.json(url, context.sigma, function (sigma) {
-            log.debug('Refreshing Sigma');
-            sigma.refresh();
-        });
+        sigma.parsers.json(url, context.sigma, refreshSigma);
     } else if (window.ove.state.current.gexfURL) {
         let url = getClientSpecificURL(window.ove.state.current.gexfURL);
         log.info('Loading content of format:', 'GEXF', ', URL:', url);
-        sigma.parsers.gexf(url, context.sigma, function (sigma) {
-            log.debug('Refreshing Sigma');
-            sigma.refresh();
-        });
+        sigma.parsers.gexf(url, context.sigma, refreshSigma);
     }
 };

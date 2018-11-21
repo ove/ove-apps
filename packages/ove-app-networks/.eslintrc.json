@@ -23,6 +23,7 @@
         {
             "files": [ "**/common/*.js" ],
             "globals": {
+                "refreshSigma": true,
                 "sigma": true
             },
             "rules": {

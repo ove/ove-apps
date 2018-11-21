@@ -10,7 +10,22 @@ initControl = function (data) {
     OVE.Utils.broadcastState();
     window.ove.socket.on(function (message) {
         if (message.operation) {
-            runOperation(message);
+            // We first of all need to know if the operation was known
+            if (Object.values(Constants.Operation).indexOf(message.operation) !== -1) {
+                runOperation(message);
+                if (message.operation === Constants.Operation.RESET) {
+                    if (window.ove.state.current.operation) {
+                        delete window.ove.state.current.operation;
+                    }
+                } else {
+                    window.ove.state.current.operation = message;
+                }
+                // Cache state for later use.
+                window.ove.state.cache();
+            } else {
+                // This can only happen due to a user error
+                log.warn('Unknown operation:', message.operation);
+            }
         }
     });
 };
