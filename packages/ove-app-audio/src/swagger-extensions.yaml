@@ -139,7 +139,7 @@ paths:
       responses:
         200:
           description: "successful operation"
-      summary: "sets the positional audio in 3d space for one or all audio files"
+      summary: "sets the positional audio (in 3D) for one or all audio files"
       tags:
       - operation
   /operation/setVolume:
