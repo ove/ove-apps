@@ -145,7 +145,7 @@ function createTriangles () {
 
     log.debug('Drawing triangles');
 
-    // We need to load Clients.JSON, as we want to position right-angled triangles so that they cross each screen's edge
+    // We need to load Spaces.json, as we want to position right-angled triangles so that they cross each screen's edge
     d3.json(buildClientsURL()).then(function (clients) {
         const id = OVE.Utils.getSpace();
 
