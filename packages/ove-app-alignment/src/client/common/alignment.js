@@ -16,12 +16,12 @@ $(function () {
 
 // This function constructs the URL (served by OVE Core) that will return the contents of the Spaces.json file
 buildSpacesURL = function () {
-    let serverURL = '';
+    let oveURL = '';
     const scripts = document.getElementsByTagName('script');
     for (let i = 0; i < scripts.length; i++) {
         if (scripts[i].src.indexOf('ove.js') > 0) {
-            serverURL = scripts[i].src.substring(0, scripts[i].src.lastIndexOf('/') + 1);
+            oveURL = scripts[i].src.substring(0, scripts[i].src.lastIndexOf('/') + 1);
         }
     }
-    return serverURL + 'clients';
+    return oveURL + 'clients';
 };

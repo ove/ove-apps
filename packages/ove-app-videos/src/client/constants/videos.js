@@ -2,8 +2,8 @@ const Constants = {
     /**************************************************************
                                 Viewer
     **************************************************************/
-    BUFFER_STATUS_BROADCAST_FREQUENCY: 700,
-    RESCALE_DURING_REFRESH_TIMEOUT: 1000,
+    BUFFER_STATUS_BROADCAST_FREQUENCY: 700, // Unit: milliseconds
+    RESCALE_DURING_REFRESH_TIMEOUT: 1000, // Unit: milliseconds
 
     /**************************************************************
                               Controller
@@ -20,7 +20,7 @@ const Constants = {
     YOUTUBE_PLAYBACK_LOOP_TEST_INTERVAL: 100, // Unit: milliseconds
 
     /**************************************************************
-                               Back-end
+                                Server
     **************************************************************/
     SOCKET_REFRESH_DELAY: 5000, // Unit: milliseconds
     SOCKET_READY_WAIT_TIME: 3000, // Unit: milliseconds

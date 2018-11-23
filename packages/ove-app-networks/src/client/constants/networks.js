@@ -5,7 +5,7 @@ const Constants = {
     DEFAULT_STATE_NAME: 'SigmaSample',
 
     /**************************************************************
-                               Back-end
+                                Server
     **************************************************************/
     SOCKET_REFRESH_DELAY: 5000, // Unit: milliseconds
     SOCKET_READY_WAIT_TIME: 3000, // Unit: milliseconds
