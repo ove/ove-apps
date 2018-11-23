@@ -29,8 +29,8 @@ function drawMonitors () {
     log.debug('Drawing Monitors');
 
     // This function draws a rectangle representing each monitor, and defines the associated interactivity
-    d3.json(buildClientsURL())
-        .then(function (clients) {
+    d3.json(buildSpacesURL())
+        .then(function (spaces) {
             log.debug('Loaded Spaces.json');
 
             // Ensure the monitorGrid SVG is empty
@@ -39,8 +39,8 @@ function drawMonitors () {
 
             // Use the contents of Spaces.json to construct a list recording the id and position of each monitor,
             // and the horizontal and vertical shifts applied to it.
-            const id = OVE.Utils.getQueryParam('oveClientId');
-            let layout = clients[id];
+            const id = OVE.Utils.getQueryParam('oveSpace');
+            let layout = spaces[id];
             layout = layout.map(function (d, i) {
                 d.clientId = i;
                 d.horizontalShift = 0;

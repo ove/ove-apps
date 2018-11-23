@@ -10,7 +10,7 @@ updateImage = function () {
         // Fix for chrome unable to load large images (#54)
         const config = window.ove.state.current.config;
         if (config.tileSources && config.tileSources.url) {
-            config.tileSources.url += '?nonce=' + OVE.Utils.getQueryParam('oveClientId');
+            config.tileSources.url += '?nonce=' + OVE.Utils.getQueryParam('oveViewId');
             log.info('Using tile-source URL:', config.tileSources.url);
         }
         loadOSD(config).then(function () {

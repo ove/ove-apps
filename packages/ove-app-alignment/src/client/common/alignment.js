@@ -14,8 +14,8 @@ $(function () {
     });
 });
 
-// This function constructs the URL (served by OVe-core) that will return the contents of the Spaces.json file
-buildClientsURL = function () {
+// This function constructs the URL (served by OVE Core) that will return the contents of the Spaces.json file
+buildSpacesURL = function () {
     let serverURL = '';
     const scripts = document.getElementsByTagName('script');
     for (let i = 0; i < scripts.length; i++) {

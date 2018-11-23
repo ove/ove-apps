@@ -146,17 +146,17 @@ function createTriangles () {
     log.debug('Drawing triangles');
 
     // We need to load Spaces.json, as we want to position right-angled triangles so that they cross each screen's edge
-    d3.json(buildClientsURL()).then(function (clients) {
+    d3.json(buildSpacesURL()).then(function (spaces) {
         const id = OVE.Utils.getSpace();
 
         // Construct list of points at the midpoint of the right edge of each screen
         // l is a property that sets the size of triangle that will be drawn on each edge
-        let rightMiddlePoints = clients[id].map(function (d) {
+        let rightMiddlePoints = spaces[id].map(function (d) {
             return { cx: d.x + d.w, cy: d.y + d.h / 2, l: d.h / 2 };
         });
 
         // Construct list of points at the midpoint of the bottom edge of each screen
-        let bottomMiddlePoints = clients[id].map(function (d) {
+        let bottomMiddlePoints = spaces[id].map(function (d) {
             return { cx: d.x + d.w / 2, cy: d.y + d.h, l: d.h / 2 };
         });
         let allPoints = rightMiddlePoints.concat(bottomMiddlePoints);

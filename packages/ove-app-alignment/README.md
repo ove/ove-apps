@@ -22,7 +22,7 @@ curl --header "Content-Type: application/json" --request POST --data "{\"app\": 
 
 ## Controlling the App
 
-The controller of the app can be loaded by accessing the URL `http://OVE_APP_ALIGNMENT_HOST:PORT/control.html?oveSectionId=SECTION_ID&oveClientId=SPACE_NAME`.
+The controller of the app can be loaded by accessing the URL `http://OVE_APP_ALIGNMENT_HOST:PORT/control.html?oveSectionId=SECTION_ID&oveSpace=SPACE_NAME`.
 
 The app enables the display of one of two patterns (a grid of vertical and horizontal lines, or a series of parallel diagonal lines) that span an entire `oveCanvas`. From the controller page, a user can select one or more OVE clients, use the arrow keys to move the pattern on these clients until it aligns with the others, and then export a modified `Spaces.json` file.
 

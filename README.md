@@ -48,7 +48,7 @@ Build and start runtime:
 Run in Google Chrome:
 
 * Control Page   `http://localhost:8081/control.html?oveSectionId=0&layers=0`
-* Client pages   `http://localhost:8080/view.html?oveClientId=LocalNine-0` < check Spaces.json for info
+* Client pages   `http://localhost:8080/view.html?oveViewId=LocalNine-0` < check Spaces.json for info
 * App's API docs `http://localhost:8081/api-docs`
 
 It is recommended to use OVE with Google Chrome, as this is the web browser used for development and in production at the DSI. However, it should also be compatible with other modern web browsers: if you encounter any browser-specific bugs please [report them as an Issue](https://github.com/ove/ove-apps/issues).
