@@ -23,5 +23,5 @@ buildSpacesURL = function () {
             oveURL = scripts[i].src.substring(0, scripts[i].src.lastIndexOf('/') + 1);
         }
     }
-    return oveURL + 'clients';
+    return oveURL + 'spaces';
 };
