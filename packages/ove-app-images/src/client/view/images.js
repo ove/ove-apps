@@ -35,16 +35,16 @@ updateImage = function () {
 
 setPosition = function () {
     const context = window.ove.context;
-    const l = window.ove.layout;
+    const g = window.ove.geometry;
     const v = window.ove.state.current.viewport;
-    if (v && Object.keys(l).length !== 0) {
+    if (v && Object.keys(g).length !== 0) {
         // multiplying by 0.5 to get half the distance, for horizontal and vertical center.
-        const center = [v.bounds.x + v.bounds.w * (0.5 * l.w + l.x) / l.section.w,
-            v.bounds.y + v.bounds.h * (0.5 * l.h + l.y) / l.section.h];
+        const center = [v.bounds.x + v.bounds.w * (0.5 * g.w + g.x) / g.section.w,
+            v.bounds.y + v.bounds.h * (0.5 * g.h + g.y) / g.section.h];
         // We always center the image and then zoom it.
         // This is a recurrent operation, and therefore is not logged on the browser console.
         context.osd.viewport.panTo(
-            new OpenSeadragon.Point(center[0], center[1]), true).zoomTo(v.zoom * l.section.w / l.w);
+            new OpenSeadragon.Point(center[0], center[1]), true).zoomTo(v.zoom * g.section.w / g.w);
         if (!context.osd.isVisible()) {
             setTimeout(function () {
                 log.debug('Making OpenSeadragon visible');

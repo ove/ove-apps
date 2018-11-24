@@ -7,16 +7,16 @@ initView = function () {
 
 updateMap = function () {
     const context = window.ove.context;
-    const l = window.ove.layout;
+    const g = window.ove.geometry;
     // This check is required since the state may not be loaded when the viewer
     // receives a state update.
-    if (Object.keys(l).length === 0) {
+    if (Object.keys(g).length === 0) {
         log.debug('State not fully loaded - retrying');
         return;
     }
     const p = window.ove.state.current.position;
-    const center = [+(p.bounds.x) + (p.bounds.w * (0.5 * l.w + l.x) / l.section.w),
-        +(p.bounds.y) + (p.bounds.h * (0.5 * l.h + l.y) / l.section.h)];
+    const center = [+(p.bounds.x) + (p.bounds.w * (0.5 * g.w + g.x) / g.section.w),
+        +(p.bounds.y) + (p.bounds.h * (0.5 * g.h + g.y) / g.section.h)];
     // Unlike in the controller, all layers will be explicitly shown or hidden based
     // on whether they have been enabled.
     context.layers.forEach(function (e, i) {

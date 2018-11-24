@@ -71,16 +71,16 @@ beginInitialization = function () {
     log.debug('Starting viewer initialization');
     OVE.Utils.initView(initView, loadURL, function () {
         let context = window.ove.context;
-        const l = window.ove.layout;
+        const g = window.ove.geometry;
         // Appropriately scaling and positioning the player is necessary.
-        context.scale = Math.min(l.section.w / l.w, l.section.h / l.h);
-        let width = (l.section.w / context.scale) + 'px';
-        let height = (l.section.h / context.scale) + 'px';
+        context.scale = Math.min(g.section.w / g.w, g.section.h / g.h);
+        let width = (g.section.w / context.scale) + 'px';
+        let height = (g.section.h / context.scale) + 'px';
         log.debug('Scaling viewer:', context.scale, ', height:', height, ', width:', width);
         $(Constants.CONTENT_DIV).css({
             zoom: 1,
-            transformOrigin: 100 * l.x / (l.section.w - l.section.w / context.scale) + '% ' +
-                             100 * l.y / (l.section.h - l.section.h / context.scale) + '%',
+            transformOrigin: 100 * g.x / (g.section.w - g.section.w / context.scale) + '% ' +
+                             100 * g.y / (g.section.h - g.section.h / context.scale) + '%',
             transform: 'scale(' + context.scale + ')',
             width: width,
             height: height

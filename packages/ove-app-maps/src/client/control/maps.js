@@ -3,7 +3,7 @@ initControl = function (data) {
     context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 
-    const l = window.ove.layout;
+    const g = window.ove.geometry;
     OVE.Utils.resizeController('.map, .outer');
     initCommon().then(function () {
         if (context.layers.length === 0) {
@@ -34,7 +34,7 @@ initControl = function (data) {
             // the original resolution intended for the controller. The data.scaled property
             // is used to determine the option.
             resolution: +(data.resolution) *
-                (data.scaled ? Math.sqrt(l.section.w * l.section.h /
+                (data.scaled ? Math.sqrt(g.section.w * g.section.h /
                     (parseInt($('.outer').css('width'), 10) * parseInt($('.outer').css('height'), 10))) : 1.0),
             zoom: parseInt(data.zoom, 10),
             enableRotation: false
@@ -63,7 +63,7 @@ uploadMapPosition = function () {
     const topLeft = context.map.getCoordinateFromPixel([0, 0]);
     const bottomRight = context.map.getCoordinateFromPixel(size);
     const resolution = +(context.map.getView().getResolution()) /
-        Math.sqrt(window.ove.layout.section.w * window.ove.layout.section.h / (size[0] * size[1]));
+        Math.sqrt(window.ove.geometry.section.w * window.ove.geometry.section.h / (size[0] * size[1]));
     if (topLeft === null || bottomRight === null) {
         log.debug('Waiting to get coordinates from pixels');
         // This method will loop until the top-left and bottom-right can be calculated.
