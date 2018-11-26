@@ -20,7 +20,7 @@ initView = function () {
 
 getClientSpecificURL = function (url) {
     // Fix for chrome unable to load large images (#54)
-    let csURL = url + '?nonce=' + OVE.Utils.getQueryParam('oveViewId');
+    let csURL = url + '?nonce=' + OVE.Utils.getViewId();
     log.debug('Using client-specific URL:', csURL);
     return csURL;
 };

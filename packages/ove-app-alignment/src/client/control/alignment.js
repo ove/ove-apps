@@ -40,8 +40,8 @@ function drawMonitors () {
             // Use the contents of Spaces.json to construct a list recording the id and position of each monitor,
             // and the horizontal and vertical shifts applied to it.
             const id = OVE.Utils.getQueryParam('oveSpace');
-            let layout = spaces[id];
-            layout = layout.map(function (d, i) {
+            let geometry = spaces[id];
+            geometry = geometry.map(function (d, i) {
                 d.clientId = i;
                 d.horizontalShift = 0;
                 d.verticalShift = 0;
@@ -53,10 +53,10 @@ function drawMonitors () {
             const width = window.innerWidth - 2 * margin;
             const height = window.innerHeight - 2 * margin;
 
-            const xMax = d3.max(layout.map(function (m) {
+            const xMax = d3.max(geometry.map(function (m) {
                 return m.x + m.w;
             }));
-            const yMax = d3.max(layout.map(function (m) {
+            const yMax = d3.max(geometry.map(function (m) {
                 return m.y + m.h;
             }));
 
@@ -77,7 +77,7 @@ function drawMonitors () {
 
             // Draw a rectangle for each monitor; apply class indexMonitor to monitor with clientId of 0
             let rects = svg.selectAll('.monitor')
-                .data(layout)
+                .data(geometry)
                 .enter()
                 .append('rect')
                 .attr('x', function (d) {
@@ -198,28 +198,28 @@ function broadcastMessage () {
 displayJSON = function () {
     // Construct array listing the position of each screen after applying shift
     let id = OVE.Utils.getQueryParam('oveClientId');
-    let newLayout = {};
-    newLayout[id] = d3.selectAll('.monitor')
+    let newGeometry = {};
+    newGeometry[id] = d3.selectAll('.monitor')
         .data()
         .map(function (d) {
             return { w: d.w, h: d.h, x: d.x + d.horizontalShift, y: d.y + d.verticalShift };
         });
 
     // Shift screens so no screens have negative x or y coordinates
-    const xOffset = d3.min(newLayout[id].map(function (d) { return d.x; }));
-    newLayout[id].map(function (d) { d.x -= xOffset; });
+    const xOffset = d3.min(newGeometry[id].map(function (d) { return d.x; }));
+    newGeometry[id].map(function (d) { d.x -= xOffset; });
 
-    const yOffset = d3.min(newLayout[id].map(function (d) { return d.y; }));
-    newLayout[id].map(function (d) { d.y -= yOffset; });
+    const yOffset = d3.min(newGeometry[id].map(function (d) { return d.y; }));
+    newGeometry[id].map(function (d) { d.y -= yOffset; });
 
     // Display new space dimensions (this will have increased in scrreens have been shifted outwards)
-    const spaceWidth = d3.max(newLayout[id].map(function (d) { return d.x + d.w; }));
-    const spaceHeight = d3.max(newLayout[id].map(function (d) { return d.y + d.h; }));
+    const spaceWidth = d3.max(newGeometry[id].map(function (d) { return d.x + d.w; }));
+    const spaceHeight = d3.max(newGeometry[id].map(function (d) { return d.y + d.h; }));
     d3.select('#space-size').text('Dimensions of space are w: ' + spaceWidth + ', h: ' + spaceHeight);
 
-    // Display JSON serialization of layout (with initial '{' and final '}' removed)
-    const layoutJSON = JSON.stringify(newLayout);
+    // Display JSON serialization of geometry (with initial '{' and final '}' removed)
+    const spacesJSON = JSON.stringify(newGeometry);
 
     d3.select('#spaces-json')
-        .text(layoutJSON.substring(1, layoutJSON.length - 1));
+        .text(spacesJSON.substring(1, spacesJSON.length - 1));
 };
