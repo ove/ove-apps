@@ -22,6 +22,7 @@
                 "changeEvent": true,
                 "initControl": true,
                 "log": true,
+                "OpenSeadragon": true,
                 "sendViewportDetails": true
             }
         },
