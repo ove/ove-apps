@@ -81,9 +81,9 @@ beginInitialization = function () {
         // The images controller can pre-load an existing state and continue navigation
         // from that point onwards and does not reset what's already loaded.
         window.ove.state.load().then(function () {
-            const loadingNewState = window.ove.state.current.loadedState !== undefined &&
-                window.ove.state.current.loadedState !== window.ove.state.name;
             const currentState = window.ove.state.current;
+            const loadingNewState = currentState.loadedState !== undefined &&
+                currentState.loadedState !== window.ove.state.name;
             if (!loadingNewState && currentState && currentState.viewport) {
                 // This happens when the image has been pre-loaded by a controller and
                 // the viewport information is already available.
