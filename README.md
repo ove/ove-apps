@@ -1,79 +1,21 @@
-# Open Visualisation Environment
+# Open Visualisation Environment - Apps
 
-Open Visualisation Environment (OVE) is an open-source software stack, designed to be used in large high resolution display (LHRD) environments like the [Imperial College](http://www.imperial.ac.uk) [Data Science Institute's](http://www.imperial.ac.uk/data-science/) [Data Observatory](http://www.imperial.ac.uk/data-science/data-observatory/).
+This repository contains a collection of applications designed to run within [Open Visualisation Environment (OVE)](https://github.com/ove/ove).
+
+OVE is an open-source software stack, designed to be used in large high resolution display (LHRD) environments like the [Imperial College](http://www.imperial.ac.uk) [Data Science Institute's](http://www.imperial.ac.uk/data-science/) [Data Observatory](http://www.imperial.ac.uk/data-science/data-observatory/).
 
 We welcome collaboration under our [Code of Conduct](https://github.com/ove/ove-apps/blob/master/CODE_OF_CONDUCT.md).
 
-## Build Instructions
+OVE needs to be installed before using OVE apps. The [OVE Documentation](https://dsi.gitbook.io/ove) provides [installation instructions](https://dsi.gitbook.io/ove/installation) and a [user guide](https://dsi.gitbook.io/ove/usage).
 
-The build system is based on [Lerna](https://lernajs.io/) using [Babel](http://babeljs.io/) for [Node.js](https://nodejs.org/en/) and uses a [PM2](http://pm2.keymetrics.io/) runtime.
+This repository contains the following OVE Apps:
 
-### Prerequisites
-
-* [git](https://git-scm.com/downloads)
-* [Node.js](https://nodejs.org/en/) (v8.0+)
-* [npm](https://www.npmjs.com/)
-* [npx](https://www.npmjs.com/package/npx) `npm install -global npx`
-* [PM2](http://pm2.keymetrics.io/) `npm install -global pm2`
-* [Lerna](https://lernajs.io/)  `npm install -global lerna`
-* [Tuoris](https://github.com/fvictor/tuoris)
-
-### Build
-
-Setup the Tuoris service (dependency of SVG application):
-
-<!---
-Victor still has not accepted a PR https://github.com/fvictor/tuoris/pull/1, which is required for OVE, and hence a fork is being cloned for now.
---->
-
-* `git clone https://github.com/senakafdo/tuoris`
-* `cd tuoris`
-* `npm install`
-* `pm2 start index.js -f -n "tuoris" -- -p 7080 -i 1`
-
-Setup the lerna environment:
-
-* `git clone https://github.com/ove/ove-apps`
-* `cd ove-apps`
-* `lerna bootstrap --hoist`
-
-Build and start runtime:
-
-* `lerna run clean`
-* `lerna run build`
-* `OVE_HOST="localhost:8080" TUORIS_HOST="localhost:7080" pm2 start pm2.json`
-
-### Run
-
-Run in Google Chrome:
-
-* Control Page   `http://localhost:8081/control.html?oveSectionId=0&layers=0`
-* Client pages   `http://localhost:8080/view.html?oveViewId=LocalNine-0` < check Spaces.json for info
-* App's API docs `http://localhost:8081/api-docs`
-
-It is recommended to use OVE with Google Chrome, as this is the web browser used for development and in production at the DSI. However, it should also be compatible with other modern web browsers: if you encounter any browser-specific bugs please [report them as an Issue](https://github.com/ove/ove-apps/issues).
-
-### Stop
-
-* `pm2 stop pm2.json`
-* `pm2 delete pm2.json`
-
-## Docker
-
-Alternatively, you can use docker to build this image:
-
-```sh
-./build.sh
-```
-
-In order to run the image, you can customize the docker-compose file or run the default configuration:
-
-```sh
-SERVICE_VERSION="latest" docker-compose up -d
-```
-
-The apps are now running in the port range of 8081 to 8090 on localhost.
-
-### Development
-
-If you are a developer who has made changes to your local copy of OVE apps, you can quickly rebuild it with the **build.sh** script and then run the app with the **docker-compose** file. The **docker-compose.yml** file can be customized to reflect local changes.
+* [Alignment](./packages/ove-app-alignment) - helps align the monitors in an OVE installation.
+* [Audio](./packages/ove-app-audio) - supports the playing of audio files within the OVE Framework.
+* [Charts](./packages/ove-app-charts) - supports visualisation of charts using the OVE framework.
+* [HTML](./packages/ove-app-html) - supports displaying HTML web pages using the OVE framework.
+* [Images](./packages/ove-app-images) - supports the display of images using the OVE framework.
+* [Maps](./packages/ove-app-maps) - supports visualisation of dynamic maps using the OVE framework.
+* [Networks](./packages/ove-app-networks) - supports visualisation of networks with node-link diagrams using the OVE framework.
+* [SVG](./packages/ove-app-svg) - supports rendering SVG using the OVE framework.
+* [Videos](./packages/ove-app-videos) - supports playing videos using the OVE framework.
