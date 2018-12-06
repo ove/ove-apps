@@ -7,7 +7,6 @@ src
 **/coverage
 
 npm-debug.log
-package-lock.json
 Dockerfile*
 docker-compose*
 .dockerignore
@@ -18,6 +17,9 @@ docker-compose*
 
 renovate.json
 pm2-windows.json
+
+package-lock.json
+**/package-lock.json
 
 *.md
 **/*.md
