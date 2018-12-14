@@ -291,7 +291,8 @@ loadSigma = function () {
     }
 
     // sigma.js supports two content formats, GEXF (Gephi) and JSON. The format is chosen based
-    // on the type of url specified in the state configuration.
+    // on the type of url specified in the state configuration. Alternatively, a Neo4j configuration
+    // can also be passed.
     if (window.ove.state.current.jsonURL) {
         let url = getClientSpecificURL(window.ove.state.current.jsonURL);
         log.info('Loading content of format:', 'JSON', ', URL:', url);
@@ -300,5 +301,69 @@ loadSigma = function () {
         let url = getClientSpecificURL(window.ove.state.current.gexfURL);
         log.info('Loading content of format:', 'GEXF', ', URL:', url);
         sigma.parsers.gexf(url, context.sigma, refreshSigma);
+    } else if (window.ove.state.current.neo4j) {
+        let config = window.ove.state.current.neo4j;
+        log.info('Loading content from Neo4j database:', config.db.url, ', with query:', config.query);
+
+        // Custom parse function that builds nodes and edges from the contents of the Graph database
+        sigma.neo4j.cypher_parse = function (result) {
+            const g = window.ove.geometry;
+
+            let graph = { nodes: [], edges: [] };
+            let nodesMap = {};
+            let edgesMap = {};
+
+            const transformX = config.x && (config.x.min !== undefined) && (config.x.max !== undefined);
+            const transformY = config.y && (config.y.min !== undefined) && (config.y.max !== undefined);
+
+            if (transformX && transformY) {
+                log.debug('Transforming X and Y coordinates');
+            } else if (transformX) {
+                log.debug('Transforming X coordinates');
+            } else if (transformY) {
+                log.debug('Transforming Y coordinates');
+            }
+
+            result.results[0].data.forEach(function (data) {
+                data.graph.nodes.forEach(function (node) {
+                    const id = node.id;
+                    if (!(id in nodesMap)) {
+                        nodesMap[id] = {
+                            id: node.id,
+                            x: transformX ? ((node.properties.x - config.x.min) /
+                                (config.x.max - config.x.min)) * g.section.w : node.properties.x,
+                            y: transformY ? ((node.properties.y - config.y.min) /
+                                (config.y.max - config.y.min)) * g.section.h : node.properties.y,
+                            size: node.properties.size,
+                            color: node.properties.color,
+                            attributes: node.properties
+                        };
+                    }
+                });
+
+                data.graph.relationships.forEach(function (edge) {
+                    const id = edge.id;
+                    if (!(id in edgesMap)) {
+                        edgesMap[id] = {
+                            id: id,
+                            source: edge.startNode,
+                            target: edge.endNode,
+                            color: edge.properties.color,
+                            attributes: edge.properties
+                        };
+                    }
+                });
+            });
+
+            log.debug('Populating graph with nodes and edges');
+            for (let key in nodesMap) {
+                graph.nodes.push(nodesMap[key]);
+            }
+            for (let key in edgesMap) {
+                graph.edges.push(edgesMap[key]);
+            }
+            return graph;
+        };
+        sigma.neo4j.cypher(config.db, config.query, context.sigma, refreshSigma);
     }
 };

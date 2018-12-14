@@ -20,6 +20,28 @@ The state of this app has a format similar to:
 
 The `jsonURL` property should be replaced with with `gexfURL` property depending on the format in which the dataset is specified. Information on all available `settings` can be found in [Sigma documentation](https://github.com/jacomyal/sigma.js/wiki/Settings). The `renderer` property is optional and defaults to `webgl`.
 
+If the content is available on a [Neo4j](https://neo4j.com/docs) database the state of this app needs to have a format similar to:
+
+```json
+{
+    "neo4j": {
+        "x": { "min": 0, "max": 100 },
+        "y": { "min": 0, "max": 100 },
+        "db": { "url": "http://localhost:7474", "user": "neo4j", "password": "admin" },
+        "query": "MATCH (n) RETURN n LIMIT 100"
+      },
+    "settings": {
+        "autoRescale": true,
+        "clone": false,
+        "rescaleIgnoreSize": true,
+        "skipErrors": true
+    },
+    "renderer": "canvas"
+}
+```
+
+A [Cypher](https://neo4j.com/docs/cypher-refcard/current/) query should be provided as the `query` along with the database connection details as the value of the `db` property. The `min` and `max` values along the `x` and `y` axes also needs to be provided if the graph coordinates does not map to pixel coordinates on the screens. Information on all available `settings` can be found in [Sigma documentation](https://github.com/jacomyal/sigma.js/wiki/Settings). The `renderer` property is optional and defaults to `webgl`.
+
 ## Loading the App
 
 A node-link diagram can be loaded using the OVE APIs:
