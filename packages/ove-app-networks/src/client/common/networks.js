@@ -269,6 +269,7 @@ runOperation = function (message) {
 refreshSigma = function (sigma) {
     log.debug('Refreshing Sigma');
     sigma.refresh();
+    log.trace('Completed refreshing Sigma');
     // Rerun any operations if they were cached in the application state.
     if (window.ove.state.current.operation) {
         runOperation(window.ove.state.current.operation);
@@ -303,18 +304,15 @@ loadSigma = function () {
         sigma.parsers.gexf(url, context.sigma, refreshSigma);
     } else if (window.ove.state.current.neo4j) {
         let config = window.ove.state.current.neo4j;
-        log.info('Loading content from Neo4j database:', config.db.url, ', with query:', config.query);
+        const g = window.ove.geometry;
+        const transformX = config.x && (config.x.min !== undefined) && (config.x.max !== undefined);
+        const transformY = config.y && (config.y.min !== undefined) && (config.y.max !== undefined);
 
         // Custom parse function that builds nodes and edges from the contents of the Graph database
         sigma.neo4j.cypher_parse = function (result) {
-            const g = window.ove.geometry;
-
             let graph = { nodes: [], edges: [] };
             let nodesMap = {};
             let edgesMap = {};
-
-            const transformX = config.x && (config.x.min !== undefined) && (config.x.max !== undefined);
-            const transformY = config.y && (config.y.min !== undefined) && (config.y.max !== undefined);
 
             if (transformX && transformY) {
                 log.debug('Transforming X and Y coordinates');
@@ -362,8 +360,38 @@ loadSigma = function () {
             for (let key in edgesMap) {
                 graph.edges.push(edgesMap[key]);
             }
+
+            log.debug('Adding bounding box');
+            let count = graph.nodes.length;
+            const coords = [[0, 0], [0, g.section.h], [g.section.w, 0], [g.section.w, g.section.h]];
+            for (let i = 0; i < coords.length; i++) {
+                graph.nodes.push({
+                    id: count + i,
+                    x: coords[i][0],
+                    y: coords[i][1],
+                    size: 1,
+                    color: config.boundingBoxColor || 'rgb(0, 0, 0)'
+                });
+            }
             return graph;
         };
-        sigma.neo4j.cypher(config.db, config.query, context.sigma, refreshSigma);
+
+        let query = config.query;
+        if (transformX) {
+            let range = {
+                min: g.x !== undefined ? (g.x / g.section.w * (config.x.max - config.x.min) + config.x.min) : config.x.min,
+                max: g.x !== undefined ? ((g.x + g.w) / g.section.w * (config.x.max - config.x.min) + config.x.min) : config.x.max
+            };
+            query = query.replace(/X_MIN/g, range.min).replace(/X_MAX/g, range.max);
+        }
+        if (transformY) {
+            let range = {
+                min: g.y !== undefined ? (g.y / g.section.h * (config.y.max - config.y.min) + config.y.min) : config.y.min,
+                max: g.y !== undefined ? ((g.y + g.h) / g.section.h * (config.y.max - config.y.min) + config.y.min) : config.y.max
+            };
+            query = query.replace(/Y_MIN/g, range.min).replace(/Y_MAX/g, range.max);
+        }
+        log.info('Loading content from Neo4j database:', config.db.url, ', with query:', query);
+        sigma.neo4j.cypher(config.db, query, context.sigma, refreshSigma);
     }
 };
