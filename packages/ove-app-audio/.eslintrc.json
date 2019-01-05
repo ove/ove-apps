@@ -45,7 +45,7 @@
                     "ignoreRestSiblings": true,
                     "varsIgnorePattern": "OVE.*Player"}]
             },
-			"globals": {
+            "globals": {
                 "Howl": true
             }
         },

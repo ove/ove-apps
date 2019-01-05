@@ -98,6 +98,17 @@
       "env": {
           "PORT": "8089"
       }
+    },
+    {
+      "name": "@ove/ove-app-whiteboard",
+      "cwd": "./packages/ove-app-whiteboard",
+      "kill_timeout": 3000,
+      "restart_delay": 3000,
+      "script": "npm",
+      "args": "run start",
+      "env": {
+          "PORT": "8090"
+      }
     }
   ]
 }

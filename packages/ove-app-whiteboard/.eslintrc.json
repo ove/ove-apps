@@ -3,6 +3,7 @@
     "globals": {
         "$": true,
         "Constants": true,
+        "fetch": true,
         "OVE": true
     },
     "overrides": [
@@ -10,23 +11,24 @@
             "files": [ "**/view/*.js" ],
             "globals": {
                 "initView": true,
-                "loadTuorisClient": true,
                 "log": true
             }
         },
         {
             "files": [ "**/control/*.js" ],
             "globals": {
+                "FileReader": true,
                 "initControl": true,
-                "log": true
+                "log": true,
+                "prompt": true
             }
         },
         {
             "files": [ "**/*.js" ],
             "globals": {
                 "beginInitialization": true,
-                "getCSS": true,
-                "loadSVGFrame": true
+                "initializePlotter": true,
+                "updateCanvas": true
             }
         }
     ],

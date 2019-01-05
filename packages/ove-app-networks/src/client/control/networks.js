@@ -24,7 +24,7 @@ initControl = function (data) {
                 window.ove.state.cache();
             } else {
                 // This can only happen due to a user error
-                log.warn('Unknown operation:', message.operation);
+                log.warn('Ignoring unknown operation:', message.operation);
             }
         }
     });

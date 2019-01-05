@@ -9,7 +9,7 @@ initView = function () {
                 runOperation(message);
             } else {
                 // This can only happen due to a user error
-                log.warn('Unknown operation:', message.operation);
+                log.warn('Ignoring unknown operation:', message.operation);
             }
         } else {
             window.ove.state.current = message;

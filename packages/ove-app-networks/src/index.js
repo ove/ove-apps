@@ -1,7 +1,7 @@
 const { Constants } = require('./client/constants/networks');
 const HttpStatus = require('http-status-codes');
 const path = require('path');
-var parser = require('odata-parser');
+const parser = require('odata-parser');
 const { express, app, log, nodeModules, Utils } = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const server = require('http').createServer(app);
 

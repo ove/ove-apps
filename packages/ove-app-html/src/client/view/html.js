@@ -6,7 +6,7 @@ initView = function () {
 
 getCSS = function () {
     const g = window.ove.geometry;
-    // The webpage is plotted across the entire section and then
+    // The web page is plotted across the entire section and then
     // moved into place based on the client's coordinates.
     const css = {
         transform: 'translate(-' + g.x + 'px,-' + g.y + 'px)',
