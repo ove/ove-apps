@@ -19,6 +19,8 @@ The state of this app has a format similar to:
 }
 ```
 
+The `url`, property is mandatory. Optionally, `launchDelay` and `changeAt` properties can be provided to control the initial delay to pre-load the contents of the web page and the precise time at which all clients will change the page they display.
+
 ## Loading the App
 
 A web page can be loaded using the OVE APIs:

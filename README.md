@@ -17,6 +17,7 @@ This repository contains the following OVE Apps:
 * [Images](./packages/ove-app-images) - supports the display of images using the OVE framework.
 * [Maps](./packages/ove-app-maps) - supports visualisation of dynamic maps using the OVE framework.
 * [Networks](./packages/ove-app-networks) - supports visualisation of networks with node-link diagrams using the OVE framework.
+* [PDF](./packages/ove-app-pdf) - supports displaying PDF documents using the OVE framework.
 * [SVG](./packages/ove-app-svg) - supports rendering SVG using the OVE framework.
 * [Videos](./packages/ove-app-videos) - supports playing videos using the OVE framework.
 * [Whiteboard](./packages/ove-app-whiteboard) - creates a whiteboard that can be used within the OVE framework.

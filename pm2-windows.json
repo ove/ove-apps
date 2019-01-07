@@ -110,6 +110,17 @@
           "PORT": "8090",
           "OVE_HOST": "localhost:8080"
       }
+    },
+    {
+      "name": "@ove/ove-app-pdf",
+      "cwd": "./packages/ove-app-pdf",
+      "kill_timeout": 3000,
+      "restart_delay": 3000,
+      "script": "dist/index.js",
+      "env": {
+          "PORT": "8091",
+          "OVE_HOST": "localhost:8080"
+      }
     }
   ]
 }

@@ -109,6 +109,17 @@
       "env": {
           "PORT": "8090"
       }
+    },
+    {
+      "name": "@ove/ove-app-pdf",
+      "cwd": "./packages/ove-app-pdf",
+      "kill_timeout": 3000,
+      "restart_delay": 3000,
+      "script": "npm",
+      "args": "run start",
+      "env": {
+          "PORT": "8091"
+      }
     }
   ]
 }

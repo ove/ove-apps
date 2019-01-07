@@ -1,0 +1,169 @@
+const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
+
+$(function () {
+    // This is what happens first. After OVE is loaded, either the viewer or controller
+    // will be initialized.
+    $(document).ready(function () {
+        log.debug('Starting application');
+        window.ove = new OVE(Constants.APP_NAME);
+        log.debug('Completed loading OVE');
+        window.ove.context.isInitialized = false;
+        beginInitialization();
+    });
+});
+
+updatePDF = function () {
+    const context = window.ove.context;
+    const state = window.ove.state.current;
+
+    if (!context.isInitialized) {
+        log.debug('Setting worker options for PDF.js');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js';
+
+        context.factor = getScalingFactor();
+        log.debug('Using scaling factor:', context.factor);
+
+        context.isInitialized = true;
+        log.debug('Application is initialized:', context.isInitialized);
+    }
+
+    if (context.url !== state.url || !context.pdf) {
+        log.debug('Fetching document from url:', state.url);
+        pdfjsLib.getDocument(state.url).promise.then(function (pdf) {
+            context.url = state.url;
+            context.pdf = pdf;
+            renderPDF(context.pdf);
+        }).catch(log.error);
+    } else {
+        // The document was already fetched, it can be reused. This will enhance performance.
+        renderPDF(context.pdf);
+    }
+};
+
+renderPDF = function (pdf) {
+    log.debug('Starting PDF rendering');
+    const context = window.ove.context;
+    const state = window.ove.state.current;
+
+    if (context.renderingInProgress) {
+        return;
+    }
+    context.renderingInProgress = true;
+
+    pdf.getPage(state.settings.startPage || 1).then(function (firstPage) {
+        const g = window.ove.geometry;
+        const pageGap = parseInt(state.settings.pageGap || Constants.DEFAULT_PAGE_GAP, 10);
+        log.debug('Using page-gap:', pageGap);
+
+        // The scale can be cached in the current state or provided as a configuration setting.
+        // If this not provided the default value will be used.
+        const scale = state.scale || state.settings.scale || Constants.DEFAULT_SCALE;
+        log.debug('Using scale:', scale);
+        let viewport = firstPage.getViewport(scale);
+        let dim = {
+            c: Math.floor(g.section.w / (viewport.width + pageGap)),
+            r: Math.floor(g.section.h / (viewport.height + pageGap)),
+            w: viewport.width,
+            h: viewport.height
+        };
+        dim.border = {
+            x: (g.section.w - (viewport.width + pageGap) * dim.c - pageGap) / 2,
+            y: (g.section.h - (viewport.height + pageGap) * dim.r - pageGap) / 2
+        };
+        log.debug('Computed page dimensions:', dim);
+
+        const renderPage = function (page) {
+            const i = page.pageNumber;
+
+            let viewport = page.getViewport(scale);
+            let pageDim = { border: { x: 0, y: 0 } };
+            if (viewport.width !== dim.w || viewport.height !== dim.h) {
+                log.debug('The size or aspect ratio is different on page:', i);
+                if (viewport.width / dim.w > viewport.height / dim.h) {
+                    const newScale = scale * dim.w / viewport.width;
+                    log.debug('Using new scale:', newScale);
+                    viewport = page.getViewport(newScale);
+                    pageDim.border.y = (dim.h - viewport.height) / 2;
+                } else {
+                    const newScale = scale * dim.h / viewport.height;
+                    log.debug('Using new scale:', newScale);
+                    viewport = page.getViewport(newScale);
+                    pageDim.border.x = (dim.w - viewport.width) / 2;
+                }
+            }
+            pageDim.h = viewport.height;
+            pageDim.w = viewport.width;
+
+            // Unless specified the default scroll direction depends on the number of rows and columns. If there
+            // are more rows, then the scroll direction would default to horizontal otherwise it will always be
+            // vertical.
+            let scrollDir = (state.settings.scrolling ||
+                (dim.c < dim.r ? Constants.Scrolling.HORIZONTAL : Constants.Scrolling.VERTICAL)).toLowerCase();
+            if (scrollDir !== Constants.Scrolling.VERTICAL && scrollDir !== Constants.Scrolling.HORIZONTAL) {
+                log.warn('Unknown scroll direction:', state.settings.scrolling);
+                // If direction is unknown reset to default
+                scrollDir = (dim.c < dim.r ? Constants.Scrolling.HORIZONTAL : Constants.Scrolling.VERTICAL);
+            }
+            log.debug('Using scroll direction:', scrollDir);
+
+            // The position of the page should take three things into consideration in addition to the page number:
+            //     1. The overall border
+            //     2. The offset if panning has taken place
+            //     3. The page specific border if the aspect ratio is different to the first page
+            // All of these values are calculated along both the x and y axes.
+            const marginX = (state.offset.x || 0) + dim.border.x + pageDim.border.x + (dim.w + pageGap) *
+                (scrollDir === Constants.Scrolling.VERTICAL ? (i - firstPage.pageNumber) % dim.c : Math.floor((i - firstPage.pageNumber) / dim.r));
+            const marginY = (state.offset.y || 0) + dim.border.y + pageDim.border.y + (dim.h + pageGap) *
+                (scrollDir !== Constants.Scrolling.VERTICAL ? (i - firstPage.pageNumber) % dim.r : Math.floor((i - firstPage.pageNumber) / dim.c));
+
+            const css = {
+                zoom: 1,
+                transformOrigin: '0% 0%',
+                transform: 'scale(' + (1 / context.factor) + ')',
+                // Each client is loaded in its original size and then scaled-down.
+                width: pageDim.w + 'px',
+                height: pageDim.h + 'px',
+                position: 'absolute',
+                marginLeft: marginX / context.factor,
+                marginTop: marginY / context.factor
+            };
+            if ($('#page' + i).length === 0) {
+                $('<canvas>', {
+                    id: 'page' + i
+                }).css(css).appendTo(Constants.CONTENT_DIV);
+            } else {
+                $('#page' + i).css(css);
+            }
+
+            if (context.scale !== scale) {
+                log.debug('Resizing canvas for page:', i);
+                let canvas = $('#page' + i)[0];
+                canvas.height = pageDim.h;
+                canvas.width = pageDim.w;
+
+                page.render({
+                    canvasContext: canvas.getContext('2d'),
+                    viewport: viewport
+                }).promise.catch(log.warn).then(function () {
+                    if (i === (state.settings.endPage || pdf.numPages)) {
+                        // Sets the scale to the context after the last page has rendered.
+                        // We wait for sometime for all pages to complete rendering.
+                        setTimeout(function () {
+                            context.scale = scale;
+                            context.renderingInProgress = false;
+                        }, Constants.RENDERING_TIMEOUT);
+                    }
+                    log.debug('Finished rendering page:', i);
+                });
+            } else {
+                context.renderingInProgress = false;
+            }
+        };
+
+        // Apply the render function on all pages;
+        let i = firstPage.pageNumber - 1;
+        while (i++ < (state.settings.endPage || pdf.numPages)) {
+            pdf.getPage(i).then(renderPage);
+        }
+    });
+};
