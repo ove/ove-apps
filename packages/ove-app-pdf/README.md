@@ -11,15 +11,19 @@ The state of this app has a format similar to:
     "url": "https://raw.githubusercontent.com/mozilla/pdf.js/master/test/pdfs/TAMReview.pdf",
     "settings": {
         "scale": 2,
-        "scrolling": "horizontal",
+        "offset": {
+            "x": 0,
+            "y": 0
+        },
         "pageGap": 50,
         "startPage": 1,
-        "endPage": 10
+        "endPage": 10,
+        "scrolling": "horizontal"
     }
 }
 ```
 
-The app accepts a `url` of a PDF document. All `settings` are optional. The `scale` is the scale at which each page is rendered. The `pageGap` is the number of pixels between each adjacent page. The app also accepts a `startPage` and `endPage` which can be used to limit the number of pages rendered. It will automatically compute the number of pages and decide on whether it is best to scroll horizontally or vertically depending on the dimensions of the section. This behaviour can be overridden by defining the `scrolling` property to be either `vertical` or `horizontal`.
+The app accepts a `url` of a PDF document. All `settings` are optional. The `scale` property defines the scale at which each page is rendered. It can be used to automatically zoom contents of a PDF when it loads. Similarly, `offset` can be used to automatically pan contents of a PDF when it loads. The `pageGap` is the number of pixels between each adjacent page. The app also accepts a `startPage` and `endPage` which can be used to limit the number of pages rendered. It will automatically compute the number of pages and decide on whether it is best to scroll horizontally or vertically depending on the dimensions of the section. This behaviour can be overridden by defining the `scrolling` property to be either `vertical` or `horizontal`.
 
 ## Loading the App
 
