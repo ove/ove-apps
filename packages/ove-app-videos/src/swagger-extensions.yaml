@@ -1,11 +1,11 @@
 tags:
-- name: "operation"
+- name: "operations"
   description: "Operations that can be performed on one or all videos"
 paths:
   /operation/bufferStatus:
     get:
       tags:
-      - "operation"
+      - "operations"
       summary: "Reads the buffer status of one or all videos"
       produces:
       - "application/json"
@@ -28,7 +28,7 @@ paths:
   /operation/pause:
     get:
       tags:
-      - "operation"
+      - "operations"
       summary: "Pauses playback on one or all videos"
       produces:
       - "application/json"
@@ -38,7 +38,7 @@ paths:
   /operation/play:
     get:
       tags:
-      - "operation"
+      - "operations"
       summary: "Plays one or all videos"
       produces:
       - "application/json"
@@ -61,7 +61,7 @@ paths:
   /operation/seekTo:
     get:
       tags:
-      - "operation"
+      - "operations"
       summary: "Seeks to a specific time one or all videos"
       produces:
       - "application/json"
@@ -84,7 +84,7 @@ paths:
   /operation/stop:
     get:
       tags:
-      - "operation"
+      - "operations"
       summary: "Stops playback one or all videos and resets time to the start"
       produces:
       - "application/json"

@@ -26,7 +26,7 @@ paths:
             type: object
       summary: "Reads the buffer status of one or all audio"
       tags:
-      - operation
+      - operations
   /operation/mute:
     get:
       parameters:
@@ -43,7 +43,7 @@ paths:
           description: "successful operation"
       summary: "Mutes playback one or all audio files"
       tags:
-      - operation
+      - operations
   /operation/pause:
     get:
       produces:
@@ -53,7 +53,7 @@ paths:
           description: "successful operation"
       summary: "Pauses playback on one or all audio"
       tags:
-      - operation
+      - operations
   /operation/play:
     get:
       parameters:
@@ -83,7 +83,7 @@ paths:
           description: "successful operation"
       summary: "Plays one or all audio files"
       tags:
-      - operation
+      - operations
   /operation/seekTo:
     get:
       parameters:
@@ -106,7 +106,7 @@ paths:
           description: "successful operation"
       summary: "Seeks to a specific time one or all audio files"
       tags:
-      - operation
+      - operations
   /operation/setPosition:
     get:
       parameters:
@@ -141,7 +141,7 @@ paths:
           description: "successful operation"
       summary: "sets the positional audio (in 3D) for one or all audio files"
       tags:
-      - operation
+      - operations
   /operation/setVolume:
     get:
       parameters:
@@ -164,7 +164,7 @@ paths:
           description: "successful operation"
       summary: "sets the volume level for one or all audio files"
       tags:
-      - operation
+      - operations
   /operation/stop:
     get:
       parameters:
@@ -181,7 +181,7 @@ paths:
           description: "successful operation"
       summary: "Stops playback one or all audio files and resets time to the start"
       tags:
-      - operation
+      - operations
   /operation/unmute:
     get:
       parameters:
@@ -198,7 +198,7 @@ paths:
           description: "successful operation"
       summary: "unutes playback one or all audio files"
       tags:
-      - operation
+      - operations
   /operation/volDown:
     get:
       parameters:
@@ -215,7 +215,7 @@ paths:
           description: "successful operation"
       summary: "decreases volume in one or all audio files"
       tags:
-      - operation
+      - operations
   /operation/volUp:
     get:
       parameters:
@@ -232,7 +232,7 @@ paths:
           description: "successful operation"
       summary: "increases volume in one or all audio files"
       tags:
-      - operation
+      - operations
 tags:
 - description: "Operations that can be performed on one or all audio"
-  name: operation
+  name: operations

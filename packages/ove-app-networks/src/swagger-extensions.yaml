@@ -1,11 +1,11 @@
 tags:
-- name: "operation"
+- name: "operations"
   description: "Operations that can be performed on one or all networks"
 paths:
   /operation/search:
     get:
       tags:
-      - "operation"
+      - "operations"
       summary: "Searches for nodes or edges that match the provider filters, and filters the display to hide nodes or edges that do not match the provided filters. Filters must be specified according to the OData v3.0 $filter specification."
       produces:
       - "application/json"
@@ -32,7 +32,7 @@ paths:
   /operation/color:
     get:
       tags:
-      - "operation"
+      - "operations"
       summary: "Recolors nodes or edges that match provider filters. Filters must be specified according to the OData v3.0 $filter specification."
       produces:
       - "application/json"
@@ -69,7 +69,7 @@ paths:
   /operation/labelNodes:
     get:
       tags:
-      - "operation"
+      - "operations"
       summary: "labels nodes that may optionally match provider filter. Filters must be specified according to the OData v3.0 $filter specification."
       produces:
       - "application/json"
@@ -96,7 +96,7 @@ paths:
   /operation/neighborsOf:
     get:
       tags:
-      - "operation"
+      - "operations"
       summary: "Displays neighbors of given node"
       produces:
       - "application/json"
