@@ -28,6 +28,7 @@ initControl = function (data) {
     }
     fetch(url).then(function (r) { return r.text(); }).then(function (text) {
         context.sections = JSON.parse(text);
+        context.transformation = { current: { zoom: 1, pan: { x: 0, y: 0 } }, next: { zoom: 1, pan: { x: 0, y: 0 } } };
         context.isInitialized = true;
         log.debug('Application is initialized:', context.isInitialized);
         log.debug('Registered information of sections, count:', context.sections.length);
@@ -48,7 +49,6 @@ initControl = function (data) {
                     function (name) {
                         log.debug('Setting up control sockets for app:', name);
                         section.ove = new OVE(name, context.hostname.substring(context.hostname.indexOf('//') + 2), section.id);
-                        // ^---- Fix //
                         section.ove.socket.on(function (message) {
                             if (!OVE.Utils.JSON.equals(message, section.current)) {
                                 log.trace('Fetching transformation from section:', section.id);
@@ -60,30 +60,49 @@ initControl = function (data) {
                                 log.trace('Sending difference request to URL:', endpoint, ', payload:', payload);
                                 $.ajax({ url: endpoint, type: 'POST', data: payload, contentType: 'application/json' })
                                     .done(function (transformation) {
-                                        applyTransformation(transformation, section.id);
+                                        const current = context.transformation.current;
+                                        context.transformation.next = {
+                                            zoom: current.zoom * transformation.zoom,
+                                            pan: { x: current.pan.x + transformation.pan.x, y: current.pan.y + transformation.pan.y }
+                                        };
                                     }).catch(log.error);
                             }
                         });
                     }).catch(log.error);
             } else {
-                context.sections.splice(i, 1); // <---- Test //
+                context.sections.splice(i, 1);
             }
         });
         // D3 is used for pan and zoom operations. Zoom is limited to a factor of 10.
         log.debug('Registering pan/zoom listeners');
         d3.select(Constants.CONTROL_CANVAS).call(d3.zoom().scaleExtent([1, 10]).on('zoom', function () {
+            const event = d3.event.transform;
+            log.trace('Got D3 event with, k:', event.k, 'x:', event.x, 'y:', event.y);
+            context.transformation.next = {
+                zoom: event.k,
+                pan: {
+                    // Avoid the scenario of getting a nasty -0.
+                    x: event.x === 0 ? 0 : -1 * event.x,
+                    y: event.y === 0 ? 0 : -1 * event.y
+                }
+            };
+        }));
+        // Separate out the application of the transformation (slow-running)
+        // from the capturing of the movement (fast-running).
+        setInterval(function () {
             if (context.operationInProgress) {
                 return;
             }
-            applyTransformation({
-                zoom: d3.event.transform.k,
-                pan: {
-                    // Avoid the scenario of getting a nasty -0.
-                    x: d3.event.transform.x === 0 ? 0 : -d3.event.transform.x,
-                    y: d3.event.transform.y === 0 ? 0 : -d3.event.transform.y
-                }
-            }, undefined);
-        }));
+            const current = context.transformation.current;
+            const next = context.transformation.next;
+            if (!OVE.Utils.JSON.equals(current, next)) {
+                context.transformation.current = next;
+                applyTransformation({
+                    zoom: next.zoom / current.zoom,
+                    pan: { x: next.pan.x - current.pan.x, y: next.pan.y - current.pan.y }
+                }, undefined);
+            }
+        }, Constants.TRANSFORMATION_TIMEOUT);
     });
     OVE.Utils.resizeController(Constants.CONTENT_DIV);
 
