@@ -64,7 +64,7 @@ sendViewportDetails = function () {
         if (!window.ove.state.current.viewport ||
             !OVE.Utils.JSON.equals(viewport, window.ove.state.current.viewport)) {
             window.ove.state.current.viewport = viewport;
-            
+
             if (window.ove.state.name) {
                 // Keep track of loaded state: this is used to check if the controller
                 // is attempting to load a different state.
