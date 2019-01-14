@@ -120,6 +120,17 @@
       "env": {
           "PORT": "8091"
       }
+    },
+    {
+      "name": "@ove/ove-app-controller",
+      "cwd": "./packages/ove-app-controller",
+      "kill_timeout": 3000,
+      "restart_delay": 3000,
+      "script": "npm",
+      "args": "run start",
+      "env": {
+          "PORT": "8092"
+      }
     }
   ]
 }
