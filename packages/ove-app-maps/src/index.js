@@ -1,8 +1,14 @@
 const { Constants } = require('./client/constants/maps');
 const path = require('path');
-const { express, app, log, nodeModules, config } = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
+const base = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
+const { express, app, Utils, log, nodeModules, config } = base;
 const request = require('request');
 const server = require('http').createServer(app);
+
+// BACKWARDS-COMPATIBILITY: For v0.2.0
+if (!base.operations) {
+    base.operations = {};
+}
 
 let layers = [];
 // The map layers can be provided as an embedded JSON data structure or as a URL pointing
@@ -34,6 +40,119 @@ app.get('/layers.json', function (_req, res) {
 });
 log.debug('Using module:', 'OpenLayers');
 app.use('/', express.static(path.join(nodeModules, 'openlayers', 'dist')));
+
+/*
+{"enabledLayers":["0"],"position":{"bounds":{"x":-38638.917798156595,"y":6714438.766397666,
+"w":55034.660365326905,"h":-7758.358370945789},"center":[-11137.70850550061,6710544.04980525],
+"resolution":3.5874064128523417,"zoom":12}}
+*/
+log.debug('Setting up state transformation operations');
+base.operations.canTransform = function (state, transformation) {
+    const combinations = [
+        ['state', 'transformation', 'transformation.zoom', 'transformation.pan', 'transformation.pan.x',
+            'transformation.pan.y', 'state.center', 'state.resolution'],
+        ['state', 'transformation', 'transformation.zoom', 'transformation.pan', 'transformation.pan.x',
+            'transformation.pan.y', 'state.position', 'state.position.center', 'state.position.resolution',
+            'state.position.bounds', 'state.position.bounds.x', 'state.position.bounds.y', 'state.position.bounds.w',
+            'state.position.bounds.h'],
+        ['state', 'transformation', 'transformation.zoom', 'state.resolution'],
+        ['state', 'transformation', 'transformation.zoom', 'state.position', 'state.position.resolution',
+            'state.position.bounds', 'state.position.center', 'state.position.bounds.x', 'state.position.bounds.y',
+            'state.position.bounds.w', 'state.position.bounds.h'],
+        ['state', 'transformation', 'transformation.pan', 'transformation.pan.x', 'transformation.pan.y',
+            'state.center', 'state.resolution'],
+        ['state', 'transformation', 'transformation.pan', 'transformation.pan.x', 'transformation.pan.y',
+            'state.position', 'state.position.center', 'state.position.resolution', 'state.position.bounds',
+            'state.position.bounds.x', 'state.position.bounds.y']
+    ];
+    let canTransform = false;
+    const evaluate = function (input, obj) {
+        return obj ? ((input.indexOf('.') === -1) ? obj[input]
+            : evaluate(input.substring(input.indexOf('.') + 1), obj[input.substring(0, input.indexOf('.'))]))
+            : undefined;
+    };
+    combinations.forEach(function (e) {
+        let result = true;
+        e.forEach(function (x) {
+            result = result && !Utils.isNullOrEmpty(evaluate(x, { state: state, transformation: transformation }));
+        });
+        canTransform = canTransform || result;
+    });
+    log.debug('Can' + (canTransform ? '' : '\'t') + 'transform state:', state, 'using:', transformation);
+    return canTransform;
+};
+
+base.operations.transform = function (input, transformation) {
+    let output = JSON.parse(JSON.stringify(input));
+    if (transformation.pan) {
+        if (output.center) {
+            // We need to force a parseFloat operation to avoid a string manipulation
+            output.center[0] = +(output.center[0]) + transformation.pan.x * output.resolution;
+            output.center[1] = +(output.center[1]) - transformation.pan.y * output.resolution;
+        } else {
+            output.position.center[0] = +(output.position.center[0]) + transformation.pan.x * output.position.resolution;
+            output.position.center[1] = +(output.position.center[1]) - transformation.pan.y * output.position.resolution;
+            output.position.bounds.x = +(output.position.bounds.x) + transformation.pan.x * output.position.resolution;
+            output.position.bounds.y = +(output.position.bounds.y) - transformation.pan.y * output.position.resolution;
+        }
+    }
+    if (transformation.zoom) {
+        if (output.resolution) {
+            output.resolution /= transformation.zoom;
+            output.zoom = +(output.zoom) + Math.ceil(Math.log2(transformation.zoom));
+        } else {
+            output.position.resolution /= transformation.zoom;
+            output.position.zoom = +(output.position.zoom) + Math.ceil(Math.log2(transformation.zoom));
+            output.position.bounds.w /= transformation.zoom;
+            output.position.bounds.h /= transformation.zoom;
+            output.position.bounds.x = (output.position.center[0] * (transformation.zoom - 1) +
+                output.position.bounds.x) / transformation.zoom;
+            output.position.bounds.y = (output.position.center[1] * (transformation.zoom - 1) +
+                output.position.bounds.y) / transformation.zoom;
+        }
+    }
+    log.debug('Successfully transformed state from:', input, 'to:', output, 'using:', transformation);
+    return output;
+};
+
+base.operations.canDiff = function (source, target) {
+    const getCanDiff = function (state) {
+        const combinations = [
+            ['state', 'state.center', 'state.resolution'],
+            ['state', 'state.position', 'state.position.center', 'state.position.resolution', 'state.position.bounds',
+                'state.position.bounds.x', 'state.position.bounds.y', 'state.position.bounds.w',
+                'state.position.bounds.h']
+        ];
+        let canDiff = false;
+        const evaluate = function (input, obj) {
+            return obj ? ((input.indexOf('.') === -1) ? obj[input]
+                : evaluate(input.substring(input.indexOf('.') + 1), obj[input.substring(0, input.indexOf('.'))]))
+                : undefined;
+        };
+        combinations.forEach(function (e) {
+            let result = true;
+            e.forEach(function (x) {
+                result = result && !Utils.isNullOrEmpty(evaluate(x, { state: state }));
+            });
+            canDiff = canDiff || result;
+        });
+        return canDiff;
+    };
+    const result = getCanDiff(source) && getCanDiff(target);
+    log.debug('Can' + (result ? '' : '\'t') + 'difference source:', source, 'and target:', target);
+    return result;
+};
+
+base.operations.diff = function (source, target) {
+    const s = source.position || source;
+    const t = target.position || target;
+    const result = {
+        zoom: s.resolution / t.resolution,
+        pan: { x: (t.center[0] - s.center[0] / s.resolution), y: (s.center[1] - t.center[1] / s.resolution) }
+    };
+    log.debug('Successfully computed difference:', result, 'from source:', source, 'to target:', target);
+    return result;
+};
 
 const port = process.env.PORT || 8080;
 server.listen(port);

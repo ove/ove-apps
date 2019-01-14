@@ -56,13 +56,15 @@ sendViewportDetails = function () {
         // The viewport information sent across includes bounds and zoom level.
         const viewport = {
             bounds: { x: bounds.x, y: bounds.y, w: bounds.width, h: bounds.height },
-            zoom: context.osd.viewport.getZoom()
+            zoom: context.osd.viewport.getZoom(),
+            dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
         };
         // Viewport details are only sent across only if they have changed. This is
         // validated by checking the current state.
         if (!window.ove.state.current.viewport ||
             !OVE.Utils.JSON.equals(viewport, window.ove.state.current.viewport)) {
             window.ove.state.current.viewport = viewport;
+            
             if (window.ove.state.name) {
                 // Keep track of loaded state: this is used to check if the controller
                 // is attempting to load a different state.
