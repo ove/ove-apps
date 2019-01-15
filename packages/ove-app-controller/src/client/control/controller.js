@@ -191,7 +191,9 @@ broadcastState = function () {
 
 loadControls = function () {
     log.debug('Displaying controller');
-    $(Constants.CONTROLLER).css('display', 'block');
+    const scale = Math.min(Math.min(document.documentElement.clientWidth, window.innerWidth) / 1440,
+        Math.min(document.documentElement.clientHeight, window.innerHeight) / 720);
+    $(Constants.CONTROLLER).css({ display: 'block', transformOrigin: '50% 50%', transform: 'scale(' + scale + ')' });
 
     $(Constants.Button.RESET).click(function () {
         // Refresh Touch UI
