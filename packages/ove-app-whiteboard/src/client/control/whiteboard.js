@@ -39,6 +39,12 @@ initControl = function () {
                     }).appendTo(Constants.CONTENT_DIV);
                 }
             });
+            // Excluding own preview.
+            setTimeout(function () {
+                for (var i = 0; i < window.frames.length; i++) {
+                    window.frames[i].postMessage({ filters: { exclude: [OVE.Utils.getSectionId()] } }, '*');
+                }
+            }, Constants.FRAME_LOAD_DELAY);
             log.debug('Displaying controller');
             $(Constants.CONTROLLER).css('display', 'block');
             // The canvas is loaded only after everything else is fully initialised.

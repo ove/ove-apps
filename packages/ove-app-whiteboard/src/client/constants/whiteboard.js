@@ -7,6 +7,7 @@ const Constants = {
     DEFAULT_LINE_JOIN: 'round',
     DEFAULT_FONT_SIZE: '8', // Unit: pixels
     DEFAULT_FILE_NAME: 'whiteboard.json',
+    FRAME_LOAD_DELAY: 100, // Unit: milliseconds
 
     /**************************************************************
                                 Common

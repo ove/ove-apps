@@ -12,11 +12,6 @@ beginInitialization = function () {
 };
 
 initializePlotter = function () {
-    if (window.parent !== window.parent.parent) {
-        // This is to prevent the whiteboard loading within itself in the controller.
-        log.debug('Plotting disabled on embedded window');
-        return;
-    }
     const context = window.ove.context;
 
     // Initialization of canvas
