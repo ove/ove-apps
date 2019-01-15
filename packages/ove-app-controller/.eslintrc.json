@@ -9,6 +9,9 @@
         {
             "files": [ "**/view/*.js" ],
             "globals": {
+                "applyTransformation": true,
+                "d3": true,
+                "handleStateUpdate": true,
                 "initView": true,
                 "log": true
             }
@@ -17,6 +20,7 @@
             "files": [ "**/control/*.js" ],
             "globals": {
                 "applyTransformation": true,
+                "broadcastState": true,
                 "d3": true,
                 "fetch": true,
                 "initControl": true,

@@ -104,6 +104,16 @@ initControl = function (data) {
             };
             log.trace('Next transformation event is:', context.transformation.next);
         }));
+        $(Constants.CONTROL_CANVAS).addClass(Constants.State.TOUCH_ACTIVE);
+        // Touch-events from clients;
+        window.ove.socket.on(function (message) {
+            if (message.event) {
+                context.transformation.next = {
+                    zoom: 1 + (message.event.zoom - 1) / context.factor,
+                    pan: { x: message.event.pan.x / context.factor, y: message.event.pan.y / context.factor }
+                };
+            }
+        });
         // Separate out the application of the transformation (slow-running)
         // from the capturing of the movement (fast-running).
         setInterval(applyTransformation, Constants.TRANSFORMATION_TIMEOUT);
@@ -117,6 +127,13 @@ initControl = function (data) {
     const canvas = $(Constants.CONTROL_CANVAS)[0];
     canvas.height = window.ove.geometry.section.h;
     canvas.width = window.ove.geometry.section.w;
+    if (window.ove.state.current.showTouch === undefined) {
+        window.ove.state.current.showTouch = true;
+    }
+    if (window.ove.state.current.showTouch && !$(Constants.Button.TOUCH).hasClass(Constants.State.ACTIVE)) {
+        $(Constants.Button.TOUCH).addClass(Constants.State.ACTIVE);
+        broadcastState();
+    }
     loadControls();
 };
 
@@ -166,11 +183,25 @@ beginInitialization = function () {
     });
 };
 
+broadcastState = function () {
+    log.debug('Displaying touch UI:', window.ove.state.current.showTouch);
+    log.debug('Broadcasting state');
+    OVE.Utils.broadcastState();
+};
+
 loadControls = function () {
     log.debug('Displaying controller');
     $(Constants.CONTROLLER).css('display', 'block');
 
     $(Constants.Button.RESET).click(function () {
+        // Refresh Touch UI
+        window.ove.state.current.showTouch = false;
+        broadcastState();
+        setTimeout(function () {
+            window.ove.state.current.showTouch = true;
+            broadcastState();
+        }, Constants.TOUCH_REFRESH_TIMEOUT);
+
         const context = window.ove.context;
         context.sections.forEach(function (section) {
             $.ajax({ url: section.app.url + '/state/base', dataType: 'json' }).done(function (payload) {
@@ -181,6 +212,12 @@ loadControls = function () {
             });
         });
         context.transformation = { current: { zoom: 1, pan: { x: 0, y: 0 } }, next: { zoom: 1, pan: { x: 0, y: 0 } } };
+    });
+
+    $(Constants.Button.TOUCH).click(function () {
+        $(Constants.Button.TOUCH).toggleClass(Constants.State.ACTIVE);
+        window.ove.state.current.showTouch = $(Constants.Button.TOUCH).hasClass(Constants.State.ACTIVE);
+        broadcastState();
     });
 
     $(Constants.Button.SHOW_BACKGROUND).click(function () {
@@ -224,7 +261,7 @@ loadControls = function () {
                             filter.push(section.id);
                         });
                         for (var i = 0; i < window.frames.length; i++) {
-                            window.frames[i].postMessage({ filters: { includeOnly: filter } }, '*');
+                            window.frames[i].postMessage({ load: true, filters: { includeOnly: filter } }, '*');
                         }
                     }, Constants.FRAME_LOAD_DELAY);
                 });

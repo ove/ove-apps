@@ -6,12 +6,13 @@ const Constants = {
     CONTROLLER: '.operations',
     CONTROL_CANVAS: '.controller',
     OVE_FRAME: '.ove-frame',
-    TRANSFORMATION_TIMEOUT: 350, // Unit: milliseconds
+    TOUCH_REFRESH_TIMEOUT: 100, // Unit: milliseconds
     FRAME_LOAD_DELAY: 100, // Unit: milliseconds
 
     /**************************************************************
                                 Common
     **************************************************************/
+    TRANSFORMATION_TIMEOUT: 350, // Unit: milliseconds
     CONTENT_DIV: '.wrapper',
     APP_NAME: 'controller'
 };
@@ -27,11 +28,13 @@ Constants.Mode = {
 
 Constants.Button = {
     SHOW_BACKGROUND: '#btnShowBackground',
-    RESET: '#btnReset'
+    RESET: '#btnReset',
+    TOUCH: '#btnTouch'
 };
 
 Constants.State = {
-    ACTIVE: 'active'
+    ACTIVE: 'active',
+    TOUCH_ACTIVE: 'touch'
 };
 
 exports.Constants = Constants;

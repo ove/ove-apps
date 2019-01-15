@@ -14,3 +14,13 @@ body {
     position: absolute;
     overflow: hidden;
 }
+.touch {
+    -ms-touch-action: none;
+    z-index: 1;
+    position: absolute;
+    display: inline-block;
+    cursor: grab;
+}
+.touch:active {
+    cursor: grabbing;
+}

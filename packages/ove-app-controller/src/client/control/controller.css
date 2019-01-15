@@ -2,24 +2,12 @@ body {
     background: #222;
 }
 
-.controller {
-    -ms-touch-action: none;
-    z-index: 1;
-    position: absolute;
-    display: inline-block;
-    cursor: grab;
-}
-.controller:active { 
-    cursor: grabbing;
-}
-
 .operations {
     position: absolute;
     bottom: 40px;
     text-align:center;
     width: 100%
 }
-
 label, .background {
     display: inline-block;
     width: 48px; height: 48px;
@@ -35,4 +23,6 @@ label, .background {
 
 #btnShowBackground {background: url(images/images.svg) center/45% no-repeat; opacity: 0.1;}
 #btnShowBackground.active {background: url(images/images.svg) center/45% no-repeat; opacity: 0.8;}
+#btnTouch {background: url(images/th.svg) center/45% no-repeat; opacity: 0.1;}
+#btnTouch.active {background: url(images/th.svg) center/45% no-repeat; opacity: 0.8;}
 #btnReset {background: url(images/undo-alt.svg) center/45% no-repeat; opacity: 0.8;}
