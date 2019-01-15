@@ -53,12 +53,12 @@ renderPDF = function (pdf) {
     pdf.getPage(state.settings.startPage || 1).then(function (firstPage) {
         const g = window.ove.geometry;
         const pageGap = parseInt(state.settings.pageGap || Constants.DEFAULT_PAGE_GAP, 10);
-        log.debug('Using page-gap:', pageGap);
+        log.trace('Using page-gap:', pageGap);
 
         // The scale can be cached in the current state or provided as a configuration setting.
         // If this not provided the default value will be used.
         const scale = state.scale || state.settings.scale || Constants.DEFAULT_SCALE;
-        log.debug('Using scale:', scale);
+        log.trace('Using scale:', scale);
         let viewport = firstPage.getViewport(scale);
         let dim = {
             c: Math.floor(g.section.w / (viewport.width + pageGap)),
@@ -70,7 +70,7 @@ renderPDF = function (pdf) {
             x: (g.section.w - (viewport.width + pageGap) * dim.c - pageGap) / 2,
             y: (g.section.h - (viewport.height + pageGap) * dim.r - pageGap) / 2
         };
-        log.debug('Computed page dimensions:', dim);
+        log.trace('Computed page dimensions:', dim);
 
         const renderPage = function (page) {
             const i = page.pageNumber;
@@ -78,15 +78,15 @@ renderPDF = function (pdf) {
             let viewport = page.getViewport(scale);
             let pageDim = { border: { x: 0, y: 0 } };
             if (viewport.width !== dim.w || viewport.height !== dim.h) {
-                log.debug('The size or aspect ratio is different on page:', i);
+                log.trace('The size or aspect ratio is different on page:', i);
                 if (viewport.width / dim.w > viewport.height / dim.h) {
                     const newScale = scale * dim.w / viewport.width;
-                    log.debug('Using new scale:', newScale);
+                    log.trace('Using new scale:', newScale);
                     viewport = page.getViewport(newScale);
                     pageDim.border.y = (dim.h - viewport.height) / 2;
                 } else {
                     const newScale = scale * dim.h / viewport.height;
-                    log.debug('Using new scale:', newScale);
+                    log.trace('Using new scale:', newScale);
                     viewport = page.getViewport(newScale);
                     pageDim.border.x = (dim.w - viewport.width) / 2;
                 }
@@ -104,7 +104,7 @@ renderPDF = function (pdf) {
                 // If direction is unknown reset to default
                 scrollDir = (dim.c < dim.r ? Constants.Scrolling.HORIZONTAL : Constants.Scrolling.VERTICAL);
             }
-            log.debug('Using scroll direction:', scrollDir);
+            log.trace('Using scroll direction:', scrollDir);
 
             // The position of the page should take three things into consideration in addition to the page number:
             //     1. The overall border
@@ -136,7 +136,7 @@ renderPDF = function (pdf) {
             }
 
             if (context.scale !== scale) {
-                log.debug('Resizing canvas for page:', i);
+                log.trace('Resizing canvas for page:', i);
                 let canvas = $('#page' + i)[0];
                 canvas.height = pageDim.h;
                 canvas.width = pageDim.w;
@@ -153,7 +153,7 @@ renderPDF = function (pdf) {
                             context.renderingInProgress = false;
                         }, Constants.RENDERING_TIMEOUT);
                     }
-                    log.debug('Finished rendering page:', i);
+                    log.trace('Finished rendering page:', i);
                 });
             } else {
                 context.renderingInProgress = false;
