@@ -148,7 +148,7 @@ base.operations.diff = function (source, target) {
     const t = target.position || target;
     const result = {
         zoom: s.resolution / t.resolution,
-        pan: { x: (t.center[0] - s.center[0] / s.resolution), y: (s.center[1] - t.center[1] / s.resolution) }
+        pan: { x: (t.center[0] - s.center[0]) / s.resolution, y: (s.center[1] - t.center[1]) / s.resolution }
     };
     log.debug('Successfully computed difference:', result, 'from source:', source, 'to target:', target);
     return result;

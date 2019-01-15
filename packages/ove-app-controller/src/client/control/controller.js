@@ -39,32 +39,44 @@ initControl = function (data) {
         context.sections.forEach(function (section, i) {
             // Prevent registration of own self.
             if (section.id !== sectionId) {
-                $.ajax({ url: section.app.url + '/' + section.id + '/state', dataType: 'json' }).done(
-                    function (payload) {
-                        const endpoint = section.app.url + '/state/base';
-                        log.debug('Saving base state for section using URL:', endpoint, ', payload:', payload);
-                        $.ajax({ url: endpoint, type: 'POST', data: JSON.stringify(payload), contentType: 'application/json' });
-                    }).catch(log.error);
+                $.ajax({ url: section.app.url + '/state/base', dataType: 'json' }).always(function (data) {
+                    const endpoint = section.app.url + '/state/base';
+                    // If 'data.status' exists, that is an indication of an error. However, if the state of some app
+                    // also has a 'status' property, the outcome can be confusing. This check is to ensure it is an
+                    // error state.
+                    if (data.status === 400) {
+                        $.ajax({ url: section.app.url + '/' + section.id + '/state', dataType: 'json' }).done(
+                            function (payload) {
+                                log.debug('Saving base state for section using URL:', endpoint, ', payload:', payload);
+                                $.ajax({ url: endpoint, type: 'POST', data: JSON.stringify(payload), contentType: 'application/json' });
+                            }).catch(log.error);
+                    } else {
+                        log.debug('Base state already cached at URL:', endpoint, ', payload:', data);
+                    }
+                });
                 $.ajax({ url: section.app.url + '/name', dataType: 'json' }).done(
                     function (name) {
                         log.debug('Setting up control sockets for app:', name);
                         section.ove = new OVE(name, context.hostname.substring(context.hostname.indexOf('//') + 2), section.id);
                         section.ove.socket.on(function (message) {
                             if (!OVE.Utils.JSON.equals(message, section.current)) {
-                                log.trace('Fetching transformation from section:', section.id);
-                                const endpoint = section.app.url + '/diff';
                                 const payload = JSON.stringify({
                                     source: section.current,
                                     target: message
                                 });
+                                section.current = message;
+                                log.trace('Fetching transformation from section:', section.id);
+                                const endpoint = section.app.url + '/diff';
                                 log.trace('Sending difference request to URL:', endpoint, ', payload:', payload);
                                 $.ajax({ url: endpoint, type: 'POST', data: payload, contentType: 'application/json' })
                                     .done(function (transformation) {
                                         const current = context.transformation.current;
                                         context.transformation.next = {
+                                            triggeredBy: section.id,
                                             zoom: current.zoom * transformation.zoom,
                                             pan: { x: current.pan.x + transformation.pan.x, y: current.pan.y + transformation.pan.y }
                                         };
+                                        log.trace('Next transformation event is:', context.transformation.next);
                                     }).catch(log.error);
                             }
                         });
@@ -86,23 +98,11 @@ initControl = function (data) {
                     y: event.y === 0 ? 0 : -1 * event.y
                 }
             };
+            log.trace('Next transformation event is:', context.transformation.next);
         }));
         // Separate out the application of the transformation (slow-running)
         // from the capturing of the movement (fast-running).
-        setInterval(function () {
-            if (context.operationInProgress) {
-                return;
-            }
-            const current = context.transformation.current;
-            const next = context.transformation.next;
-            if (!OVE.Utils.JSON.equals(current, next)) {
-                context.transformation.current = next;
-                applyTransformation({
-                    zoom: next.zoom / current.zoom,
-                    pan: { x: next.pan.x - current.pan.x, y: next.pan.y - current.pan.y }
-                }, undefined);
-            }
-        }, Constants.TRANSFORMATION_TIMEOUT);
+        setInterval(applyTransformation, Constants.TRANSFORMATION_TIMEOUT);
     });
     OVE.Utils.resizeController(Constants.CONTENT_DIV);
 
@@ -115,25 +115,39 @@ initControl = function (data) {
     canvas.width = window.ove.geometry.section.w;
 };
 
-applyTransformation = function (transformation, skip) {
+applyTransformation = function () {
     const context = window.ove.context;
-    context.operationInProgress = true;
-    log.debug('Applying transformation:', transformation);
-    context.sections.forEach(function (section) {
-        if (section.id !== skip) {
-            const endpoint = section.app.url + '/' + section.id + '/state/transform';
-            const payload = JSON.stringify(transformation);
-            log.trace('Applying transformation on section using URL:', endpoint, ', payload:', payload);
-            $.ajax({ url: endpoint, type: 'POST', data: payload, contentType: 'application/json' }).done(
-                function (response) {
-                    section.current = response;
-                    section.ove.socket.send(section.current);
-                }).catch(log.error);
+    if (context.operationInProgress) {
+        return;
+    }
+    const current = context.transformation.current;
+    const next = context.transformation.next;
+    if (!OVE.Utils.JSON.equals(current, next)) {
+        context.operationInProgress = true;
+        context.transformation.current = next;
+
+        let triggeredBy = null;
+        if (context.transformation.current.triggeredBy) {
+            triggeredBy = context.transformation.current.triggeredBy;
+            delete context.transformation.current.triggeredBy;
         }
-    });
-    setTimeout(function () {
-        context.operationInProgress = false;
-    }, Constants.TRANSFORMATION_TIMEOUT);
+        log.debug('Applying transformation:', context.transformation.current);
+        context.sections.forEach(function (section) {
+            if (section.id !== triggeredBy) {
+                const endpoint = section.app.url + '/' + section.id + '/state/transform';
+                const payload = JSON.stringify(context.transformation.current);
+                log.trace('Applying transformation on section using URL:', endpoint, ', payload:', payload);
+                $.ajax({ url: endpoint, type: 'POST', data: payload, contentType: 'application/json' }).done(
+                    function (response) {
+                        section.current = response;
+                        section.ove.socket.send(section.current);
+                    }).catch(log.error);
+            }
+        });
+        setTimeout(function () {
+            context.operationInProgress = false;
+        }, Constants.TRANSFORMATION_TIMEOUT);
+    }
 };
 
 beginInitialization = function () {
