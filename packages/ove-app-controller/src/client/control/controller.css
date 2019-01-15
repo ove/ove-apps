@@ -12,3 +12,27 @@ body {
 .controller:active { 
     cursor: grabbing;
 }
+
+.operations {
+    position: absolute;
+    bottom: 40px;
+    text-align:center;
+    width: 100%
+}
+
+label, .background {
+    display: inline-block;
+    width: 48px; height: 48px;
+    position: relative;
+    padding-right: 5px;
+    border-radius: 50%;
+    text-shadow: 1px 1px 2px #000;
+    color: #fff;
+    font-size: 32px;
+    line-height: 46px;
+}
+.background {background: snow;}
+
+#btnShowBackground {background: url(images/images.svg) center/45% no-repeat; opacity: 0.1;}
+#btnShowBackground.active {background: url(images/images.svg) center/45% no-repeat; opacity: 0.8;}
+#btnReset {background: url(images/undo-alt.svg) center/45% no-repeat; opacity: 0.8;}
