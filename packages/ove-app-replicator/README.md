@@ -20,15 +20,16 @@ The state of this app has a format similar to:
         "w": 100,
         "h": 100,
     },
-    "oveHost": "localhost:8080"
+    "oveHost": "localhost:8080",
+    "border": "solid gold"
 }
 ```
 
-The `mode` property is mandatory and should have a value of `space`, `group`, or `section`. If the `mode` has been set to `space`, the `spaceName` property must usually be provided. An app will replicate its own space (and thereby provide a mini-map sort of an experience), if the `spaceName` property is omitted. 
+The `mode` property is mandatory and should have a value of `space`, `group`, or `section`. If the `mode` has been set to `space`, the `spaceName` property must usually be provided. An app will replicate its own space (and thereby provide a mini-map sort of an experience), if the `spaceName` property is omitted.
 
 The `groupIds` property is optional, and must be provided if `mode` is `group`. Similarly, the `sectionIds` property becomes mandatory if the `mode` is `section`. The optional `crop` property defines the region that will be replicated. Everything outside this region will not be visible. The content rendered within the app will scale to fit the app's own dimensions defined as `w` and `h` of the geometry when creating the app. The `crop` area can have its own geometry that is independent of the app's own geometry.
 
-The optional `oveHost` property must be set in order to connect to a remote OVE environment.  The `spaceName` must always be provided if `oveHost` has been set, whenever the `mode` is `space`.
+The optional `oveHost` property must be set in order to connect to a remote OVE environment.  The `spaceName` must always be provided if `oveHost` has been set, whenever the `mode` is `space`. The optional `border` property is useful when the replication is deployed as an overlay (for example, as a mini-map). Setting a `border` will set an opaque background to the replication. Please note that the border width cannot be set using this property.
 
 The replicator app can only work with one `space` at a time. If the `mode` was set to `group` or `section` the `spaceName` will be taken into consideration. If the `spaceName` was not provided, the `space` with the most number of items will be chosen.
 

@@ -1,7 +1,8 @@
 {
   "states": {
     "Default": {
-      "mode": "space"
+      "mode": "space",
+      "border": "solid gold"
     }
   }
 }

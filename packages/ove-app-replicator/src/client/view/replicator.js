@@ -91,8 +91,14 @@ initView = function (data) {
                 const sectionsToReplicate = sections[spaceName];
                 log.info('Replicating', sectionsToReplicate.length, 'sections from space:', spaceName, 'on host:', hostname);
                 if (sectionsToReplicate.length > 0) {
-                    replicate(hostname, spaceName, sectionsToReplicate,
-                        data.crop || { x: 0, y: 0, w: Number.MAX_VALUE, h: Number.MAX_VALUE });
+                    replicate(sectionsToReplicate, {
+                        crop: data.crop || { x: 0, y: 0, w: Number.MAX_VALUE, h: Number.MAX_VALUE },
+                        border: data.border ? '2px ' + data.border : 'none',
+                        margin: data.border ? 4 : 0,
+                        background: data.border ? '#222' : 'none',
+                        hostname: hostname,
+                        space: spaceName
+                    });
                 }
             }
             context.isInitialized = true;
@@ -102,7 +108,7 @@ initView = function (data) {
     OVE.Utils.resizeViewer(Constants.CONTENT_DIV);
 };
 
-replicate = function (hostname, space, sections, crop) {
+replicate = function (sections, config) {
     let minMax = { x: { min: Number.MAX_VALUE, max: Number.MIN_VALUE }, y: { min: Number.MAX_VALUE, max: Number.MIN_VALUE } };
     sections.forEach(function (section) {
         minMax.x.min = Math.min(minMax.x.min, section.x);
@@ -111,16 +117,16 @@ replicate = function (hostname, space, sections, crop) {
         minMax.y.max = Math.max(minMax.y.max, section.y + section.h);
     });
     let bounds = {
-        x: minMax.x.min + crop.x,
-        y: minMax.y.min + crop.y,
-        w: Math.min(minMax.x.max - minMax.x.min, crop.w),
-        h: Math.min(minMax.y.max - minMax.y.min, crop.h)
+        x: minMax.x.min + config.crop.x,
+        y: minMax.y.min + config.crop.y,
+        w: Math.min(minMax.x.max - minMax.x.min, config.crop.w),
+        h: Math.min(minMax.y.max - minMax.y.min, config.crop.h)
     };
     log.debug('Calculated interim bounds:', bounds);
     let offset = { x: 0, y: 0 };
     let scale;
-    const maxWidth = parseInt($(Constants.CONTENT_DIV).css('width'), 10);
-    const maxHeight = parseInt($(Constants.CONTENT_DIV).css('height'), 10);
+    const maxWidth = parseInt($(Constants.CONTENT_DIV).css('width'), 10) - config.margin;
+    const maxHeight = parseInt($(Constants.CONTENT_DIV).css('height'), 10) - config.margin;
     log.debug('Calculated maximum width:', maxWidth, 'and height:', maxHeight);
     if (bounds.w * maxHeight >= maxWidth * bounds.h) {
         scale = maxWidth / bounds.w;
@@ -142,19 +148,20 @@ replicate = function (hostname, space, sections, crop) {
         position: 'absolute',
         marginLeft: offset.x,
         marginTop: offset.y,
-        background: 'none',
+        border: config.border,
+        background: config.background,
         overflow: 'hidden'
     }).appendTo(Constants.CONTENT_DIV);
-    fetch(hostname + '/spaces')
+    fetch(config.hostname + '/spaces')
         .then(function (r) { return r.text(); }).then(function (text) {
-            log.debug('Loading space:', space);
-            let clients = JSON.parse(text)[space];
+            log.debug('Loading space:', config.space);
+            let clients = JSON.parse(text)[config.space];
             clients.forEach(function (c, i) {
                 if (c.x !== undefined && c.y !== undefined && c.w !== undefined && c.h !== undefined &&
                     ((+c.x + c.w) > bounds.x && +c.x < (bounds.x + bounds.w)) &&
                     ((+c.y + c.h) > bounds.y && +c.y < (bounds.y + bounds.h))) {
                     $('<iframe>', {
-                        src: hostname + '/view.html?oveViewId=' + space + '-' + i,
+                        src: config.hostname + '/view.html?oveViewId=' + config.space + '-' + i,
                         class: Constants.OVE_FRAME.substring(1),
                         allowtransparency: true,
                         frameborder: 0,
