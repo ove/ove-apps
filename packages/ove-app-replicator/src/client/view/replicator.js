@@ -95,7 +95,7 @@ initView = function (data) {
                         crop: data.crop || { x: 0, y: 0, w: Number.MAX_VALUE, h: Number.MAX_VALUE },
                         border: data.border ? '2px ' + data.border : 'none',
                         margin: data.border ? 4 : 0,
-                        background: data.border ? '#222' : 'none',
+                        background: data.background || (data.border ? '#222' : 'none'),
                         hostname: hostname,
                         space: spaceName
                     });

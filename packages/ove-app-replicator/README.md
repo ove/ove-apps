@@ -21,7 +21,8 @@ The state of this app has a format similar to:
         "h": 100,
     },
     "oveHost": "localhost:8080",
-    "border": "solid gold"
+    "border": "solid gold",
+    "background": "#222"
 }
 ```
 
@@ -29,7 +30,7 @@ The `mode` property is mandatory and should have a value of `space`, `group`, or
 
 The `groupIds` property is optional, and must be provided if `mode` is `group`. Similarly, the `sectionIds` property becomes mandatory if the `mode` is `section`. The optional `crop` property defines the region that will be replicated. Everything outside this region will not be visible. The content rendered within the app will scale to fit the app's own dimensions defined as `w` and `h` of the geometry when creating the app. The `crop` area can have its own geometry that is independent of the app's own geometry.
 
-The optional `oveHost` property must be set in order to connect to a remote OVE environment.  The `spaceName` must always be provided if `oveHost` has been set, whenever the `mode` is `space`. The optional `border` property is useful when the replication is deployed as an overlay (for example, as a mini-map). Setting a `border` will set an opaque background to the replication. Please note that the border width cannot be set using this property.
+The optional `oveHost` property must be set in order to connect to a remote OVE environment.  The `spaceName` must always be provided if `oveHost` has been set, whenever the `mode` is `space`. The optional `border` property is useful when the replication is deployed as an overlay (for example, as a mini-map). Setting a `border` will set an opaque background to the replication. The optional `background` property can be set to change the colour and the opacity of the background. Please note that the border width cannot be set using this property.
 
 The replicator app can only work with one `space` at a time. If the `mode` was set to `group` or `section` the `spaceName` will be taken into consideration. If the `spaceName` was not provided, the `space` with the most number of items will be chosen.
 
