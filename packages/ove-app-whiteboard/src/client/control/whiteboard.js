@@ -41,9 +41,7 @@ initControl = function () {
             });
             // Excluding own preview.
             setTimeout(function () {
-                for (var i = 0; i < window.frames.length; i++) {
-                    window.frames[i].postMessage({ load: true, filters: { exclude: [OVE.Utils.getSectionId()] } }, '*');
-                }
+                window.ove.frame.send(Constants.Frame.CHILD, { load: true, filters: { exclude: [OVE.Utils.getSectionId()] } }, 'core');
             }, Constants.FRAME_LOAD_DELAY);
             log.debug('Displaying controller');
             const scale = Math.min(Math.min(document.documentElement.clientWidth, window.innerWidth) / 1440,

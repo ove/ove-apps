@@ -7,11 +7,12 @@ initControl = function (data) {
     // If a URL was passed, the URL of the loaded state would be overridden.
     const mode = OVE.Utils.getQueryParam('mode') || state.mode;
     const groupId = OVE.Utils.getQueryParam('groupId') || state.groupId;
+    const space = OVE.Utils.getSpace();
     log.debug('Controller mode:', mode);
     let url;
     switch (mode) {
         case Constants.Mode.SPACE:
-            url = window.ove.context.hostname + '/sections?space=' + OVE.Utils.getSpace();
+            url = window.ove.context.hostname + '/sections?space=' + space;
             break;
         case Constants.Mode.GROUP:
             url = window.ove.context.hostname + '/sections?groupId=' + parseInt(groupId, 10);
@@ -41,8 +42,8 @@ initControl = function (data) {
         // Ensure sectionId is no longer returned, so that we can work with multiple sections.
         OVE.Utils.getSectionId = OVE.Utils.getViewId = function () { return undefined; };
         context.sections.forEach(function (section, i) {
-            // Prevent registration of own self.
-            if (section.id === context.sectionId) {
+            // Prevent registration of own self and sections not in same space.
+            if (section.id === context.sectionId || section.space !== space) {
                 context.sections.splice(i, 1);
             } else {
                 const endpoint = section.app.url + '/state/base';
@@ -232,9 +233,9 @@ loadControls = function () {
                     log.debug('Loading space:', space);
 
                     let clients = Object.values(JSON.parse(text))[0];
-                    // We load each client into the whiteboard controller so that it is possible to see the live
-                    // contents of the space. The client is reduced in size by the computed scaling factor such
-                    // that they all fit within the controller's screen.
+                    // We load each client into the controller so that it is possible to see the live
+                    // contents of the space. The client is reduced in size by the computed scaling
+                    // factor such that they all fit within the controller's screen.
                     clients.forEach(function (c, i) {
                         if (c.x !== undefined && c.y !== undefined && c.w !== undefined && c.h !== undefined) {
                             $('<iframe>', {
@@ -262,9 +263,7 @@ loadControls = function () {
                         context.sections.forEach(function (section) {
                             filter.push(section.id);
                         });
-                        for (var i = 0; i < window.frames.length; i++) {
-                            window.frames[i].postMessage({ load: true, filters: { includeOnly: filter } }, '*');
-                        }
+                        window.ove.frame.send(Constants.Frame.CHILD, { load: true, filters: { includeOnly: filter } }, 'core');
                     }, Constants.FRAME_LOAD_DELAY);
                 });
         } else {
