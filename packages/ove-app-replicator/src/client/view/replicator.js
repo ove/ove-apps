@@ -135,7 +135,6 @@ replicate = function (sections, config) {
         scale = maxHeight / bounds.h;
         offset.y = (maxWidth - maxHeight * bounds.w / bounds.h) / 2;
     }
-    log.debug('Using bounds:', bounds, 'offset:', offset, 'and scale:', scale);
     $('<div>', {
         class: Constants.SPACE_DIV.substring(1)
     }).css({
@@ -152,42 +151,65 @@ replicate = function (sections, config) {
         background: config.background,
         overflow: 'hidden'
     }).appendTo(Constants.CONTENT_DIV);
-    fetch(config.hostname + '/spaces')
-        .then(function (r) { return r.text(); }).then(function (text) {
-            log.debug('Loading space:', config.space);
-            let clients = JSON.parse(text)[config.space];
-            clients.forEach(function (c, i) {
-                if (c.x !== undefined && c.y !== undefined && c.w !== undefined && c.h !== undefined &&
-                    ((+c.x + c.w) > bounds.x && +c.x < (bounds.x + bounds.w)) &&
-                    ((+c.y + c.h) > bounds.y && +c.y < (bounds.y + bounds.h))) {
-                    $('<iframe>', {
-                        src: config.hostname + '/view.html?oveViewId=' + config.space + '-' + i,
-                        class: Constants.OVE_FRAME.substring(1),
-                        allowtransparency: true,
-                        frameborder: 0,
-                        scrolling: 'no'
-                    }).css({
-                        zoom: 1,
-                        transformOrigin: '0% 0%',
-                        transform: 'scale(' + scale + ')',
-                        // Each client is loaded in its original size and then scaled-down.
-                        width: (c.w + (c.offset ? c.offset.x : 0)) + 'px',
-                        height: (c.h + (c.offset ? c.offset.y : 0)) + 'px',
-                        position: 'absolute',
-                        marginLeft: (c.x - (c.offset ? c.offset.x : 0)) * scale,
-                        marginTop: (c.y - (c.offset ? c.offset.y : 0)) * scale
-                    }).appendTo(Constants.SPACE_DIV);
-                }
-            });
-            // Only displaying the subset of sections in the background.
-            setTimeout(function () {
-                const filter = [];
-                sections.forEach(function (section) {
-                    filter.push(section.id);
-                });
+    const g = window.ove.geometry;
+    let viewport = {
+        x: g.x - offset.x - config.margin / 2 <= 0 ? bounds.x : bounds.x + (g.x - offset.x - config.margin / 2) / scale,
+        y: g.y - offset.y - config.margin / 2 <= 0 ? bounds.y : bounds.y + (g.y - offset.y - config.margin / 2) / scale,
+        w: g.x + g.w - offset.x - config.margin / 2 <= 0 ? 0 : g.x - offset.x - config.margin / 2 > g.w ? g.w / scale : (g.w - g.x + offset.x + config.margin / 2) / scale,
+        h: g.y + g.h - offset.y - config.margin / 2 <= 0 ? 0 : g.y - offset.y - config.margin / 2 > g.h ? g.h / scale : (g.h - g.y + offset.y + config.margin / 2) / scale
+    };
+    if (viewport.w > 0 && viewport.x > bounds.x + bounds.w) {
+        viewport.w -= bounds.x - viewport.x + bounds.w;
+        if (viewport.w <= 0) {
+            viewport.w = 0;
+        }
+    }
+    if (viewport.h > 0 && viewport.y > bounds.y + bounds.h) {
+        viewport.h -= bounds.y - viewport.y + bounds.h;
+        if (viewport.h <= 0) {
+            viewport.h = 0;
+        }
+    }
+    log.debug('Computed viewport:', viewport, 'using bounds:', bounds, 'offset:', offset, 'and scale:', scale);
 
-                window.ove.frame.send(Constants.Frame.CHILD,
-                    { load: true, transparentBackground: true, filters: { includeOnly: filter } }, 'core');
-            }, Constants.FRAME_LOAD_DELAY);
-        });
+    if (viewport.w > 0 && viewport.h > 0) {
+        fetch(config.hostname + '/spaces')
+            .then(function (r) { return r.text(); }).then(function (text) {
+                log.debug('Loading space:', config.space);
+                let clients = JSON.parse(text)[config.space];
+                clients.forEach(function (c, i) {
+                    if (c.x !== undefined && c.y !== undefined && c.w !== undefined && c.h !== undefined &&
+                        ((+c.x + c.w) > viewport.x && +c.x < (viewport.x + viewport.w)) &&
+                        ((+c.y + c.h) > viewport.y && +c.y < (viewport.y + viewport.h))) {
+                        $('<iframe>', {
+                            src: config.hostname + '/view.html?oveViewId=' + config.space + '-' + i,
+                            class: Constants.OVE_FRAME.substring(1),
+                            allowtransparency: true,
+                            frameborder: 0,
+                            scrolling: 'no'
+                        }).css({
+                            zoom: 1,
+                            transformOrigin: '0% 0%',
+                            transform: 'scale(' + scale + ')',
+                            // Each client is loaded in its original size and then scaled-down.
+                            width: (c.w + (c.offset ? c.offset.x : 0)) + 'px',
+                            height: (c.h + (c.offset ? c.offset.y : 0)) + 'px',
+                            position: 'absolute',
+                            marginLeft: (c.x - (c.offset ? c.offset.x : 0)) * scale,
+                            marginTop: (c.y - (c.offset ? c.offset.y : 0)) * scale
+                        }).appendTo(Constants.SPACE_DIV);
+                    }
+                });
+                // Only displaying the subset of sections in the background.
+                setTimeout(function () {
+                    const filter = [];
+                    sections.forEach(function (section) {
+                        filter.push(section.id);
+                    });
+
+                    window.ove.frame.send(Constants.Frame.CHILD,
+                        { load: true, transparentBackground: true, filters: { includeOnly: filter } }, 'core');
+                }, Constants.FRAME_LOAD_DELAY);
+            });
+    }
 };
