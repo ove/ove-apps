@@ -3,6 +3,8 @@ const Constants = {
                                 Viewer
     **************************************************************/
     MAIN_VIDEO: '#main-video',
+    LOAD_MAIN_VIDEO_TIMEOUT: 1000, // Unit: milliseconds
+    RESCALE_DURING_REFRESH_TIMEOUT: 1000, // Unit: milliseconds
 
     /**************************************************************
                               Controller

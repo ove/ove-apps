@@ -15,14 +15,29 @@ initView = function () {
 };
 
 loadVideo = function () {
-    const mainVideo = $(Constants.MAIN_VIDEO);
-    const selectedVideo = $('#' + window.ove.context.videos[window.ove.state.current.connection]);
-    if (mainVideo[0].srcObject !== selectedVideo[0].srcObject) {
-        mainVideo.fadeOut('fast', () => {
-            log.debug('Loading Session:', window.ove.state.current.connection);
-            mainVideo[0].srcObject = selectedVideo[0].srcObject;
-            mainVideo.fadeIn('fast');
-        });
+    const setMainVideo = function () {
+        const mainVideo = $(Constants.MAIN_VIDEO);
+        const selectedVideo = $('#' + window.ove.context.videos[window.ove.state.current.connection]);
+        if (mainVideo[0].srcObject !== selectedVideo[0].srcObject) {
+            mainVideo.fadeOut('fast', () => {
+                log.debug('Loading Session:', window.ove.state.current.connection);
+                mainVideo[0].srcObject = selectedVideo[0].srcObject;
+                mainVideo.fadeIn('fast');
+            });
+            log.debug('Refreshing viewer');
+
+            // A refresh operation takes place when a player is loaded or when a video is
+            // ready to be played. This ensures that proper CSS settings are applied.
+            $(Constants.CONTENT_DIV).css('transform', 'scale(' + (window.ove.context.scale + 0.001) + ')');
+            setTimeout(function () {
+                $(Constants.CONTENT_DIV).css('transform', 'scale(' + window.ove.context.scale + ')');
+            }, Constants.RESCALE_DURING_REFRESH_TIMEOUT);
+        }
+    };
+    if ($('#' + window.ove.context.videos[window.ove.state.current.connection])[0]) {
+        setMainVideo();
+    } else {
+        setTimeout(setMainVideo, Constants.LOAD_MAIN_VIDEO_TIMEOUT);
     }
 };
 
