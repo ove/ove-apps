@@ -20,12 +20,13 @@ app.get('/operation/token', function (req, res) {
     const id = req.query.sessionId + '-' + req.query.username;
     if (sessions[id]) {
         log.debug('Existing session:', id);
-        return sessions[id];
+        res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JSON)
+            .send(JSON.stringify(sessions[id]));
     } else {
         log.debug('New session:', id);
         ov.createSession({ customSessionId: req.query.sessionId }).then(session => {
-            sessions[id] = session;
-            sessions[id].generateToken({ role: OpenViduRole.SUBSCRIBER }).then(token => {
+            session.generateToken({ role: OpenViduRole.SUBSCRIBER }).then(token => {
+                sessions[id] = token;
                 res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JSON)
                     .send(JSON.stringify(token));
             }).catch(log.error);
