@@ -14,10 +14,6 @@ app.use('/', express.static(path.join(nodeModules, 'pdfjs-dist', 'build')));
 log.debug('Using module:', 'd3');
 app.use('/', express.static(path.join(nodeModules, 'd3', 'dist')));
 
-/*
-{"url":"https://raw.githubusercontent.com/mozilla/pdf.js/master/test/pdfs/TAMReview.pdf",
-"settings":{"scale":2,"scrolling":"vertical"},"offset":{"x":0,"y":0},"scale":2}
-*/
 log.debug('Setting up state transformation operations');
 base.operations.canTransform = function (state, transformation) {
     const combinations = [

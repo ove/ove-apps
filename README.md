@@ -22,4 +22,5 @@ This repository contains the following OVE Apps:
 * [Replicator](./packages/ove-app-replicator) - replicating content of an OVE installation.
 * [SVG](./packages/ove-app-svg) - supports rendering SVG using the OVE framework.
 * [Videos](./packages/ove-app-videos) - supports playing videos using the OVE framework.
+* [WebRTC](./packages/ove-app-webrtc) - supports video conferencing and screen sharing using the OVE framework.
 * [Whiteboard](./packages/ove-app-whiteboard) - creates a whiteboard that can be used within the OVE framework.

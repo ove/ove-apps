@@ -12,11 +12,6 @@ if (!base.operations) {
 log.debug('Using module:', 'openseadragon');
 app.use('/', express.static(path.join(nodeModules, 'openseadragon', 'build', 'openseadragon')));
 
-/*
-{"config":{"tileSources":"https://openseadragon.github.io/example-images/highsmith/highsmith.dzi"},
-"viewport":{"bounds":{"x":-4.154856907278946,"y":0,"w":9.309713814557892,"h":1.3124110446911472},
-"zoom":0.10741468748870332, "dimensions":{"w":15360,"h":2160}}}
-*/
 log.debug('Setting up state transformation operations');
 base.operations.canTransform = function (state, transformation) {
     const combinations = [

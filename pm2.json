@@ -142,6 +142,17 @@
       "env": {
           "PORT": "8093"
       }
+    },
+    {
+      "name": "@ove/ove-app-webrtc",
+      "cwd": "./packages/ove-app-webrtc",
+      "kill_timeout": 3000,
+      "restart_delay": 3000,
+      "script": "npm",
+      "args": "run start",
+      "env": {
+          "PORT": "8094"
+      }
     }
   ]
 }

@@ -41,11 +41,6 @@ app.get('/layers.json', function (_req, res) {
 log.debug('Using module:', 'OpenLayers');
 app.use('/', express.static(path.join(nodeModules, 'openlayers', 'dist')));
 
-/*
-{"enabledLayers":["0"],"position":{"bounds":{"x":-38638.917798156595,"y":6714438.766397666,
-"w":55034.660365326905,"h":-7758.358370945789},"center":[-11137.70850550061,6710544.04980525],
-"resolution":3.5874064128523417,"zoom":12}}
-*/
 log.debug('Setting up state transformation operations');
 base.operations.canTransform = function (state, transformation) {
     const combinations = [

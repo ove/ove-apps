@@ -24,6 +24,6 @@ label, .background {
 
 #btnShowBackground {background: url(images/images.svg) center/45% no-repeat; opacity: 0.1;}
 #btnShowBackground.active {background: url(images/images.svg) center/45% no-repeat; opacity: 0.8;}
+#btnReset {background: url(images/history.svg) center/45% no-repeat; opacity: 0.8;}
 #btnTouch {background: url(images/touch.svg) top/100% no-repeat; opacity: 0.1;}
 #btnTouch.active {background: url(images/touch.svg) top/100% no-repeat; opacity: 0.8;}
-#btnReset {background: url(images/sync-alt.svg) center/45% no-repeat; opacity: 0.8;}

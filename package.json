@@ -10,9 +10,9 @@
     "build:clean": "lerna run clean && lerna run build",
     "lint": "lerna run lint",
     "test": "lerna run test",
-    "start": "OVE_HOST='localhost:8080' TUORIS_HOST='localhost:7080' pm2 start pm2.json",
-    "start:windows": "OVE_HOST='localhost:8080' TUORIS_HOST='localhost:7080' pm2 start pm2-windows.json",
-    "start:dev": "OVE_HOST='localhost:8080' TUORIS_HOST='localhost:7080' lerna run start:dev"
+    "start": "OVE_HOST='localhost:8080' TUORIS_HOST='localhost:7080' OPENVIDU_HOST='localhost:4443' pm2 start pm2.json",
+    "start:windows": "OVE_HOST='localhost:8080' TUORIS_HOST='localhost:7080' OPENVIDU_HOST='localhost:4443' pm2 start pm2-windows.json",
+    "start:dev": "OVE_HOST='localhost:8080' TUORIS_HOST='localhost:7080' OPENVIDU_HOST='localhost:4443' lerna run start:dev"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",

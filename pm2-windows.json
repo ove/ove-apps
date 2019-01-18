@@ -143,6 +143,18 @@
           "PORT": "8093",
           "OVE_HOST": "localhost:8080"
       }
+    },
+    {
+      "name": "@ove/ove-app-webrtc",
+      "cwd": "./packages/ove-app-webrtc",
+      "kill_timeout": 3000,
+      "restart_delay": 3000,
+      "script": "dist/index.js",
+      "env": {
+          "PORT": "8094",
+          "OVE_HOST": "localhost:8080",
+          "TUORIS_HOST": "localhost:4443"
+      }
     }
   ]
 }
