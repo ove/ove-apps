@@ -10,6 +10,22 @@ if (!base.operations) {
     base.operations = {};
 }
 
+// BACKWARDS-COMPATIBILITY: For v0.2.0
+if (!Utils.JSON.getDescendant) {
+    Utils.JSON.getDescendant = function getDescendant (input, obj) {
+        if (!obj) {
+            return undefined;
+        }
+
+        const nameSeparator = input.indexOf('.');
+        if (nameSeparator === -1) {
+            return obj[input];
+        } else {
+            return getDescendant(input.substring(nameSeparator + 1), obj[input.substring(0, nameSeparator)]);
+        }
+    };
+}
+
 let layers = [];
 // The map layers can be provided as an embedded JSON data structure or as a URL pointing
 // to a location at which it is stored externally.
@@ -60,16 +76,13 @@ base.operations.canTransform = function (state, transformation) {
             'state.position', 'state.position.center', 'state.position.resolution', 'state.position.bounds',
             'state.position.bounds.x', 'state.position.bounds.y']
     ];
+
     let canTransform = false;
-    const evaluate = function (input, obj) {
-        return obj ? ((input.indexOf('.') === -1) ? obj[input]
-            : evaluate(input.substring(input.indexOf('.') + 1), obj[input.substring(0, input.indexOf('.'))]))
-            : undefined;
-    };
     combinations.forEach(function (e) {
         let result = true;
         e.forEach(function (x) {
-            result = result && !Utils.isNullOrEmpty(evaluate(x, { state: state, transformation: transformation }));
+            result = result && !Utils.isNullOrEmpty(
+                Utils.JSON.getDescendant(x, { state: state, transformation: transformation }));
         });
         canTransform = canTransform || result;
     });
@@ -118,16 +131,12 @@ base.operations.canDiff = function (source, target) {
                 'state.position.bounds.x', 'state.position.bounds.y', 'state.position.bounds.w',
                 'state.position.bounds.h']
         ];
+
         let canDiff = false;
-        const evaluate = function (input, obj) {
-            return obj ? ((input.indexOf('.') === -1) ? obj[input]
-                : evaluate(input.substring(input.indexOf('.') + 1), obj[input.substring(0, input.indexOf('.'))]))
-                : undefined;
-        };
         combinations.forEach(function (e) {
             let result = true;
             e.forEach(function (x) {
-                result = result && !Utils.isNullOrEmpty(evaluate(x, { state: state }));
+                result = result && !Utils.isNullOrEmpty(Utils.JSON.getDescendant(x, { state: state }));
             });
             canDiff = canDiff || result;
         });
@@ -143,7 +152,10 @@ base.operations.diff = function (source, target) {
     const t = target.position || target;
     const result = {
         zoom: s.resolution / t.resolution,
-        pan: { x: (t.center[0] - s.center[0]) / s.resolution, y: (s.center[1] - t.center[1]) / s.resolution }
+        pan: {
+            x: (t.center[0] - s.center[0]) / s.resolution,
+            y: (s.center[1] - t.center[1]) / s.resolution
+        }
     };
     log.debug('Successfully computed difference:', result, 'from source:', source, 'to target:', target);
     return result;

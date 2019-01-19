@@ -36,15 +36,16 @@ initControl = function (data) {
         updatePDF();
     };
 
-    // D3 is used for pan and zoom operations. Zoom is limited to a factor of 10.
+    // D3 is used for pan and zoom operations.
     log.debug('Registering pan/zoom listeners');
-    d3.select(Constants.CONTROL_CANVAS).call(d3.zoom().scaleExtent([1, 10]).on('zoom', function () {
+    d3.select(Constants.CONTROL_CANVAS).call(d3.zoom().scaleExtent([1, Constants.MAX_ZOOM_LEVEL]).on('zoom', function () {
         if (context.renderingInProgress) {
             return;
         }
         state.offset.x = d3.event.transform.x * getScalingFactor();
         state.offset.y = d3.event.transform.y * getScalingFactor();
         state.scale = d3.event.transform.k * (state.settings.scale || Constants.DEFAULT_SCALE);
+
         log.debug('Updating scale:', state.scale, 'and offset:', state.offset);
         if (!OVE.Utils.JSON.equals(context.state, state)) {
             // We only trigger updates if the state has really changed.
@@ -57,8 +58,11 @@ initControl = function (data) {
 };
 
 getScalingFactor = function () {
-    return Math.max(window.ove.geometry.section.w / Math.min(document.documentElement.clientWidth, window.innerWidth),
-        window.ove.geometry.section.h / Math.min(document.documentElement.clientHeight, window.innerHeight));
+    const horizontalScalingFactor = window.ove.geometry.section.w /
+        Math.min(document.documentElement.clientWidth, window.innerWidth);
+    const verticalScalingFactor = window.ove.geometry.section.h /
+        Math.min(document.documentElement.clientHeight, window.innerHeight);
+    return Math.max(horizontalScalingFactor, verticalScalingFactor);
 };
 
 beginInitialization = function () {

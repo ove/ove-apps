@@ -59,6 +59,7 @@ renderPDF = function (pdf) {
         // If this not provided the default value will be used.
         const scale = state.scale || state.settings.scale || Constants.DEFAULT_SCALE;
         log.trace('Using scale:', scale);
+
         let viewport = firstPage.getViewport(scale);
         let dim = {
             c: Math.floor(g.section.w / (viewport.width + pageGap)),
@@ -80,13 +81,17 @@ renderPDF = function (pdf) {
             if (viewport.width !== dim.w || viewport.height !== dim.h) {
                 log.trace('The size or aspect ratio is different on page:', i);
                 if (viewport.width / dim.w > viewport.height / dim.h) {
+                    // Scaling to fit width.
                     const newScale = scale * dim.w / viewport.width;
-                    log.trace('Using new scale:', newScale);
+                    log.trace('Computed new scale:', newScale);
+
                     viewport = page.getViewport(newScale);
                     pageDim.border.y = (dim.h - viewport.height) / 2;
                 } else {
+                    // Scaling to fit height.
                     const newScale = scale * dim.h / viewport.height;
-                    log.trace('Using new scale:', newScale);
+                    log.trace('Computed new scale:', newScale);
+
                     viewport = page.getViewport(newScale);
                     pageDim.border.x = (dim.w - viewport.width) / 2;
                 }
@@ -106,15 +111,24 @@ renderPDF = function (pdf) {
             }
             log.trace('Using scroll direction:', scrollDir);
 
+            let pageRow = 0;
+            let pageColumn = 0;
+            if (scrollDir === Constants.Scrolling.VERTICAL) {
+                pageColumn = (i - firstPage.pageNumber) % dim.c;
+                pageRow = Math.floor((i - firstPage.pageNumber) / dim.c);
+            } else {
+                pageColumn = Math.floor((i - firstPage.pageNumber) / dim.r);
+                pageRow = (i - firstPage.pageNumber) % dim.r;
+            }
+            log.trace('Calculated page column:', pageColumn, 'and row:', pageRow);
+
             // The position of the page should take three things into consideration in addition to the page number:
             //     1. The overall border
             //     2. The offset if panning has taken place
             //     3. The page specific border if the aspect ratio is different to the first page
             // All of these values are calculated along both the x and y axes.
-            const marginX = (state.offset.x || 0) + dim.border.x + pageDim.border.x + (dim.w + pageGap) *
-                (scrollDir === Constants.Scrolling.VERTICAL ? (i - firstPage.pageNumber) % dim.c : Math.floor((i - firstPage.pageNumber) / dim.r));
-            const marginY = (state.offset.y || 0) + dim.border.y + pageDim.border.y + (dim.h + pageGap) *
-                (scrollDir !== Constants.Scrolling.VERTICAL ? (i - firstPage.pageNumber) % dim.r : Math.floor((i - firstPage.pageNumber) / dim.c));
+            const marginX = (state.offset.x || 0) + dim.border.x + pageDim.border.x + (dim.w + pageGap) * pageColumn;
+            const marginY = (state.offset.y || 0) + dim.border.y + pageDim.border.y + (dim.h + pageGap) * pageRow;
 
             const css = {
                 zoom: 1,
@@ -127,22 +141,26 @@ renderPDF = function (pdf) {
                 marginLeft: marginX / context.factor,
                 marginTop: marginY / context.factor
             };
-            if ($('#page' + i).length === 0) {
+
+            let pageCanvas = $(Constants.PAGE_CANVAS_NAME_PREFIX + i);
+            if (pageCanvas.length === 0) {
                 $('<canvas>', {
-                    id: 'page' + i
+                    id: Constants.PAGE_CANVAS_NAME_PREFIX.substring(1) + i
                 }).css(css).appendTo(Constants.CONTENT_DIV);
+                pageCanvas = $(Constants.PAGE_CANVAS_NAME_PREFIX + i);
+                log.trace('Created canvas for page');
             } else {
-                $('#page' + i).css(css);
+                pageCanvas.css(css);
+                log.trace('Repositioned canvas of page');
             }
 
             if (context.scale !== scale) {
                 log.trace('Resizing canvas for page:', i);
-                let canvas = $('#page' + i)[0];
-                canvas.height = pageDim.h;
-                canvas.width = pageDim.w;
+                pageCanvas[0].height = pageDim.h;
+                pageCanvas[0].width = pageDim.w;
 
                 page.render({
-                    canvasContext: canvas.getContext('2d'),
+                    canvasContext: pageCanvas[0].getContext('2d'),
                     viewport: viewport
                 }).promise.catch(log.warn).then(function () {
                     if (i === (state.settings.endPage || pdf.numPages)) {

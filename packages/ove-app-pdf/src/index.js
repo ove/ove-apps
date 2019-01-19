@@ -9,6 +9,22 @@ if (!base.operations) {
     base.operations = {};
 }
 
+// BACKWARDS-COMPATIBILITY: For v0.2.0
+if (!Utils.JSON.getDescendant) {
+    Utils.JSON.getDescendant = function getDescendant (input, obj) {
+        if (!obj) {
+            return undefined;
+        }
+
+        const nameSeparator = input.indexOf('.');
+        if (nameSeparator === -1) {
+            return obj[input];
+        } else {
+            return getDescendant(input.substring(nameSeparator + 1), obj[input.substring(0, nameSeparator)]);
+        }
+    };
+}
+
 log.debug('Using module:', 'pdf.js');
 app.use('/', express.static(path.join(nodeModules, 'pdfjs-dist', 'build')));
 log.debug('Using module:', 'd3');
@@ -23,16 +39,13 @@ base.operations.canTransform = function (state, transformation) {
         ['state', 'transformation', 'transformation.pan', 'transformation.pan.x', 'transformation.pan.y',
             'state.offset', 'state.offset.x', 'state.offset.y']
     ];
+
     let canTransform = false;
-    const evaluate = function (input, obj) {
-        return obj ? ((input.indexOf('.') === -1) ? obj[input]
-            : evaluate(input.substring(input.indexOf('.') + 1), obj[input.substring(0, input.indexOf('.'))]))
-            : undefined;
-    };
     combinations.forEach(function (e) {
         let result = true;
         e.forEach(function (x) {
-            result = result && !Utils.isNullOrEmpty(evaluate(x, { state: state, transformation: transformation }));
+            result = result && !Utils.isNullOrEmpty(
+                Utils.JSON.getDescendant(x, { state: state, transformation: transformation }));
         });
         canTransform = canTransform || result;
     });
@@ -57,14 +70,10 @@ base.operations.transform = function (input, transformation) {
 base.operations.canDiff = function (source, target) {
     const getCanDiff = function (state) {
         const combination = ['state', 'state.offset', 'state.offset.x', 'state.offset.y', 'state.scale', 'state.url'];
-        const evaluate = function (input, obj) {
-            return obj ? ((input.indexOf('.') === -1) ? obj[input]
-                : evaluate(input.substring(input.indexOf('.') + 1), obj[input.substring(0, input.indexOf('.'))]))
-                : undefined;
-        };
+
         let canDiff = true;
         combination.forEach(function (x) {
-            canDiff = canDiff && !Utils.isNullOrEmpty(evaluate(x, { state: state }));
+            canDiff = canDiff && !Utils.isNullOrEmpty(Utils.JSON.getDescendant(x, { state: state }));
         });
         return canDiff;
     };
@@ -76,7 +85,10 @@ base.operations.canDiff = function (source, target) {
 base.operations.diff = function (source, target) {
     const result = {
         zoom: target.scale / source.scale,
-        pan: { x: source.offset.x - target.offset.x, y: source.offset.y - target.offset.y }
+        pan: {
+            x: source.offset.x - target.offset.x,
+            y: source.offset.y - target.offset.y
+        }
     };
     log.debug('Successfully computed difference:', result, 'from source:', source, 'to target:', target);
     return result;
