@@ -26,6 +26,7 @@ const Constants = {
                                 Common
     **************************************************************/
     OPENVIDU_HOST: (function () { return process.env.OPENVIDU_HOST; })(),
+    RANDOM_SESSION: 'random',
     VIDEO_CONTAINER: '#video-container',
     CONTENT_DIV: '.wrapper',
     NOTICE: '.notice',

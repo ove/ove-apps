@@ -23,10 +23,12 @@ loadVideo = function () {
 changeUserData = function (connection, video) {
     const maxSessions = window.ove.state.current.maxSessions || Constants.MAX_SESSION_COUNT;
     const gap = Constants.GAP_BETWEEN_VIDEOS;
+
     // Loading previews of active sessions on the controller.
     if (arguments.length === 2) {
         const width = parseInt($(Constants.CONTENT_DIV).css('width'), 10);
         const height = parseInt($(Constants.CONTENT_DIV).css('height'), 10);
+
         let videoWidth = video.videoWidth || 320;
         let videoHeight = video.videoHeight || 240;
         const videos = $(Constants.VIDEO_CONTAINER).children('video');
@@ -34,14 +36,18 @@ changeUserData = function (connection, video) {
             videoWidth = Math.max(videoWidth, videos[i].videoWidth);
             videoHeight = Math.max(videoHeight, videos[i].videoHeight);
         }
-        log.debug('Calculated maximum video width:', videoWidth, 'and height:', videoHeight);
-        let ratio = 1;
-        if (width * (videoHeight + gap) > height * (videoWidth + gap)) {
-            ratio *= Math.floor((width * (videoHeight + gap)) / (height * (videoWidth + gap)));
+        log.debug('Computed maximum video width:', videoWidth, 'and height:', videoHeight);
+
+        let ratio;
+        const possibleCols = width / (videoWidth + gap);
+        const possibleRows = height / (videoHeight + gap);
+        if (possibleCols > possibleRows) {
+            ratio = Math.floor(possibleCols / possibleRows);
         } else {
-            ratio /= Math.floor((height * (videoWidth + gap)) / (width * (videoHeight + gap)));
+            ratio = 1 / Math.floor(possibleRows / possibleCols);
         }
-        log.debug('Using columns to rows ratio:', ratio);
+        log.debug('Computed columns to rows ratio:', ratio);
+
         let dim = {
             c: Math.ceil(Math.sqrt(maxSessions * ratio)),
             r: Math.ceil(Math.sqrt(maxSessions / ratio))
@@ -49,6 +55,7 @@ changeUserData = function (connection, video) {
         dim.w = Math.floor(width / dim.c) - gap;
         dim.h = Math.floor(height / dim.r) - gap;
         log.debug('Computed dimensions:', dim);
+
         let count = $(Constants.VIDEO_CONTAINER).children('video').length;
         if (count <= maxSessions) {
             let req = {
@@ -56,9 +63,15 @@ changeUserData = function (connection, video) {
                 r: Math.ceil(Math.sqrt(count * dim.r / dim.c))
             };
             log.debug('Computed required columns and rows:', req, ', for videos:', count);
+
+            // We are calculating the top and left margins using the total possible vertical and
+            // horizontal margins. We use 50% of the available horizontal margin, which will center
+            // the content horizontally. But, we use 80% of the available vertical margin, which
+            // moves the content to the bottom of the screen as much as possible.
             const marginX = (gap + width - (dim.w + gap) * req.c) * 0.5;
             const marginY = (gap + height - (dim.h + gap) * req.r) * 0.8;
             log.debug('Computed margins x:', marginX, 'y:', marginY);
+
             for (let i = 0; i < count; i++) {
                 $('#' + $(Constants.VIDEO_CONTAINER).children('video')[i].id).css({
                     width: dim.w,
@@ -76,6 +89,7 @@ changeUserData = function (connection, video) {
                 log.debug('Broadcasting state');
                 OVE.Utils.broadcastState();
             });
+
             // Select at least one session, or else users may assume system is not working
             if ($(Constants.VIDEO_CONTAINER).children('video').length === 1) {
                 setTimeout(function () {
@@ -103,7 +117,7 @@ loadControls = function () {
             $(Constants.Button.END).addClass(Constants.State.ACTIVE);
             $(Constants.Background.END).addClass(Constants.State.ACTIVE);
             // If the Session Id was random we generate a 10 character string.
-            if (window.ove.state.current.sessionId === 'random') {
+            if (window.ove.state.current.sessionId.toLowerCase() === Constants.RANDOM_SESSION) {
                 const getRandomString = function (length) {
                     const chars = String.fromCharCode.apply(null,
                         Array.from({ length: 26 }, (_v, k) => k + 'A'.charCodeAt()).concat(
