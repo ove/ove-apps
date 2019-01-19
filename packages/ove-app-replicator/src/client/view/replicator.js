@@ -151,12 +151,15 @@ replicate = function (sections, config) {
         background: config.background,
         overflow: 'hidden'
     }).appendTo(Constants.CONTENT_DIV);
+
     const g = window.ove.geometry;
+    const ox = g.x - offset.x - config.margin / 2;
+    const oy = g.y - offset.y - config.margin / 2;
     let viewport = {
-        x: g.x - offset.x - config.margin / 2 <= 0 ? bounds.x : bounds.x + (g.x - offset.x - config.margin / 2) / scale,
-        y: g.y - offset.y - config.margin / 2 <= 0 ? bounds.y : bounds.y + (g.y - offset.y - config.margin / 2) / scale,
-        w: g.x + g.w - offset.x - config.margin / 2 <= 0 ? 0 : g.x - offset.x - config.margin / 2 > g.w ? g.w / scale : (g.w - g.x + offset.x + config.margin / 2) / scale,
-        h: g.y + g.h - offset.y - config.margin / 2 <= 0 ? 0 : g.y - offset.y - config.margin / 2 > g.h ? g.h / scale : (g.h - g.y + offset.y + config.margin / 2) / scale
+        x: bounds.x + Math.max(0, ox) / scale,
+        y: bounds.y + Math.max(0, oy) / scale,
+        w: (g.w + ox <= 0 ? 0 : g.w - ox < 0 ? g.w : g.w - ox) / scale,
+        h: (g.h + oy <= 0 ? 0 : g.h - oy < 0 ? g.h : g.h - oy) / scale
     };
     if (viewport.w > 0 && viewport.x > bounds.x + bounds.w) {
         viewport.w -= bounds.x - viewport.x + bounds.w;
