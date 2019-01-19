@@ -25,7 +25,18 @@ const Constants = {
     /**************************************************************
                                 Common
     **************************************************************/
-    OPENVIDU_HOST: (function () { return process.env.OPENVIDU_HOST; })(),
+    OPENVIDU_HOST: (function () {
+        let host = process.env.OPENVIDU_HOST;
+        if (host) {
+            if (host.indexOf('//') >= 0) {
+                host = host.substring(host.indexOf('//') + 2);
+            }
+            if (host.indexOf('/') >= 0) {
+                host = host.substring(0, host.indexOf('/'));
+            }
+        }
+        return host;
+    })(),
     RANDOM_SESSION: 'random',
     VIDEO_CONTAINER: '#video-container',
     CONTENT_DIV: '.wrapper',

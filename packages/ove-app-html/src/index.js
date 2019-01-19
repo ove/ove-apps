@@ -6,16 +6,23 @@ const { express, app, log, Utils } = require('@ove-lib/appbase')(__dirname, Cons
 const request = require('request');
 const server = require('http').createServer(app);
 
+// BACKWARDS-COMPATIBILITY: For v0.2.0
+if (!Utils.getOVEHost) {
+    Utils.getOVEHost = function () {
+        return process.env.OVE_HOST;
+    };
+}
+
 // Expose the distributed JS library and helper scripts.
 app.use('/libs/:name(distributed).js', function (req, res) {
-    request('http://' + process.env.OVE_HOST + '/jquery.min.js', function (err, _res, body) {
+    request('http://' + Utils.getOVEHost() + '/jquery.min.js', function (err, _res, body) {
         if (err) {
             log.error('Failed to load jquery:', err);
             Utils.sendMessage(res, HttpStatus.BAD_REQUEST,
                 JSON.stringify({ error: 'failed to load dependency' }));
         } else {
             let text = body + '\n';
-            request('http://' + process.env.OVE_HOST + '/ove.js', function (err, _res, body) {
+            request('http://' + Utils.getOVEHost() + '/ove.js', function (err, _res, body) {
                 if (err) {
                     log.error('Failed to load ove.js:', err);
                     Utils.sendMessage(res, HttpStatus.BAD_REQUEST,
@@ -24,7 +31,7 @@ app.use('/libs/:name(distributed).js', function (req, res) {
                     text += body + '\n' +
                         fs.readFileSync(path.join(__dirname, 'libs', req.params.name + '.js'));
                     res.set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JS).send(text
-                        .replace(/__OVEHOST__/g, process.env.OVE_HOST));
+                        .replace(/__OVEHOST__/g, Utils.getOVEHost()));
                 }
             });
         }

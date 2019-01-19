@@ -6,6 +6,13 @@ const { Constants } = require('./client/constants/audio');
 const { express, app, log, nodeModules, Utils } = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const server = require('http').createServer(app);
 
+// BACKWARDS-COMPATIBILITY: For v0.2.0
+if (!Utils.getOVEHost) {
+    Utils.getOVEHost = function () {
+        return process.env.OVE_HOST;
+    };
+}
+
 for (const mod of ['howler']) {
     log.debug('Using module:', mod);
     app.use('/', express.static(path.join(nodeModules, mod, 'dist')));
@@ -15,7 +22,7 @@ let ws;
 let bufferStatus = [];
 setTimeout(function () {
     const getSocket = function () {
-        const socketURL = 'ws://' + process.env.OVE_HOST;
+        const socketURL = 'ws://' + Utils.getOVEHost();
         log.debug('Establishing WebSocket connection with:', socketURL);
         ws = new (require('ws'))(socketURL);
         ws.on('close', function (code) {
