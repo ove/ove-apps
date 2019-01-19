@@ -16,7 +16,7 @@ initControl = function () {
                 g.section.h / Math.min(document.documentElement.clientHeight, window.innerHeight));
             log.debug('Computed scaling factor:', context.factor);
             // We load each client into the whiteboard controller so that it is possible to see the live
-            // contents of the space. The client is reduced in size by the computed scaling factor such
+            // contents of the space. Each client is reduced in size by the computed scaling factor such
             // that they all fit within the controller's screen.
             clients.forEach(function (c, i) {
                 if (c.x !== undefined && c.y !== undefined && c.w !== undefined && c.h !== undefined) {
@@ -65,6 +65,7 @@ initializePlotter = function () {
 
     // Initialization of canvas
     context.canvas = $(Constants.WHITEBOARD_CANVAS)[0];
+
     // It is important to set canvas height and width like this to avoid it scaling.
     context.canvas.width = parseInt($(Constants.CONTENT_DIV).css('width'), 10);
     context.canvas.height = parseInt($(Constants.CONTENT_DIV).css('height'), 10);

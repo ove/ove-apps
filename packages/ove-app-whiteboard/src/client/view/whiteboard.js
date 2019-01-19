@@ -16,6 +16,7 @@ initializePlotter = function () {
 
     // Initialization of canvas
     context.canvas = $(Constants.WHITEBOARD_CANVAS)[0];
+
     // It is important to set canvas height and width like this to avoid it scaling.
     context.canvas.width = parseInt($(Constants.CONTENT_DIV).css('width'), 10);
     context.canvas.height = parseInt($(Constants.CONTENT_DIV).css('height'), 10);
@@ -39,7 +40,6 @@ initializePlotter = function () {
         context._2d.stroke();
     };
 
-    // Socket event listener
     window.ove.socket.on(function (operation) {
         if (operation.paint) {
             const data = operation.paint;
