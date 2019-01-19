@@ -6,6 +6,7 @@ const Constants = {
     CONTROLLER: '.operations',
     CONTROL_CANVAS: '.controller',
     OVE_FRAME: '.ove-frame',
+    MAX_ZOOM_LEVEL: 10,
     TOUCH_REFRESH_TIMEOUT: 100, // Unit: milliseconds
     FRAME_LOAD_DELAY: 100, // Unit: milliseconds
 

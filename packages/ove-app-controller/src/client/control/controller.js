@@ -92,7 +92,7 @@ initControl = function (data) {
         });
         // D3 is used for pan and zoom operations. Zoom is limited to a factor of 10.
         log.debug('Registering pan/zoom listeners');
-        d3.select(Constants.CONTROL_CANVAS).call(d3.zoom().scaleExtent([1, 10]).on('zoom', function () {
+        d3.select(Constants.CONTROL_CANVAS).call(d3.zoom().scaleExtent([1, Constants.MAX_ZOOM_LEVEL]).on('zoom', function () {
             const event = d3.event.transform;
             log.trace('Got D3 event with, k:', event.k, 'x:', event.x, 'y:', event.y);
             context.transformation.next = {
