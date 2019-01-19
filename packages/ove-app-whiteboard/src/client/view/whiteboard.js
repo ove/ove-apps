@@ -46,10 +46,11 @@ initializePlotter = function () {
             context._2d.restore();
             if (data.plots && data.plots.length >= 1) {
                 log.trace('Painting line with color:', data.color, 'along points:', data.plots);
-                // recursive redraw required in order to ensure the same thickness is obtained as source
+                // An iterative redraw required in order to ensure the same thickness is obtained as source.
+                // See explanation within the 'restoreFromPlotHistory' operation for more information.
                 while (data.plots.length >= 1) {
                     drawOnCanvas(data.color, data.lineWidth, data.plots);
-                    data.plots.splice(data.plots.length - 1, 1);
+                    data.plots.pop();
                 }
             } else if (data.text) {
                 log.trace('Painting characters with color:', data.color, 'text:', data.text);

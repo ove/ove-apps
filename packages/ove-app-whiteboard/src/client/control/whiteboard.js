@@ -161,9 +161,15 @@ initializePlotter = function () {
                 socket.send({ paint: { color: p.color, lineWidth: lineWidth, plots: p.remote } });
                 let pl = p.local.slice(0); // create a shallow copy to work with
                 while (pl.length > 0) {
-                    // recursive redraw required in order to ensure the same thickness is obtained as originally drawn
+                    // The drawOnCanvas operation is invoked iteratively within the draw operation. It is essential to
+                    // ensure the end user gets to see what they draw immediately, compared to waiting until the entire
+                    // drawing operation has completed. It is also required to ensure that we record a plot as a set of
+                    // non-discrete points. The end result of this is an iterative redrawing of the line, which changes
+                    // the thickness of the line being drawn, based on how the browser handles it. In order to ensure
+                    // we maintain the same thickness as the original drawing, we need to iterative redraw the plot in
+                    // this operation as well.
                     drawOnCanvas(p.color, pl);
-                    pl.splice(pl.length - 1, 1);
+                    pl.pop();
                 }
             }
         });
