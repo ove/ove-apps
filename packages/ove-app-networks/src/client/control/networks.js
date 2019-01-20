@@ -5,6 +5,30 @@ initControl = function (data) {
     OVE.Utils.resizeController(Constants.CONTENT_DIV);
     log.debug('Restoring state:', data);
     window.ove.state.current = data;
+
+    let url = OVE.Utils.getURLQueryParam();
+    // If a URL was passed, the URLs of the loaded state would be overridden.
+    if (!url && !data.jsonURL && !data.gexfURL) {
+        // If not, the URL could also have been provided as a part of the state configuration.
+        // We don't care to test if 'data.url' was set or not, since it will be tested below
+        // anyway.
+        url = data.url;
+    }
+    if (url && (url.endsWith('.json') || url.endsWith('.gexf'))) {
+        if (url.endsWith('.json')) {
+            log.debug('New jsonURL at controller:', url);
+            window.ove.state.current.jsonURL = url;
+        } else {
+            log.debug('New gexfURL at controller:', url);
+            // The jsonURL will take precedence if it exists, so it must be unset before a
+            // gexfURL can be set.
+            if (window.ove.state.current.jsonURL) {
+                delete window.ove.state.current.jsonURL;
+            }
+            window.ove.state.current.gexfURL = url;
+        }
+    }
+
     loadSigma();
     log.debug('Broadcasting state');
     OVE.Utils.broadcastState();

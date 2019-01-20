@@ -13,6 +13,31 @@ initControl = function (data, viewport) {
     // initialising the app.
     const currentState = data.config || data;
     log.debug('Restoring state:', currentState);
+
+    let url = OVE.Utils.getURLQueryParam();
+    // If a URL was passed, the tileSources of the loaded state would be overridden.
+    if (!url && !currentState.tileSources) {
+        // If not, the URL could also have been provided as a part of the state configuration.
+        // We don't care to test if 'data.url' was set or not, since it will be tested below
+        // anyway.
+        url = currentState.url;
+    }
+    if (url) {
+        if (url.endsWith('.dzi')) {
+            log.debug('New DZI URL at controller:', url);
+            currentState.tileSources = url;
+        } else if (url.endsWith('.xml')) {
+            log.debug('New XML URL at controller:', url);
+            currentState.tileSources = url;
+        } else if (url.endsWith('.json')) {
+            log.debug('New JSON at controller:', url);
+            currentState.tileSources = url;
+        } else {
+            log.debug('New image URL at controller:', url);
+            currentState.tileSources = { type: 'image', url: url };
+        }
+    }
+
     window.ove.state.current = { config: currentState };
     // Viewport details would be updated for specific events - check OSD_MONITORED_EVENTS.
     const setupHandlers = function () {

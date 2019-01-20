@@ -5,7 +5,7 @@ initControl = function (data) {
     log.debug('Restoring state:', data);
     const state = window.ove.state.current = data;
     // If a URL was passed, the URL of the loaded state would be overridden.
-    const url = OVE.Utils.getQueryParam('url');
+    const url = OVE.Utils.getURLQueryParam();
     if (url) {
         log.debug('New URL at controller:', url);
         state.url = url;

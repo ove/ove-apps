@@ -2,6 +2,21 @@ initControl = function (data) {
     window.ove.context.connections = {};
     log.debug('Restoring state:', data);
     window.ove.state.current = data;
+
+    let url = OVE.Utils.getURLQueryParam();
+    // If a URL was passed, the sessionId of the loaded state would be overridden.
+    if (!url) {
+        // If not, the URL could also have been provided as a part of the state configuration.
+        // We don't care to test if 'data.url' was set or not, since it will be tested below
+        // anyway.
+        url = data.url;
+    }
+    if (url) {
+        const sessionId = url.substring(url.lastIndexOf('/') + 1);
+        log.debug('New SessionId at controller:', sessionId);
+        window.ove.state.current.sessionId = sessionId;
+    }
+
     // Unlike most apps, the WebRTC app's controller renders the video selector
     // height and width.
     $(Constants.CONTENT_DIV).css({ width: '100vw', height: '80vh' });

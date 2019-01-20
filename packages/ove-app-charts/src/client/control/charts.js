@@ -5,6 +5,13 @@ initControl = function (data) {
     OVE.Utils.resizeController(Constants.CONTENT_DIV);
     log.debug('Restoring state:', data);
     window.ove.state.current = data;
+
+    let url = OVE.Utils.getURLQueryParam();
+    if (url) {
+        log.debug('New URL at controller:', url);
+        window.ove.state.current.url = url;
+    }
+
     loadVega();
     log.debug('Broadcasting state');
     OVE.Utils.broadcastState();

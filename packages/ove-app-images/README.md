@@ -14,6 +14,8 @@ The state of this app has a format similar to:
 
 The `tileSources` property points to a [DZI file](https://docs.microsoft.com/en-us/previous-versions/windows/silverlight/dotnet-windows-silverlight/cc645077(v=vs.95)) and could be of an XML or JSON format as explained in the [OpenSeadragon documentation](https://openseadragon.github.io/examples/tilesource-dzi/).
 
+Optionally, a `url` property can be set instead of the `tileSources` property. If it had an extension of `.dzi`, `.xml` or `.json` the `tileSources` property will be set to point to this URL. If the URL had any other extension or had no extension at all, it will be assumed to be a simple image.
+
 The app also supports alternative types of content using other types of [tile sources supported by OpenSeadragon](https://openseadragon.github.io/#examples-and-features).
 
 ## Loading the App

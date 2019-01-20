@@ -18,7 +18,9 @@ The state of this app has a format similar to:
 }
 ```
 
-The `jsonURL` property should be replaced with with `gexfURL` property depending on the format in which the dataset is specified. Information on all available `settings` can be found in [Sigma documentation](https://github.com/jacomyal/sigma.js/wiki/Settings). The `renderer` property is optional and defaults to `webgl`.
+The `jsonURL` property should be replaced with with `gexfURL` property depending on the format in which the dataset is specified. Optionally, a `url` property can be set instead of the `jsonURL` and `gexfURL` properties. Based on its extension, it will be used to set either of the `jsonURL` and `gexfURL` properties. If it had no extension at all, it will be ignored.
+
+Information on all available `settings` can be found in [Sigma documentation](https://github.com/jacomyal/sigma.js/wiki/Settings). The `renderer` property is optional and defaults to `webgl`.
 
 If the content is available on a [Neo4j](https://neo4j.com/docs) database the state of this app needs to have a format similar to:
 

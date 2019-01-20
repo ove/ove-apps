@@ -28,31 +28,61 @@ initControl = function (data) {
             });
             window.ove.state.current.scripts = data.scripts;
         }
-        initMap({
-            center: [+(data.center[0]), +(data.center[1])],
-            // The resolution can be scaled to match the section's dimensions, or it could be
-            // the original resolution intended for the controller. The data.scaled property
-            // is used to determine the option.
-            resolution: +(data.resolution) *
-                (data.scaled ? Math.sqrt(g.section.w * g.section.h /
-                    (parseInt($('.outer').css('width'), 10) * parseInt($('.outer').css('height'), 10))) : 1.0),
-            zoom: parseInt(data.zoom, 10),
-            enableRotation: false
-        });
-        // We force the setting of the zoom.
-        const zoom = parseInt(data.zoom, 10);
-        log.debug('Setting zoom to:', zoom);
-        context.map.getView().setZoom(zoom);
-        uploadMapPosition();
-        context.isInitialized = true;
-        // Handlers for OpenLayers events.
-        for (const e of Constants.OL_MONITORED_EVENTS) {
-            if (e === 'change:center') {
-                context.map.getView().on(e, uploadMapPosition);
-            } else {
-                context.map.getView().on(e, changeEvent);
+
+        const config = {
+            center: data.center,
+            resolution: data.resolution,
+            zoom: data.zoom
+        };
+
+        const loadMap = function () {
+            initMap({
+                center: [+(config.center[0]), +(config.center[1])],
+                // The resolution can be scaled to match the section's dimensions, or it could be
+                // the original resolution intended for the controller. The data.scaled property
+                // is used to determine the option.
+                resolution: +(config.resolution) *
+                    (data.scaled ? Math.sqrt(g.section.w * g.section.h /
+                        (parseInt($('.outer').css('width'), 10) * parseInt($('.outer').css('height'), 10))) : 1.0),
+                zoom: parseInt(config.zoom, 10),
+                enableRotation: false
+            });
+            // We force the setting of the zoom.
+            const zoom = parseInt(config.zoom, 10);
+            log.debug('Setting zoom to:', zoom);
+            context.map.getView().setZoom(zoom);
+            uploadMapPosition();
+            context.isInitialized = true;
+            // Handlers for OpenLayers events.
+            for (const e of Constants.OL_MONITORED_EVENTS) {
+                if (e === 'change:center') {
+                    context.map.getView().on(e, uploadMapPosition);
+                } else {
+                    context.map.getView().on(e, changeEvent);
+                }
+                log.debug('Registering OpenLayers handler:', e);
             }
-            log.debug('Registering OpenLayers handler:', e);
+        };
+
+        let url = OVE.Utils.getURLQueryParam();
+        // If a URL was passed, the sessionId of the loaded state would be overridden.
+        if (!url) {
+            // If not, the URL could also have been provided as a part of the state configuration.
+            // We don't care to test if 'data.url' was set or not, since it will be tested below
+            // anyway.
+            url = data.url;
+        }
+        if (url) {
+            log.debug('Loading configuration from URL:', url);
+            $.ajax({ url: url, dataType: 'json' }).always(function (data) {
+                config.center = data.center || config.center;
+                config.resolution = data.resolution || config.resolution;
+                config.zoom = data.zoom || config.zoom;
+                log.debug('Using center:', config.center, 'resolution:', config.resolution, 'and zoom:', config.zoom);
+                loadMap();
+            });
+        } else {
+            loadMap();
         }
     });
 };

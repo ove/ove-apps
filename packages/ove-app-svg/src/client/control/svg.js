@@ -7,7 +7,7 @@ initControl = function (data) {
     // If a URL was passed, the URL of the loaded state is overridden.
     // Note that state is synchronised by the Tuoris service, rather than being broadcast
     // directly to the viewers.
-    let url = OVE.Utils.getQueryParam('url');
+    let url = OVE.Utils.getURLQueryParam();
     if (url) {
         log.debug('New URL at controller:', url);
         window.ove.state.current.url = url;
