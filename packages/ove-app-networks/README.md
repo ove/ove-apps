@@ -75,13 +75,13 @@ The implementation makes it possible to query on all properties of nodes and edg
 To search for nodes having a size greater than or equal to 2, using OVE APIs:
 
 ```sh
-curl  --request GET http://OVE_APP_NETWORKS_HOST:PORT/operation/search?filter=size%20ge%202
+curl  --request POST http://OVE_APP_NETWORKS_HOST:PORT/operation/search?filter=size%20ge%202
 ```
 
 To reset the network to its original state:
 
 ```sh
-curl  --request GET http://OVE_APP_NETWORKS_HOST:PORT/operation/reset
+curl  --request POST http://OVE_APP_NETWORKS_HOST:PORT/operation/reset
 ```
 
 Instructions on invoking all operations are available on the [API Documentation](http://OVE_APP_NETWORKS_HOST:PORT/api-docs#operation).

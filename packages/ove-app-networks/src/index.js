@@ -32,8 +32,7 @@ setTimeout(function () {
     getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);
 
-let operationsList = Object.values(Constants.Operation).join('|');
-app.get('/operation/:name(' + operationsList + ')', function (req, res) {
+const handleOperation = function (req, res) {
     const sectionId = req.query.oveSectionId;
     const operation = req.params.name;
 
@@ -124,7 +123,13 @@ app.get('/operation/:name(' + operationsList + ')', function (req, res) {
     }
     res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE,
         Constants.HTTP_CONTENT_TYPE_JSON).send(Utils.JSON.EMPTY);
-});
+};
+
+let operationsList = Object.values(Constants.Operation);
+app.post('/operation/:name(' + operationsList.join('|') + ')', handleOperation);
+
+// BACKWARDS-COMPATIBILITY: For <= v0.2.0
+app.get('/operation/:name(' + operationsList.join('|') + ')', handleOperation);
 
 const port = process.env.PORT || 8080;
 server.listen(port);

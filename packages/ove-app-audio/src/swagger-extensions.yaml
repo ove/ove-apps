@@ -28,7 +28,7 @@ paths:
       tags:
       - operations
   /operation/mute:
-    get:
+    post:
       parameters:
       - description: "Section ID"
         format: int32
@@ -45,7 +45,7 @@ paths:
       tags:
       - operations
   /operation/pause:
-    get:
+    post:
       produces:
       - application/json
       responses:
@@ -55,7 +55,7 @@ paths:
       tags:
       - operations
   /operation/play:
-    get:
+    post:
       parameters:
       - description: "Loop playback or not"
         enum:
@@ -85,7 +85,7 @@ paths:
       tags:
       - operations
   /operation/seekTo:
-    get:
+    post:
       parameters:
       - description: "Time in seconds from start of video"
         format: float
@@ -108,7 +108,7 @@ paths:
       tags:
       - operations
   /operation/setPosition:
-    get:
+    post:
       parameters:
       - description: "x value"
         format: float
@@ -143,7 +143,7 @@ paths:
       tags:
       - operations
   /operation/setVolume:
-    get:
+    post:
       parameters:
       - description: "Volume level between 0 and 1.0"
         format: float
@@ -166,7 +166,7 @@ paths:
       tags:
       - operations
   /operation/stop:
-    get:
+    post:
       parameters:
       - description: "Section ID"
         format: int32
@@ -183,7 +183,7 @@ paths:
       tags:
       - operations
   /operation/unmute:
-    get:
+    post:
       parameters:
       - description: "Section ID"
         format: int32
@@ -200,7 +200,7 @@ paths:
       tags:
       - operations
   /operation/volDown:
-    get:
+    post:
       parameters:
       - description: "Section ID"
         format: int32
@@ -217,7 +217,7 @@ paths:
       tags:
       - operations
   /operation/volUp:
-    get:
+    post:
       parameters:
       - description: "Section ID"
         format: int32

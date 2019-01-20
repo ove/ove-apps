@@ -26,7 +26,7 @@ paths:
                 type: "string"
                 enum: ["complete", "buffering"]
   /operation/pause:
-    get:
+    post:
       tags:
       - "operations"
       summary: "Pauses playback on one or all videos"
@@ -36,7 +36,7 @@ paths:
         200:
           description: "successful operation"
   /operation/play:
-    get:
+    post:
       tags:
       - "operations"
       summary: "Plays one or all videos"
@@ -59,7 +59,7 @@ paths:
         200:
           description: "successful operation"
   /operation/seekTo:
-    get:
+    post:
       tags:
       - "operations"
       summary: "Seeks to a specific time one or all videos"
@@ -82,7 +82,7 @@ paths:
         200:
           description: "successful operation"
   /operation/stop:
-    get:
+    post:
       tags:
       - "operations"
       summary: "Stops playback one or all videos and resets time to the start"

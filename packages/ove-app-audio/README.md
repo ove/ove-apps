@@ -39,7 +39,7 @@ The app's [API](http://OVE_APP_AUDIO_HOST:PORT/api-docs#operation) also exposes 
 To play audio using OVE APIs:
 
 ```sh
-curl http://OVE_APP_AUDIO_HOST:PORT/operation/play
+curl --request POST http://OVE_APP_AUDIO_HOST:PORT/operation/play
 ```
 
 Instructions on invoking other operations are available on the [API Documentation](http://OVE_APP_AUDIO_HOST:PORT/api-docs#operation).

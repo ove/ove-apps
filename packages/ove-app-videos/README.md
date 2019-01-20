@@ -39,7 +39,7 @@ The app's [API](http://OVE_APP_VIDEOS_HOST:PORT/api-docs#operation) also exposes
 To play videos using OVE APIs:
 
 ```sh
-curl  --request GET http://OVE_APP_VIDEOS_HOST:PORT/operation/play
+curl  --request POST http://OVE_APP_VIDEOS_HOST:PORT/operation/play
 ```
 
 Instructions on invoking other operations are available on the [API Documentation](http://OVE_APP_VIDEOS_HOST:PORT/api-docs#operation).
