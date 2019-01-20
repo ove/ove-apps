@@ -10,7 +10,7 @@ The state of this app has a format similar to:
 
 ```json
 {
-    "spec": "https://raw.githubusercontent.com/vega/vega/master/docs/examples/bar-chart.vg.json",
+    "url": "https://raw.githubusercontent.com/vega/vega/master/docs/examples/bar-chart.vg.json",
     "options": {
         "width": 800,
         "height": 800
@@ -18,7 +18,7 @@ The state of this app has a format similar to:
 }
 ```
 
-The `spec` property points to either a URL of, or contains an embedded [Vega-Embed specification](https://vega.github.io/vega/docs/#specification).
+The `url` property points to a URL of a [Vega-Embed specification](https://vega.github.io/vega/docs/#specification). Alternatively, the specification be embedded in the state using a `spec` property.
 
 ## Loading the App
 
@@ -27,13 +27,13 @@ A chart can be loaded using the OVE APIs:
 Linux/Mac:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_CHARTS_HOST:PORT","states": {"load": {"spec": "https://raw.githubusercontent.com/vega/vega/master/docs/examples/bar-chart.vg.json", "options": {"width": 800, "height": 800}}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_CHARTS_HOST:PORT","states": {"load": {"url": "https://raw.githubusercontent.com/vega/vega/master/docs/examples/bar-chart.vg.json", "options": {"width": 800, "height": 800}}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
 ```
 
 Windows:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_CHARTS_HOST:PORT\", \"states\": {\"load\": {\"spec\": \"https://raw.githubusercontent.com/vega/vega/master/docs/examples/bar-chart.vg.json\", \"options\": {\"width\": 800, \"height\": 800}}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_CHARTS_HOST:PORT\", \"states\": {\"load\": {\"url\": \"https://raw.githubusercontent.com/vega/vega/master/docs/examples/bar-chart.vg.json\", \"options\": {\"width\": 800, \"height\": 800}}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 The charts app has a transparent background. If required, a background colour of choice can be set using the [Background Utility](../ove-app-html/docs/UTIL_BACKGROUND.md) provided by OVE.

@@ -18,7 +18,11 @@ The state of this app has a format similar to:
 }
 ```
 
-The `center`, `resolution` and `zoom` properties are mandatory. Optionally, there can be one or more enabled layers and one or more scripts to load custom overlays as seen above. The `enabledLayers` property accepts a list of integer values. These integer values correspond to the order (starting from 0) in which the layers were defined on the [Map Layers configuration](../ove-app-maps/docs/MAP_LAYERS_JSON.md). The `scripts` property accepts a list of URLs of JavaScript files.
+The `center`, `resolution` and `zoom` properties are mandatory. It is also possible to store these properties in a file with a `.json` extension and provide its location using the optional `url` property. If the `url` property is provided, `center`, `resolution` and `zoom` can be omitted from the state configuration.
+
+Optionally, there can be one or more enabled layers and one or more scripts to load custom overlays as seen above. The `enabledLayers` property accepts a list of integer values. These integer values correspond to the order (starting from 0) in which the layers were defined on the [Map Layers configuration](../ove-app-maps/docs/MAP_LAYERS_JSON.md).
+
+The `scripts` property accepts a list of URLs of JavaScript files.
 
 ## Designing Custom Overlays
 

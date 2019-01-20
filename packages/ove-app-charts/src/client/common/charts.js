@@ -21,9 +21,9 @@ loadVega = function () {
 
     const state = window.ove.state.current;
     // Vega specification can either be inline or provided at some URL.
-    if (state.specURL) {
-        log.info('Loading Vega spec at url:', state.specURL, ', with options:', state.options);
-        window.vegaEmbed(Constants.CONTENT_DIV, state.specURL, state.options).catch(log.error);
+    if (state.url) {
+        log.info('Loading Vega spec at url:', state.url, ', with options:', state.options);
+        window.vegaEmbed(Constants.CONTENT_DIV, state.url, state.options).catch(log.error);
     } else if (state.spec) {
         log.info('Loading inline Vega spec with options:', state.options);
         window.vegaEmbed(Constants.CONTENT_DIV, JSON.parse(state.spec), state.options).catch(log.error);

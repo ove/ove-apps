@@ -3,7 +3,7 @@ initControl = function (data) {
     log.debug('Application is initialized:', window.ove.context.isInitialized);
     log.debug('Restoring state:', data);
     window.ove.state.current = data;
-    const url = OVE.Utils.getQueryParam('url');
+    const url = OVE.Utils.getURLQueryParam();
     if (url) {
         const launchDelay = parseInt(OVE.Utils.getQueryParam('launchDelay', 0), 10);
         log.debug('New URL at controller:', url, ', with launch delay:', launchDelay);
