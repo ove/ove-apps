@@ -363,15 +363,29 @@ loadSigma = function () {
 
             log.debug('Adding bounding box');
             let count = graph.nodes.length;
-            const coords = [[0, 0], [0, g.section.h], [g.section.w, 0], [g.section.w, g.section.h]];
+            let coords;
+            if (OVE.Utils.getViewId()) {
+                // Viewer
+                coords = [[g.x, g.y], [g.x, g.y + g.h], [g.x + g.w, g.y], [g.x + g.w, g.y + g.h]];
+            } else {
+                // Controller
+                coords = [[0, 0], [0, g.section.h], [g.section.w, 0], [g.section.w, g.section.h]];
+            }
             for (let i = 0; i < coords.length; i++) {
-                graph.nodes.push({
-                    id: count + i,
-                    x: coords[i][0],
-                    y: coords[i][1],
-                    size: 1,
-                    color: config.boundingBoxColor || 'rgb(0, 0, 0)'
-                });
+                if (nodesMap[count + i]) {
+                    // There is a possibility that we may already have a node with the ids we use
+                    // for the bounding box, if so, assume a much larger count.
+                    count *= 2;
+                    i--;
+                } else {
+                    graph.nodes.push({
+                        id: count + i,
+                        x: coords[i][0],
+                        y: coords[i][1],
+                        size: 1,
+                        color: config.boundingBoxColor || 'rgb(0, 0, 0)'
+                    });
+                }
             }
             return graph;
         };

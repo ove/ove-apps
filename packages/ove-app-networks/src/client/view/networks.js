@@ -28,6 +28,12 @@ getClientSpecificURL = function (url) {
 beginInitialization = function () {
     log.debug('Starting viewer initialization');
     OVE.Utils.initView(initView, loadSigma, function () {
-        OVE.Utils.resizeViewer(Constants.CONTENT_DIV);
+        const g = window.ove.geometry;
+        const css = {
+            width: g.w + 'px',
+            height: g.h + 'px'
+        };
+        log.debug('Resizing viewer with height:', css.height, ', width:', css.width);
+        $(Constants.CONTENT_DIV).css(css);
     });
 };
