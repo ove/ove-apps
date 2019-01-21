@@ -382,7 +382,7 @@ loadSigma = function () {
                         id: count + i,
                         x: coords[i][0],
                         y: coords[i][1],
-                        size: 1,
+                        size: config.boundingBoxNodeSize || 1,
                         color: config.boundingBoxColor || 'rgb(0, 0, 0)'
                     });
                 }
