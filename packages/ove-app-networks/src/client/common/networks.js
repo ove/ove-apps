@@ -43,13 +43,23 @@ runOperation = function (message) {
         };
         // Evaluate as a string
         const evaluateS = function (element, filter) {
-            return evaluate(element, filter).toString();
+            const res = evaluate(element, filter);
+            return res ? res.toString() : undefined;
         };
         // Evaluate a function
         const evaluateF = function (element, func, args) {
             const firstArg = evaluateS(element, args[0]);
+            if (firstArg === undefined) {
+                return undefined;
+            }
             const secondArg = args.length > 1 ? evaluateS(element, args[1]) : undefined;
+            if (secondArg === undefined && args.length > 1) {
+                return undefined;
+            }
             const thirdArg = args.length > 2 ? evaluateS(element, args[2]) : undefined;
+            if (thirdArg === undefined && args.length > 2) {
+                return undefined;
+            }
             switch (func) {
                 case Constants.Evaluation.Function.SUBSTRING:
                     // Unable to use secondArg and thirdArg as the replace method expects
@@ -157,14 +167,18 @@ runOperation = function (message) {
             let ln = n.length;
             while (ln) {
                 ln--;
-                if (n[ln].origColor === undefined) {
-                    n[ln].origColor = n[ln].color ? n[ln].color : null;
-                } else if (n[ln].origColor === null) {
-                    delete n[ln].color;
-                } else {
-                    n[ln].color = n[ln].origColor;
+                if (message.operation === Constants.Operation.COLOR ||
+                    message.operation === Constants.Operation.RESET) {
+                    if (n[ln].origColor === undefined) {
+                        n[ln].origColor = n[ln].color ? n[ln].color : null;
+                    } else if (n[ln].origColor === null) {
+                        delete n[ln].color;
+                    } else {
+                        n[ln].color = n[ln].origColor;
+                    }
                 }
-                if (hasLabels) {
+                if (hasLabels && (message.operation === Constants.Operation.LABEL ||
+                    message.operation === Constants.Operation.RESET)) {
                     if (n[ln].origLabel === undefined) {
                         n[ln].origLabel = n[ln].label ? n[ln].label : null;
                     } else if (n[ln].origLabel === null) {
@@ -185,9 +199,10 @@ runOperation = function (message) {
     const nodeFilter = getFromMessage(message, 'node', '$filter');
     const edgeFilter = getFromMessage(message, 'edge', '$filter');
 
-    let filter = (new sigma.plugins.filter(window.ove.context.sigma)).undo();
+    let filter = (new sigma.plugins.filter(window.ove.context.sigma));
     switch (message.operation) {
         case Constants.Operation.SEARCH:
+            filter = filter.undo();
             if (nodeFilter) {
                 log.debug('Filtering nodes using filter:', nodeFilter);
                 filter = filter.nodesBy(function (n) {
@@ -256,11 +271,11 @@ runOperation = function (message) {
         case Constants.Operation.NEIGHBORS_OF:
             const nodeName = getFromMessage(message, 'node', 'name');
             log.debug('Displaying neighbors of node:', nodeName);
-            filter.neighborsOf(nodeName).apply();
+            filter.undo().neighborsOf(nodeName).apply();
             break;
         case Constants.Operation.RESET:
             log.debug('Successfully reset graph');
-            filter.apply();
+            filter.undo().apply();
             // Applying the empty filter means the graph is restored to what it was originally.
             break;
     }
@@ -354,7 +369,11 @@ loadSigma = function () {
             });
 
             log.debug('Populating graph with nodes and edges');
+            let maxId = -1;
             for (let key in nodesMap) {
+                // The maximum node-id is required to know which is the starting id for the nodes
+                // that form the bounding box.
+                maxId = Math.max(maxId, key);
                 graph.nodes.push(nodesMap[key]);
             }
             for (let key in edgesMap) {
@@ -362,7 +381,6 @@ loadSigma = function () {
             }
 
             log.debug('Adding bounding box');
-            let count = graph.nodes.length;
             let coords;
             if (OVE.Utils.getViewId()) {
                 // Viewer
@@ -372,20 +390,13 @@ loadSigma = function () {
                 coords = [[0, 0], [0, g.section.h], [g.section.w, 0], [g.section.w, g.section.h]];
             }
             for (let i = 0; i < coords.length; i++) {
-                if (nodesMap[count + i]) {
-                    // There is a possibility that we may already have a node with the ids we use
-                    // for the bounding box, if so, assume a much larger count.
-                    count *= 2;
-                    i--;
-                } else {
-                    graph.nodes.push({
-                        id: count + i,
-                        x: coords[i][0],
-                        y: coords[i][1],
-                        size: config.boundingBoxNodeSize || 1,
-                        color: config.boundingBoxColor || 'rgb(0, 0, 0)'
-                    });
-                }
+                graph.nodes.push({
+                    id: maxId + 1 + i,
+                    x: coords[i][0],
+                    y: coords[i][1],
+                    size: config.boundingBoxNodeSize || 1,
+                    color: config.boundingBoxColor || 'rgb(0, 0, 0)'
+                });
             }
             return graph;
         };
