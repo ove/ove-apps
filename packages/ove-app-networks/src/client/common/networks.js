@@ -44,7 +44,7 @@ runOperation = function (message) {
         // Evaluate as a string
         const evaluateS = function (element, filter) {
             const res = evaluate(element, filter);
-            return res ? res.toString() : undefined;
+            return res || res === 0 ? res.toString() : undefined;
         };
         // Evaluate a function
         const evaluateF = function (element, func, args) {
