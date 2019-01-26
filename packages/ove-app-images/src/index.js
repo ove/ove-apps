@@ -19,9 +19,8 @@ if (!Utils.JSON.getDescendant) {
         const nameSeparator = input.indexOf('.');
         if (nameSeparator === -1) {
             return obj[input];
-        } else {
-            return getDescendant(input.substring(nameSeparator + 1), obj[input.substring(0, nameSeparator)]);
         }
+        return getDescendant(input.substring(nameSeparator + 1), obj[input.substring(0, nameSeparator)]);
     };
 }
 

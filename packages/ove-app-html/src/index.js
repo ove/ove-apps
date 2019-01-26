@@ -20,21 +20,22 @@ app.use('/libs/:name(distributed).js', function (req, res) {
             log.error('Failed to load jquery:', err);
             Utils.sendMessage(res, HttpStatus.BAD_REQUEST,
                 JSON.stringify({ error: 'failed to load dependency' }));
-        } else {
-            let text = body + '\n';
-            request('http://' + Utils.getOVEHost() + '/ove.js', function (err, _res, body) {
-                if (err) {
-                    log.error('Failed to load ove.js:', err);
-                    Utils.sendMessage(res, HttpStatus.BAD_REQUEST,
-                        JSON.stringify({ error: 'failed to load dependency' }));
-                } else {
-                    text += body + '\n' +
-                        fs.readFileSync(path.join(__dirname, 'libs', req.params.name + '.js'));
-                    res.set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JS).send(text
-                        .replace(/__OVEHOST__/g, Utils.getOVEHost()));
-                }
-            });
+            return;
         }
+
+        let text = body + '\n';
+        request('http://' + Utils.getOVEHost() + '/ove.js', function (err, _res, body) {
+            if (err) {
+                log.error('Failed to load ove.js:', err);
+                Utils.sendMessage(res, HttpStatus.BAD_REQUEST,
+                    JSON.stringify({ error: 'failed to load dependency' }));
+                return;
+            }
+            text += body + '\n' +
+                fs.readFileSync(path.join(__dirname, 'libs', req.params.name + '.js'));
+            res.set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JS).send(text
+                .replace(/__OVEHOST__/g, Utils.getOVEHost()));
+        });
     });
 });
 app.use('/libs/distributed', express.static(path.join(__dirname, 'libs', 'distributed')));

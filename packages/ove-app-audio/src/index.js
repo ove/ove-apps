@@ -82,6 +82,7 @@ const handleOperation = function (req, res) {
     } else {
         log.info('Performing operation:', name, ', on all sections');
     }
+
     // If this is a buffer status check and depending on whether a sectionId is provided, below
     // code checks whether buffering is in progress.
     if (name === Constants.Operation.BUFFER_STATUS) {
@@ -98,44 +99,45 @@ const handleOperation = function (req, res) {
         }
         res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JSON).send(
             JSON.stringify({ status: (isComplete ? Constants.BufferStatus.COMPLETE : Constants.BufferStatus.BUFFERING) }));
-    } else {
-        // other commands receive additional query parameters.
-        let message = {
-            operation: {
-                name: name,
-                executionTime: (new Date().getTime() + Constants.OPERATION_SYNC_DELAY)
-            }
-        };
-        if (name === Constants.Operation.SEEK) {
-            // We assume that the seek time is properly set instead of enforcing any strict type checks.
-            message.operation.time = req.query.time;
-        } else if (name === Constants.Operation.PLAY) {
-            // Checks whether the loop parameter is defined and it equals to true.
-            // The typeof check is better than an equals check since undefined can
-            // be overridden.
-            message.operation.loop = (typeof req.query.loop !== 'undefined' &&
-                JSON.parse(String(req.query.loop).toLowerCase()));
-            // you may set a volume
-            if (typeof req.query.volume !== 'undefined') {
-                message.operation.volume = req.query.volume;
-            }
-        } else if (name === Constants.Operation.SET_VOLUME) {
-            message.operation.volume = req.query.volume;
-        } else if (name === Constants.Operation.SET_POSITION) {
-            message.operation.x = req.query.x;
-            message.operation.y = req.query.y;
-            message.operation.z = req.query.z;
-        }
-        // If the section id is not set the message will be available to all the sections.
-        if (sectionId) {
-            ws.send(JSON.stringify({ appId: Constants.APP_NAME, sectionId: sectionId, message: message }));
-        } else {
-            ws.send(JSON.stringify({ appId: Constants.APP_NAME, message: message }));
-        }
-
-        res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE,
-            Constants.HTTP_CONTENT_TYPE_JSON).send(JSON.stringify({}));
+        return;
     }
+
+    // other commands receive additional query parameters.
+    let message = {
+        operation: {
+            name: name,
+            executionTime: (new Date().getTime() + Constants.OPERATION_SYNC_DELAY)
+        }
+    };
+    if (name === Constants.Operation.SEEK) {
+        // We assume that the seek time is properly set instead of enforcing any strict type checks.
+        message.operation.time = req.query.time;
+    } else if (name === Constants.Operation.PLAY) {
+        // Checks whether the loop parameter is defined and it equals to true.
+        // The typeof check is better than an equals check since undefined can
+        // be overridden.
+        message.operation.loop = (typeof req.query.loop !== 'undefined' &&
+            JSON.parse(String(req.query.loop).toLowerCase()));
+        // you may set a volume
+        if (typeof req.query.volume !== 'undefined') {
+            message.operation.volume = req.query.volume;
+        }
+    } else if (name === Constants.Operation.SET_VOLUME) {
+        message.operation.volume = req.query.volume;
+    } else if (name === Constants.Operation.SET_POSITION) {
+        message.operation.x = req.query.x;
+        message.operation.y = req.query.y;
+        message.operation.z = req.query.z;
+    }
+    // If the section id is not set the message will be available to all the sections.
+    if (sectionId) {
+        ws.send(JSON.stringify({ appId: Constants.APP_NAME, sectionId: sectionId, message: message }));
+    } else {
+        ws.send(JSON.stringify({ appId: Constants.APP_NAME, message: message }));
+    }
+
+    res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE,
+        Constants.HTTP_CONTENT_TYPE_JSON).send(JSON.stringify({}));
 };
 
 let operationsList = Object.values(Constants.Operation);

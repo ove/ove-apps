@@ -23,10 +23,14 @@ initCommon = function () {
         if (message.state) {
             log.debug('Got state change request: ', message.state);
             handleStateChange(message.state);
+            return;
         } else if (message.bufferStatus && context.isInitialized) {
             log.debug('Got buffer status change request: ', message.bufferStatus);
             handleBufferStatusChange(message.bufferStatus);
-        } else if (message.operation && context.isInitialized) {
+            return;
+        }
+
+        if (message.operation && context.isInitialized) {
             log.debug('Got invoke operation request: ', message.operation);
             const op = message.operation;
 

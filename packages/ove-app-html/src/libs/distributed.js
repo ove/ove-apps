@@ -204,13 +204,14 @@ window.watch = function (name, property, frequency) {
             context.watching[__self.name] = setInterval(function () {
                 if (context.isController) {
                     window.ove.state.current[__self.name] = __self.property.get();
-                } else {
-                    const state = window.ove.state.current;
-                    if (!OVE.Utils.JSON.equals(state[__self.name], context.state[__self.name])) {
-                        log.debug('Detected state change - updating variable:', __self.name);
-                        __self.property.set(state[__self.name]);
-                        context.state[__self.name] = JSON.parse(JSON.stringify(state))[__self.name];
-                    }
+                    return;
+                }
+
+                const state = window.ove.state.current;
+                if (!OVE.Utils.JSON.equals(state[__self.name], context.state[__self.name])) {
+                    log.debug('Detected state change - updating variable:', __self.name);
+                    __self.property.set(state[__self.name]);
+                    context.state[__self.name] = JSON.parse(JSON.stringify(state))[__self.name];
                 }
             }, __self.frequency);
         });

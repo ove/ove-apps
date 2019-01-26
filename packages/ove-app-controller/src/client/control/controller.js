@@ -45,50 +45,50 @@ initControl = function (data) {
             // Prevent registration of own self and sections not in same space.
             if (section.id === context.sectionId || section.space !== space) {
                 context.sections.splice(i, 1);
-            } else {
-                const endpoint = section.app.url + '/state/base';
-                $.ajax({ url: endpoint, dataType: 'json' }).always(function (data) {
-                    // If 'data.status' exists, that is an indication of an error. However, if the state of some app
-                    // also has a 'status' property, the outcome can be confusing. This check is to ensure it is an
-                    // error state.
-                    if (data.status === 400) {
-                        $.ajax({ url: section.app.url + '/' + section.id + '/state', dataType: 'json' }).done(
-                            function (payload) {
-                                log.debug('Saving base state for section using URL:', endpoint, ', payload:', payload);
-                                $.ajax({ url: endpoint, type: 'POST', data: JSON.stringify(payload), contentType: 'application/json' });
-                            }).catch(log.error);
-                    } else {
-                        log.debug('Base state already cached at URL:', endpoint, ', payload:', data);
-                    }
-                });
-                $.ajax({ url: section.app.url + '/name', dataType: 'json' }).done(
-                    function (name) {
-                        log.debug('Setting up control sockets for app:', name);
-                        section.ove = new OVE(name, context.hostname.substring(context.hostname.indexOf('//') + 2), section.id);
-                        section.ove.socket.on(function (message) {
-                            if (!OVE.Utils.JSON.equals(message, section.current)) {
-                                const payload = JSON.stringify({
-                                    source: section.current,
-                                    target: message
-                                });
-                                section.current = message;
-                                log.trace('Fetching transformation from section:', section.id);
-                                const endpoint = section.app.url + '/diff';
-                                log.trace('Sending difference request to URL:', endpoint, ', payload:', payload);
-                                $.ajax({ url: endpoint, type: 'POST', data: payload, contentType: 'application/json' })
-                                    .done(function (transformation) {
-                                        const current = context.transformation.current;
-                                        context.transformation.next = {
-                                            triggeredBy: section.id,
-                                            zoom: current.zoom * transformation.zoom,
-                                            pan: { x: current.pan.x + transformation.pan.x, y: current.pan.y + transformation.pan.y }
-                                        };
-                                        log.trace('Next transformation event is:', context.transformation.next);
-                                    }).catch(log.error);
-                            }
-                        });
-                    }).catch(log.error);
+                return;
             }
+            const endpoint = section.app.url + '/state/base';
+            $.ajax({ url: endpoint, dataType: 'json' }).always(function (data) {
+                // If 'data.status' exists, that is an indication of an error. However, if the state of some app
+                // also has a 'status' property, the outcome can be confusing. This check is to ensure it is an
+                // error state.
+                if (data.status === 400) {
+                    $.ajax({ url: section.app.url + '/' + section.id + '/state', dataType: 'json' }).done(
+                        function (payload) {
+                            log.debug('Saving base state for section using URL:', endpoint, ', payload:', payload);
+                            $.ajax({ url: endpoint, type: 'POST', data: JSON.stringify(payload), contentType: 'application/json' });
+                        }).catch(log.error);
+                } else {
+                    log.debug('Base state already cached at URL:', endpoint, ', payload:', data);
+                }
+            });
+            $.ajax({ url: section.app.url + '/name', dataType: 'json' }).done(
+                function (name) {
+                    log.debug('Setting up control sockets for app:', name);
+                    section.ove = new OVE(name, context.hostname.substring(context.hostname.indexOf('//') + 2), section.id);
+                    section.ove.socket.on(function (message) {
+                        if (!OVE.Utils.JSON.equals(message, section.current)) {
+                            const payload = JSON.stringify({
+                                source: section.current,
+                                target: message
+                            });
+                            section.current = message;
+                            log.trace('Fetching transformation from section:', section.id);
+                            const endpoint = section.app.url + '/diff';
+                            log.trace('Sending difference request to URL:', endpoint, ', payload:', payload);
+                            $.ajax({ url: endpoint, type: 'POST', data: payload, contentType: 'application/json' })
+                                .done(function (transformation) {
+                                    const current = context.transformation.current;
+                                    context.transformation.next = {
+                                        triggeredBy: section.id,
+                                        zoom: current.zoom * transformation.zoom,
+                                        pan: { x: current.pan.x + transformation.pan.x, y: current.pan.y + transformation.pan.y }
+                                    };
+                                    log.trace('Next transformation event is:', context.transformation.next);
+                                }).catch(log.error);
+                        }
+                    });
+                }).catch(log.error);
         });
         // D3 is used for pan and zoom operations. Zoom is limited to a factor of 10.
         log.debug('Registering pan/zoom listeners');
@@ -225,49 +225,50 @@ loadControls = function () {
 
     $(Constants.Button.SHOW_BACKGROUND).click(function () {
         $(Constants.Button.SHOW_BACKGROUND).toggleClass(Constants.State.ACTIVE);
-        if ($(Constants.Button.SHOW_BACKGROUND).hasClass(Constants.State.ACTIVE)) {
-            const context = window.ove.context;
-            fetch(context.hostname + '/spaces?oveSectionId=' + context.sectionId)
-                .then(function (r) { return r.text(); }).then(function (text) {
-                    const space = Object.keys(JSON.parse(text))[0];
-                    log.debug('Loading space:', space);
-
-                    let clients = Object.values(JSON.parse(text))[0];
-                    // We load each client into the controller so that it is possible to see the live
-                    // contents of the space. The client is reduced in size by the computed scaling
-                    // factor such that they all fit within the controller's screen.
-                    clients.forEach(function (c, i) {
-                        if (c.x !== undefined && c.y !== undefined && c.w !== undefined && c.h !== undefined) {
-                            $('<iframe>', {
-                                src: context.hostname + '/view.html?oveViewId=' + space + '-' + i,
-                                class: Constants.OVE_FRAME.substring(1),
-                                allowtransparency: true,
-                                frameborder: 0,
-                                scrolling: 'no'
-                            }).css({
-                                zoom: 1,
-                                transformOrigin: '0% 0%',
-                                transform: 'scale(' + (1 / context.factor) + ')',
-                                // Each client is loaded in its original size and then scaled-down.
-                                width: (c.w + c.offset.x) + 'px',
-                                height: (c.h + c.offset.y) + 'px',
-                                position: 'absolute',
-                                marginLeft: (c.x - c.offset.x) / context.factor,
-                                marginTop: (c.y - c.offset.y) / context.factor
-                            }).appendTo(Constants.CONTENT_DIV);
-                        }
-                    });
-                    // Only displaying the subset of sections in the background.
-                    setTimeout(function () {
-                        const filter = [];
-                        context.sections.forEach(function (section) {
-                            filter.push(section.id);
-                        });
-                        window.ove.frame.send(Constants.Frame.CHILD, { load: true, filters: { includeOnly: filter } }, 'core');
-                    }, Constants.FRAME_LOAD_DELAY);
-                });
-        } else {
+        if (!$(Constants.Button.SHOW_BACKGROUND).hasClass(Constants.State.ACTIVE)) {
             $(Constants.OVE_FRAME).remove();
+            return;
         }
+
+        const context = window.ove.context;
+        fetch(context.hostname + '/spaces?oveSectionId=' + context.sectionId)
+            .then(function (r) { return r.text(); }).then(function (text) {
+                const space = Object.keys(JSON.parse(text))[0];
+                log.debug('Loading space:', space);
+
+                let clients = Object.values(JSON.parse(text))[0];
+                // We load each client into the controller so that it is possible to see the live
+                // contents of the space. The client is reduced in size by the computed scaling
+                // factor such that they all fit within the controller's screen.
+                clients.forEach(function (c, i) {
+                    if (c.x !== undefined && c.y !== undefined && c.w !== undefined && c.h !== undefined) {
+                        $('<iframe>', {
+                            src: context.hostname + '/view.html?oveViewId=' + space + '-' + i,
+                            class: Constants.OVE_FRAME.substring(1),
+                            allowtransparency: true,
+                            frameborder: 0,
+                            scrolling: 'no'
+                        }).css({
+                            zoom: 1,
+                            transformOrigin: '0% 0%',
+                            transform: 'scale(' + (1 / context.factor) + ')',
+                            // Each client is loaded in its original size and then scaled-down.
+                            width: (c.w + c.offset.x) + 'px',
+                            height: (c.h + c.offset.y) + 'px',
+                            position: 'absolute',
+                            marginLeft: (c.x - c.offset.x) / context.factor,
+                            marginTop: (c.y - c.offset.y) / context.factor
+                        }).appendTo(Constants.CONTENT_DIV);
+                    }
+                });
+                // Only displaying the subset of sections in the background.
+                setTimeout(function () {
+                    const filter = [];
+                    context.sections.forEach(function (section) {
+                        filter.push(section.id);
+                    });
+                    window.ove.frame.send(Constants.Frame.CHILD, { load: true, filters: { includeOnly: filter } }, 'core');
+                }, Constants.FRAME_LOAD_DELAY);
+            });
     });
 };

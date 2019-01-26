@@ -72,47 +72,48 @@ changeUserData = function (connection, video) {
         log.debug('Computed dimensions:', dim);
 
         let count = $(Constants.VIDEO_CONTAINER).children('video').length;
-        if (count <= maxSessions) {
-            let req = {
-                c: Math.ceil(Math.sqrt(count * dim.c / dim.r)),
-                r: Math.ceil(Math.sqrt(count * dim.r / dim.c))
-            };
-            log.debug('Computed required columns and rows:', req, ', for videos:', count);
-
-            // We are calculating the top and left margins using the total possible vertical and
-            // horizontal margins. We use 50% of the available horizontal margin, which will center
-            // the content horizontally. But, we use 80% of the available vertical margin, which
-            // moves the content to the bottom of the screen as much as possible.
-            const marginX = (gap + width - (dim.w + gap) * req.c) * 0.5;
-            const marginY = (gap + height - (dim.h + gap) * req.r) * 0.8;
-            log.debug('Computed margins x:', marginX, 'y:', marginY);
-
-            for (let i = 0; i < count; i++) {
-                $('#' + $(Constants.VIDEO_CONTAINER).children('video')[i].id).css({
-                    width: dim.w,
-                    height: dim.h,
-                    position: 'absolute',
-                    marginLeft: marginX + (dim.w + gap) * (i % dim.c),
-                    marginTop: marginY + (dim.h + gap) * Math.floor(i / dim.r)
-                });
-            }
-            window.ove.context.connections[video.id] = connection.connectionId || connection;
-            $('#' + video.id).click(function () {
-                $(Constants.VIDEO_CONTAINER).children('video').css('border', '');
-                $(this).css('border', Constants.SELECTED_SESSION_BORDER);
-                window.ove.state.current.connection = window.ove.context.connections[video.id];
-                log.debug('Broadcasting state');
-                OVE.Utils.broadcastState();
-            });
-
-            // Select at least one session, or else users may assume system is not working
-            if ($(Constants.VIDEO_CONTAINER).children('video').length === 1) {
-                setTimeout(function () {
-                    $(Constants.VIDEO_CONTAINER).children('video')[0].click();
-                }, Constants.SELECTION_TIMEOUT);
-            }
-        } else {
+        if (count > maxSessions) {
             video.remove();
+            return;
+        }
+
+        let req = {
+            c: Math.ceil(Math.sqrt(count * dim.c / dim.r)),
+            r: Math.ceil(Math.sqrt(count * dim.r / dim.c))
+        };
+        log.debug('Computed required columns and rows:', req, ', for videos:', count);
+
+        // We are calculating the top and left margins using the total possible vertical and
+        // horizontal margins. We use 50% of the available horizontal margin, which will center
+        // the content horizontally. But, we use 80% of the available vertical margin, which
+        // moves the content to the bottom of the screen as much as possible.
+        const marginX = (gap + width - (dim.w + gap) * req.c) * 0.5;
+        const marginY = (gap + height - (dim.h + gap) * req.r) * 0.8;
+        log.debug('Computed margins x:', marginX, 'y:', marginY);
+
+        for (let i = 0; i < count; i++) {
+            $('#' + $(Constants.VIDEO_CONTAINER).children('video')[i].id).css({
+                width: dim.w,
+                height: dim.h,
+                position: 'absolute',
+                marginLeft: marginX + (dim.w + gap) * (i % dim.c),
+                marginTop: marginY + (dim.h + gap) * Math.floor(i / dim.r)
+            });
+        }
+        window.ove.context.connections[video.id] = connection.connectionId || connection;
+        $('#' + video.id).click(function () {
+            $(Constants.VIDEO_CONTAINER).children('video').css('border', '');
+            $(this).css('border', Constants.SELECTED_SESSION_BORDER);
+            window.ove.state.current.connection = window.ove.context.connections[video.id];
+            log.debug('Broadcasting state');
+            OVE.Utils.broadcastState();
+        });
+
+        // Select at least one session, or else users may assume system is not working
+        if ($(Constants.VIDEO_CONTAINER).children('video').length === 1) {
+            setTimeout(function () {
+                $(Constants.VIDEO_CONTAINER).children('video')[0].click();
+            }, Constants.SELECTION_TIMEOUT);
         }
     }
 };

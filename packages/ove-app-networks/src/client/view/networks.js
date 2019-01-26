@@ -5,12 +5,13 @@ initView = function () {
     window.ove.socket.on(function (message) {
         if (message.operation) {
             // We first of all need to know if the operation was known
-            if (Object.values(Constants.Operation).indexOf(message.operation) !== -1) {
-                runOperation(message);
-            } else {
+            if (Object.values(Constants.Operation).indexOf(message.operation) === -1) {
                 // This can only happen due to a user error
                 log.warn('Ignoring unknown operation:', message.operation);
+                return;
             }
+
+            runOperation(message);
         } else {
             window.ove.state.current = message;
             loadSigma();

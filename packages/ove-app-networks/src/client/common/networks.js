@@ -19,13 +19,12 @@ runOperation = function (message) {
         if (!propertyName || propertyName.indexOf('.') === -1) {
             return element[propertyName] ||
                 (element.attributes ? element.attributes[propertyName] : undefined);
-        } else {
-            const firstPart = propertyName.substring(0, propertyName.indexOf('.'));
-            const otherParts = propertyName.substring(propertyName.indexOf('.') + 1);
-            const childElement = element[firstPart] ||
-                (element.attributes ? element.attributes[firstPart] : undefined);
-            return getFromElement(childElement, otherParts);
         }
+        const firstPart = propertyName.substring(0, propertyName.indexOf('.'));
+        const otherParts = propertyName.substring(propertyName.indexOf('.') + 1);
+        const childElement = element[firstPart] ||
+            (element.attributes ? element.attributes[firstPart] : undefined);
+        return getFromElement(childElement, otherParts);
     };
 
     // Helper method to retrieve a property from a message

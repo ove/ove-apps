@@ -98,28 +98,28 @@ uploadMapPosition = function () {
         log.debug('Waiting to get coordinates from pixels');
         // This method will loop until the top-left and bottom-right can be calculated.
         setTimeout(uploadMapPosition, 70);
-    } else {
-        // We broadcast the coordinates of the center, the zoom level and the resolution.
-        // We also send the coordinates of the top-left and bottom-right, to ensure the
-        // map is focusing on the correct lat/long.
-        const position = {
-            bounds: {
-                x: topLeft[0],
-                y: topLeft[1],
-                w: bottomRight[0] - topLeft[0],
-                h: bottomRight[1] - topLeft[1]
-            },
-            center: context.map.getView().getCenter(),
-            resolution: resolution,
-            zoom: context.map.getView().getZoom()
-        };
-        // The broadcast happens only if the position has changed.
-        if (!window.ove.state.current.position ||
-            !OVE.Utils.JSON.equals(position, window.ove.state.current.position)) {
-            window.ove.state.current.position = position;
-            log.debug('Broadcasting state with position:', position);
-            OVE.Utils.broadcastState();
-        }
+        return;
+    }
+    // We broadcast the coordinates of the center, the zoom level and the resolution.
+    // We also send the coordinates of the top-left and bottom-right, to ensure the
+    // map is focusing on the correct lat/long.
+    const position = {
+        bounds: {
+            x: topLeft[0],
+            y: topLeft[1],
+            w: bottomRight[0] - topLeft[0],
+            h: bottomRight[1] - topLeft[1]
+        },
+        center: context.map.getView().getCenter(),
+        resolution: resolution,
+        zoom: context.map.getView().getZoom()
+    };
+    // The broadcast happens only if the position has changed.
+    if (!window.ove.state.current.position ||
+        !OVE.Utils.JSON.equals(position, window.ove.state.current.position)) {
+        window.ove.state.current.position = position;
+        log.debug('Broadcasting state with position:', position);
+        OVE.Utils.broadcastState();
     }
 };
 
