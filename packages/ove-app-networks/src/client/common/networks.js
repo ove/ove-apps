@@ -200,7 +200,7 @@ runOperation = function (message) {
 
     let filter = (new sigma.plugins.filter(window.ove.context.sigma));
     switch (message.operation) {
-        case Constants.Operation.SEARCH:
+        case Constants.Operation.SHOW_ONLY:
             filter = filter.undo();
             if (nodeFilter) {
                 log.debug('Filtering nodes using filter:', nodeFilter);

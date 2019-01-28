@@ -45,17 +45,17 @@ const handleOperation = function (req, res) {
     const nodeLabel = req.query.property;
 
     let message = { operation: operation };
-    // The search operation sets either or both of the node and edge filters. The color
+    // The showOnly operation sets either or both of the node and edge filters. The color
     // operation also sets the colors in addition to the filters, it is possible to have
     // separate node and edge colors. The neighborsOf operation sets the name of the
     // node in focus. The parser ensures all filters are compatible with the OData v3.0
     // $filter specification.
     switch (operation) {
-        case Constants.Operation.SEARCH:
+        case Constants.Operation.SHOW_ONLY:
             if (sectionId) {
-                log.info('Performing search operation on section:', sectionId);
+                log.info('Performing showOnly operation on section:', sectionId);
             } else {
-                log.info('Performing search operation on all sections');
+                log.info('Performing showOnly operation on all sections');
             }
             if (nodeFilter) {
                 log.debug('Using node filter:', nodeFilter);

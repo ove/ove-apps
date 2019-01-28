@@ -23,7 +23,7 @@ const Constants = {
                             Enums
 **************************************************************/
 Constants.Operation = {
-    SEARCH: 'search',
+    SHOW_ONLY: 'showOnly',
     COLOR: 'color',
     LABEL: 'labelNodes',
     NEIGHBORS_OF: 'neighborsOf',

@@ -2,11 +2,11 @@ tags:
 - name: "operations"
   description: "Operations that can be performed on one or all networks"
 paths:
-  /operation/search:
+  /operation/showOnly:
     post:
       tags:
       - "operations"
-      summary: "Searches for nodes or edges that match the provider filters, and filters the display to hide nodes or edges that do not match the provided filters. Filters must be specified according to the OData v3.0 $filter specification."
+      summary: "Shows only the nodes or edges that match the provider filters, and filters the display to hide nodes or edges that do not match the provided filters. Filters must be specified according to the OData v3.0 $filter specification."
       produces:
       - "application/json"
       parameters:
