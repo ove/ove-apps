@@ -1,7 +1,14 @@
 initView = function () {
     window.ove.context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
-    OVE.Utils.setOnStateUpdate(updateURL);
+    window.ove.socket.on(function (message) {
+        if (message.operation !== Constants.Operation.REFRESH) {
+            window.ove.state.current = message;
+        } else {
+            window.ove.state.current.changeAt = message.changeAt;
+        }
+        updateURL();
+    });
 };
 
 getCSS = function () {

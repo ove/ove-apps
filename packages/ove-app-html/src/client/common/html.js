@@ -13,6 +13,8 @@ $(function () {
 });
 
 updateURL = function () {
+    // This method will also handle the refresh operation in the same way it handles
+    // the original loading operation.
     if (!window.ove.context.isInitialized) {
         log.debug('Creating content iFrame');
         const pathname = new URL(window.location.href).pathname;

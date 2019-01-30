@@ -17,6 +17,14 @@ initControl = function (data) {
     log.debug('Broadcasting state');
     OVE.Utils.broadcastState();
     updateURL();
+    window.ove.socket.on(function (message) {
+        if (message.operation !== Constants.Operation.REFRESH) {
+            window.ove.state.current = message;
+        } else {
+            window.ove.state.current.changeAt = message.changeAt;
+        }
+        updateURL();
+    });
 };
 
 getCSS = function () {
