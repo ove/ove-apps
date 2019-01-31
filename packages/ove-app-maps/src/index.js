@@ -53,8 +53,8 @@ if (process.env.OVE_MAPS_LAYERS) {
 app.get('/layers.json', function (_req, res) {
     res.send(JSON.stringify(layers));
 });
-log.debug('Using module:', 'OpenLayers');
-app.use('/', express.static(path.join(nodeModules, 'openlayers', 'dist')));
+log.debug('Using module:', 'ol');
+app.use('/ol', express.static(path.join(nodeModules, 'ol')));
 
 log.debug('Setting up state transformation operations');
 base.operations.canTransform = function (state, transformation) {
