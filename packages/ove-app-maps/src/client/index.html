@@ -7,9 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title></title>
     <link rel="shortcut icon" href="#">
-    <link rel="stylesheet" href="ol.css" type="text/css">
+    <link rel="stylesheet" href="ol/ol.css" type="text/css">
     <link rel="stylesheet" href="maps.__OVETYPE__.css" type="text/css">
-    <script src="ol.js"></script>
+    <!-- OL has a dependency import issue in their npm module: #8552 and #9171, which is not properly resolved -->
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
     <script src="jquery.min.js"></script>
     <script src="//__OVEHOST__/ove.js"></script>
     <script src="maps.__OVETYPE__.js"></script>
