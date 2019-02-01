@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@ove-lib/appbase": "0.2.0",
-    "@fortawesome/fontawesome-free": "5.6.3",
+    "@fortawesome/fontawesome-free": "5.7.0",
     "jquery": "3.3.1"
   }
 }
