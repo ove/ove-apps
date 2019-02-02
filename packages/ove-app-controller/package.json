@@ -1,7 +1,7 @@
 {
   "name": "@ove/ove-app-controller",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"No tests specified\" && exit 0",
