@@ -180,7 +180,8 @@ renderPDF = function (pdf) {
 
         // Apply the render function on all pages;
         let i = firstPage.pageNumber - 1;
-        while (i++ < (state.settings.endPage || pdf.numPages)) {
+        while (i < (state.settings.endPage || pdf.numPages)) {
+            i++;
             pdf.getPage(i).then(renderPage);
         }
     });

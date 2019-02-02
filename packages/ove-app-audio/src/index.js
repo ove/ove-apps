@@ -3,15 +3,8 @@ const path = require('path');
 
 const { Constants } = require('./client/constants/audio');
 
-const { express, app, log, nodeModules, Utils } = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
+const { express, app, appState, log, nodeModules, Utils } = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const server = require('http').createServer(app);
-
-// BACKWARDS-COMPATIBILITY: For v0.2.0
-if (!Utils.getOVEHost) {
-    Utils.getOVEHost = function () {
-        return process.env.OVE_HOST;
-    };
-}
 
 for (const mod of ['howler']) {
     log.debug('Using module:', mod);
@@ -19,20 +12,20 @@ for (const mod of ['howler']) {
 }
 
 let ws;
-let bufferStatus = [];
+appState.set('bufferStatus', []);
 setTimeout(function () {
     const getSocket = function () {
         const socketURL = 'ws://' + Utils.getOVEHost();
         log.debug('Establishing WebSocket connection with:', socketURL);
-        ws = new (require('ws'))(socketURL);
-        ws.on('close', function (code) {
+        let socket = new (require('ws'))(socketURL);
+        socket.on('close', function (code) {
             log.warn('Lost websocket connection: closed with code:', code);
             log.warn('Attempting to reconnect in ' + Constants.SOCKET_REFRESH_DELAY + 'ms');
             // If the socket is closed, we try to refresh it.
             setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
         });
-        ws.on('error', log.error);
-        ws.on('message', function (msg) {
+        socket.on('error', log.error);
+        socket.on('message', function (msg) {
             let m = JSON.parse(msg);
             if (m.appId === Constants.APP_NAME && m.message.bufferStatus) {
                 // The handling of the buffer status updates operates similarly to the video app,
@@ -48,28 +41,34 @@ setTimeout(function () {
                 //   4. After the above steps are completed peers start broadcasting their buffer statuses.
                 //   5. If at least 15% of a video is buffered across all peers synchronized playback
                 //      can begin and the video will be displayed.
+                let bufferStatus = appState.get('bufferStatus[' + m.sectionId + ']');
                 let status = m.message.bufferStatus;
-                let bufferIsEmpty = Utils.isNullOrEmpty(bufferStatus[m.sectionId]);
+                let bufferIsEmpty = Utils.isNullOrEmpty(bufferStatus);
                 if (status.type.registration) {
                     if (bufferIsEmpty) {
-                        bufferStatus[m.sectionId] = { clients: [] };
-                        bufferStatus[m.sectionId].clients.push(status.clientId);
-                    } else if (!bufferStatus[m.sectionId].clients.includes(status.clientId)) {
-                        bufferStatus[m.sectionId].clients.push(status.clientId);
+                        bufferStatus = { clients: [] };
+                        bufferStatus.clients.push(status.clientId);
+                        bufferIsEmpty = false;
+                    } else if (!bufferStatus.clients.includes(status.clientId)) {
+                        bufferStatus.clients.push(status.clientId);
                     }
                 } else if (status.type.update && !bufferIsEmpty &&
-                    bufferStatus[m.sectionId].clients.includes(status.clientId)) {
+                    bufferStatus.clients.includes(status.clientId)) {
                     if (status.percentage >= Constants.MIN_BUFFERED_PERCENTAGE ||
                         status.duration >= Constants.MIN_BUFFERED_DURATION) {
-                        bufferStatus[m.sectionId].clients.splice(bufferStatus[m.sectionId].clients.indexOf(status.clientId), 1);
-                        if (bufferStatus[m.sectionId].clients.length === 0) {
-                            delete bufferStatus[m.sectionId];
-                            bufferStatus[m.sectionId] = {};
+                        bufferStatus.clients.splice(bufferStatus.clients.indexOf(status.clientId), 1);
+                        if (bufferStatus.clients.length === 0) {
+                            appState.del('bufferStatus[' + m.sectionId + ']');
+                            return;
                         }
                     }
                 }
+                if (!bufferIsEmpty) {
+                    appState.set('bufferStatus[' + m.sectionId + ']', bufferStatus);
+                }
             }
         });
+        ws = Utils.getSafeSocket(socket);
     };
     getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);
@@ -86,6 +85,7 @@ const handleOperation = function (req, res) {
     // If this is a buffer status check and depending on whether a sectionId is provided, below
     // code checks whether buffering is in progress.
     if (name === Constants.Operation.BUFFER_STATUS) {
+        const bufferStatus = appState.get('bufferStatus');
         let isComplete = true;
         if (sectionId) {
             isComplete = Utils.isNullOrEmpty(bufferStatus[sectionId]);
@@ -131,9 +131,9 @@ const handleOperation = function (req, res) {
     }
     // If the section id is not set the message will be available to all the sections.
     if (sectionId) {
-        ws.send(JSON.stringify({ appId: Constants.APP_NAME, sectionId: sectionId, message: message }));
+        ws.safeSend(JSON.stringify({ appId: Constants.APP_NAME, sectionId: sectionId, message: message }));
     } else {
-        ws.send(JSON.stringify({ appId: Constants.APP_NAME, message: message }));
+        ws.safeSend(JSON.stringify({ appId: Constants.APP_NAME, message: message }));
     }
 
     res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE,

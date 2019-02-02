@@ -5,26 +5,6 @@ const { express, app, Utils, log, nodeModules, config } = base;
 const request = require('request');
 const server = require('http').createServer(app);
 
-// BACKWARDS-COMPATIBILITY: For v0.2.0
-if (!base.operations) {
-    base.operations = {};
-}
-
-// BACKWARDS-COMPATIBILITY: For v0.2.0
-if (!Utils.JSON.getDescendant) {
-    Utils.JSON.getDescendant = function getDescendant (input, obj) {
-        if (!obj) {
-            return undefined;
-        }
-
-        const nameSeparator = input.indexOf('.');
-        if (nameSeparator === -1) {
-            return obj[input];
-        }
-        return getDescendant(input.substring(nameSeparator + 1), obj[input.substring(0, nameSeparator)]);
-    };
-}
-
 let layers = [];
 // The map layers can be provided as an embedded JSON data structure or as a URL pointing
 // to a location at which it is stored externally.

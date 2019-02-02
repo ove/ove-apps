@@ -4,26 +4,6 @@ const base = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const { express, app, Utils, log, nodeModules } = base;
 const server = require('http').createServer(app);
 
-// BACKWARDS-COMPATIBILITY: For v0.2.0
-if (!base.operations) {
-    base.operations = {};
-}
-
-// BACKWARDS-COMPATIBILITY: For v0.2.0
-if (!Utils.JSON.getDescendant) {
-    Utils.JSON.getDescendant = function getDescendant (input, obj) {
-        if (!obj) {
-            return undefined;
-        }
-
-        const nameSeparator = input.indexOf('.');
-        if (nameSeparator === -1) {
-            return obj[input];
-        }
-        return getDescendant(input.substring(nameSeparator + 1), obj[input.substring(0, nameSeparator)]);
-    };
-}
-
 log.debug('Using module:', 'openseadragon');
 app.use('/', express.static(path.join(nodeModules, 'openseadragon', 'build', 'openseadragon')));
 

@@ -6,26 +6,20 @@ const { express, app, log, Utils } = require('@ove-lib/appbase')(__dirname, Cons
 const request = require('request');
 const server = require('http').createServer(app);
 
-// BACKWARDS-COMPATIBILITY: For v0.2.0
-if (!Utils.getOVEHost) {
-    Utils.getOVEHost = function () {
-        return process.env.OVE_HOST;
-    };
-}
-
-var ws;
+let ws;
 setTimeout(function () {
     const getSocket = function () {
         const socketURL = 'ws://' + Utils.getOVEHost();
         log.debug('Establishing WebSocket connection with:', socketURL);
-        ws = new (require('ws'))(socketURL);
-        ws.on('close', function (code) {
+        let socket = new (require('ws'))(socketURL);
+        socket.on('close', function (code) {
             log.warn('Lost websocket connection: closed with code:', code);
             log.warn('Attempting to reconnect in ' + Constants.SOCKET_REFRESH_DELAY + 'ms');
             // If the socket is closed, we try to refresh it.
             setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
         });
-        ws.on('error', log.error);
+        socket.on('error', log.error);
+        ws = Utils.getSafeSocket(socket);
     };
     getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);
@@ -48,9 +42,9 @@ const handleOperation = function (req, res) {
 
     // If the section id is not set the message will be available to all the sections.
     if (sectionId) {
-        ws.send(JSON.stringify({ appId: Constants.APP_NAME, sectionId: sectionId, message: message }));
+        ws.safeSend(JSON.stringify({ appId: Constants.APP_NAME, sectionId: sectionId, message: message }));
     } else {
-        ws.send(JSON.stringify({ appId: Constants.APP_NAME, message: message }));
+        ws.safeSend(JSON.stringify({ appId: Constants.APP_NAME, message: message }));
     }
     res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE,
         Constants.HTTP_CONTENT_TYPE_JSON).send(Utils.JSON.EMPTY);
