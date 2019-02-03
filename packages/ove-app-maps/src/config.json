@@ -23,6 +23,27 @@
           "url": "https://{a-c}.tile.thunderforest.com/transport/{z}/{x}/{y}.png"
         }
       }
+    },
+    { 
+      "type": "ol.layer.Tile",
+      "visible": false,
+      "wms": false,
+      "source": {
+        "type": "ol.source.CartoDB",
+        "config": {
+          "account": "documentation",
+          "config": {
+            "layers": [{
+              "type": "cartodb",
+              "options": {
+                "cartocss_version": "2.1.1",
+                "cartocss": "#layer { polygon-fill: #1E90FF; polygon-opacity: 0.6;}",
+                "sql": "select * from european_countries_e where name = 'France'"
+              }
+            }]
+          }
+        }
+      }
     }
   ],
   "states": {
