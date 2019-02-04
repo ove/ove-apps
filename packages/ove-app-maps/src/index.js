@@ -35,6 +35,10 @@ app.get('/layers.json', function (_req, res) {
 });
 log.debug('Using module:', 'ol');
 app.use('/ol', express.static(path.join(nodeModules, 'ol')));
+log.debug('Using module:', 'leaflet');
+app.use('/', express.static(path.join(nodeModules, 'leaflet', 'dist')));
+log.debug('Using module:', 'carto.js');
+app.use('/', express.static(path.join(nodeModules, '@carto', 'carto.js')));
 
 log.debug('Setting up state transformation operations');
 base.operations.canTransform = function (state, transformation) {

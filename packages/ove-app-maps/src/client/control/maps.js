@@ -19,7 +19,7 @@ initControl = function (data) {
         // Make enabled layers visible.
         window.ove.state.current.enabledLayers.forEach(function (e) {
             log.debug('Setting visible for layer:', e);
-            context.layers[e].setVisible(true);
+            context.library.showLayer(context.layers[e]);
         });
         if (data.scripts && data.scripts.length !== 0) {
             const first = $('script:first');
@@ -36,32 +36,24 @@ initControl = function (data) {
         };
 
         const loadMap = function () {
-            initMap({
+            // The resolution can be scaled to match the section's dimensions, or it could be
+            // the original resolution intended for the controller. The data.scaled property
+            // is used to determine the option.
+            const scaleFactor = (data.scaled ? Math.sqrt(g.section.w * g.section.h /
+                (parseInt($('.outer').css('width'), 10) * parseInt($('.outer').css('height'), 10))) : 1.0);
+            const resolution = config.resolution ? +(config.resolution) * scaleFactor : undefined;
+            const zoom = config.resolution ? +(config.zoom) : (+(config.zoom) - Math.log2(scaleFactor));
+            context.map = context.library.initialize({
                 center: [+(config.center[0]), +(config.center[1])],
-                // The resolution can be scaled to match the section's dimensions, or it could be
-                // the original resolution intended for the controller. The data.scaled property
-                // is used to determine the option.
-                resolution: +(config.resolution) *
-                    (data.scaled ? Math.sqrt(g.section.w * g.section.h /
-                        (parseInt($('.outer').css('width'), 10) * parseInt($('.outer').css('height'), 10))) : 1.0),
-                zoom: parseInt(config.zoom, 10),
+                resolution: resolution,
+                zoom: zoom,
                 enableRotation: false
             });
             // We force the setting of the zoom.
-            const zoom = parseInt(config.zoom, 10);
-            log.debug('Setting zoom to:', zoom);
-            context.map.getView().setZoom(zoom);
+            context.library.setZoom(zoom);
             uploadMapPosition();
             context.isInitialized = true;
-            // Handlers for OpenLayers events.
-            for (const e of Constants.OL_MONITORED_EVENTS) {
-                if (e === 'change:center') {
-                    context.map.getView().on(e, uploadMapPosition);
-                } else {
-                    context.map.getView().on(e, changeEvent);
-                }
-                log.debug('Registering OpenLayers handler:', e);
-            }
+            context.library.registerHandlerForEvents(uploadMapPosition);
         };
 
         let url = OVE.Utils.getURLQueryParam();
@@ -89,11 +81,14 @@ initControl = function (data) {
 
 uploadMapPosition = function () {
     const context = window.ove.context;
-    const size = context.map.getSize();
-    const topLeft = context.map.getCoordinateFromPixel([0, 0]);
-    const bottomRight = context.map.getCoordinateFromPixel(size);
-    const resolution = +(context.map.getView().getResolution()) /
-        Math.sqrt(window.ove.geometry.section.w * window.ove.geometry.section.h / (size[0] * size[1]));
+    const size = context.library.getSize();
+    const topLeft = context.library.getTopLeft();
+    const bottomRight = context.library.getBottomRight();
+
+    // If the resolution is not available, the scaling factor will be applied to zoom, instead.
+    const scaleFactor = Math.sqrt(window.ove.geometry.section.w * window.ove.geometry.section.h / (size[0] * size[1]));
+    const zoom = context.library.getResolution() ? context.library.getZoom() : (context.library.getZoom() + Math.log2(scaleFactor));
+    const resolution = context.library.getResolution() ? context.library.getResolution() / scaleFactor : undefined;
     if (topLeft === null || bottomRight === null) {
         log.debug('Waiting to get coordinates from pixels');
         // This method will loop until the top-left and bottom-right can be calculated.
@@ -110,9 +105,9 @@ uploadMapPosition = function () {
             w: bottomRight[0] - topLeft[0],
             h: bottomRight[1] - topLeft[1]
         },
-        center: context.map.getView().getCenter(),
+        center: context.library.getCenter(),
         resolution: resolution,
-        zoom: context.map.getView().getZoom()
+        zoom: zoom
     };
     // The broadcast happens only if the position has changed.
     if (!window.ove.state.current.position ||
@@ -121,12 +116,6 @@ uploadMapPosition = function () {
         log.debug('Broadcasting state with position:', position);
         OVE.Utils.broadcastState();
     }
-};
-
-changeEvent = function () {
-    // it takes a while for the all attributes of the map to be updated, especially after
-    // a resolution/zoom-level change.
-    setTimeout(uploadMapPosition, Constants.OL_CHANGE_CENTER_AFTER_UPDATE_WAIT_TIME);
 };
 
 beginInitialization = function () {

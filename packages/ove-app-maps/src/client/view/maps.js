@@ -7,6 +7,10 @@ initView = function () {
 
 updateMap = function () {
     const context = window.ove.context;
+    if (!context.library) {
+        log.warn('Mapping library not loaded');
+        return;
+    }
     const g = window.ove.geometry;
     // This check is required since the state may not be loaded when the viewer
     // receives a state update.
@@ -21,12 +25,16 @@ updateMap = function () {
     // on whether they have been enabled.
     context.layers.forEach(function (e, i) {
         const visible = window.ove.state.current.enabledLayers.includes(i.toString());
-        e.setVisible(visible);
+        if (visible) {
+            context.library.showLayer(e);
+        } else {
+            context.library.hideLayer(e);
+        }
         if (visible) {
             log.debug('Setting visible for layer:', i);
         }
     });
-    // Initialization of OpenLayers requires center, resolution and a zoom level.
+    // Initialization of maps requires center, resolution and a zoom level.
     // If the map has already been initialized what changes is the center and/or the
     // resolution.
     if (!context.isInitialized) {
@@ -37,16 +45,17 @@ updateMap = function () {
                 $('<script>', { src: e }).insertBefore(first);
             });
         }
-        initMap({
+        context.map = context.library.initialize({
             center: center,
             resolution: +(p.resolution),
             zoom: parseInt(p.zoom, 10),
             enableRotation: false });
         context.isInitialized = true;
     }
-    log.debug('Updating map with center:', center, ', and resolution:', +(p.resolution));
-    context.map.getView().setCenter(center);
-    context.map.getView().setResolution(+(p.resolution));
+    log.debug('Updating map with zoom:', parseInt(p.zoom, 10), ', center:', center, ', and resolution:', +(p.resolution));
+    context.library.setZoom(parseInt(p.zoom, 10));
+    context.library.setCenter(center);
+    context.library.setResolution(+(p.resolution));
 };
 
 beginInitialization = function () {

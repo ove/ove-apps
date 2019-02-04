@@ -24,6 +24,17 @@
             }
         },
         {
+            "files": [ "**/libraries/*.js" ],
+            "rules": {
+                "new-cap": ["error", { "newIsCap": false, "capIsNew": false }],
+                "no-unused-vars": ["error", {
+                    "vars": "all",
+                    "args": "none",
+                    "ignoreRestSiblings": true,
+                    "varsIgnorePattern": "OVE.*Map"}]
+            }
+        },
+        {
             "files": [ "**/*.js" ],
             "globals": {
                 "changeEvent": true,

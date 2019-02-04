@@ -1,5 +1,34 @@
 {
   "layers": [
+    {
+      "type": "L.tileLayer",
+      "visible": false,
+      "wms": false,
+      "url": "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.jpg"
+    },
+    {
+      "type": "L.tileLayer",
+      "visible": false,
+      "wms": false,
+      "url": "https://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png"
+    },
+    {
+      "type": "L.cartoDB",
+      "visible": false,
+      "wms": false,
+      "source": {
+        "apiKey": "default_public",
+        "username": "cartojs-test",
+        "layers": [
+          {
+            "cartocss": "#layer { marker-width: 7; marker-fill: #EE4D5A; marker-line-color: #FFFFFF; }",
+            "sql": "SELECT * FROM ne_10m_populated_places_simple WHERE adm0name = 'United Kingdom'"
+          }
+        ]
+      }
+    }
+  ],
+  "layers_leaflet": [
     { 
       "type": "ol.layer.Tile",
       "visible": false,
