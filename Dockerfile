@@ -9,6 +9,7 @@ COPY . .
 RUN npm run install:prod
 
 RUN npm uninstall -global lerna
+RUN apk del git
 
 EXPOSE 8081-8094
 
