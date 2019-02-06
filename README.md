@@ -10,17 +10,17 @@ OVE needs to be installed before using OVE apps. The [OVE Documentation](https:/
 
 This repository contains the following OVE Apps:
 
-* [Alignment](./packages/ove-app-alignment) - helps align the monitors in an OVE installation.
-* [Audio](./packages/ove-app-audio) - supports the playing of audio files within the OVE Framework.
-* [Charts](./packages/ove-app-charts) - supports visualisation of charts using the OVE framework.
-* [Controller](./packages/ove-app-controller) - a unified controller for all OVE apps
-* [HTML](./packages/ove-app-html) - supports displaying HTML web pages using the OVE framework.
-* [Images](./packages/ove-app-images) - supports the display of images using the OVE framework.
-* [Maps](./packages/ove-app-maps) - supports visualisation of dynamic maps using the OVE framework.
-* [Networks](./packages/ove-app-networks) - supports visualisation of networks with node-link diagrams using the OVE framework.
-* [PDF](./packages/ove-app-pdf) - supports displaying PDF documents using the OVE framework.
-* [Replicator](./packages/ove-app-replicator) - replicating content of an OVE installation.
-* [SVG](./packages/ove-app-svg) - supports rendering SVG using the OVE framework.
-* [Videos](./packages/ove-app-videos) - supports playing videos using the OVE framework.
-* [WebRTC](./packages/ove-app-webrtc) - supports video conferencing and screen sharing using the OVE framework.
-* [Whiteboard](./packages/ove-app-whiteboard) - creates a whiteboard that can be used within the OVE framework.
+* [Alignment](packages/ove-app-alignment) - helps align the monitors in an OVE installation.
+* [Audio](packages/ove-app-audio) - supports the playing of audio files within the OVE Framework.
+* [Charts](packages/ove-app-charts) - supports visualisation of charts using the OVE framework.
+* [Controller](packages/ove-app-controller) - a unified controller for all OVE apps
+* [HTML](packages/ove-app-html) - supports displaying HTML web pages using the OVE framework.
+* [Images](packages/ove-app-images) - supports the display of images using the OVE framework.
+* [Maps](packages/ove-app-maps) - supports visualisation of dynamic maps using the OVE framework.
+* [Networks](packages/ove-app-networks) - supports visualisation of networks with node-link diagrams using the OVE framework.
+* [PDF](packages/ove-app-pdf) - supports displaying PDF documents using the OVE framework.
+* [Replicator](packages/ove-app-replicator) - replicating content of an OVE installation.
+* [SVG](packages/ove-app-svg) - supports rendering SVG using the OVE framework.
+* [Videos](packages/ove-app-videos) - supports playing videos using the OVE framework.
+* [WebRTC](packages/ove-app-webrtc) - supports video conferencing and screen sharing using the OVE framework.
+* [Whiteboard](packages/ove-app-whiteboard) - creates a whiteboard that can be used within the OVE framework.
