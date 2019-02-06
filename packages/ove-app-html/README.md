@@ -41,12 +41,10 @@ curl --header "Content-Type: application/json" --request POST --data "{\"app\": 
 
 The controller of the app can be loaded by accessing the URL `http://OVE_APP_HTML_HOST:PORT/control.html?oveSectionId=SECTION_ID`.
 
-The app's [API](http://OVE_APP_HTML_HOST:PORT/api-docs#operation) also exposes a `refresh` operation. This operation can be executed on an individual web page or across all web pages.
+The app's API also exposes a `refresh` operation. This operation can be executed on an individual web page or across all web pages.
 
 To refresh a web page that is already loaded, using OVE APIs:
 
 ```sh
 curl  --request POST http://OVE_APP_HTML_HOST:PORT/operation/refresh
 ```
-
-Instructions on invoking other operations are available on the [API Documentation](http://OVE_APP_HTML_HOST:PORT/api-docs#operation).

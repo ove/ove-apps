@@ -34,7 +34,7 @@ curl --header "Content-Type: application/json" --request POST --data "{\"app\": 
 
 The controller of the app can be loaded by accessing the URL `http://OVE_APP_VIDEOS_HOST:PORT/control.html?oveSectionId=SECTION_ID`.
 
-The app's [API](http://OVE_APP_VIDEOS_HOST:PORT/api-docs#operation) also exposes operations such as `play`, `pause`, `stop`, `seekTo` and `bufferStatus`. These operations can be executed on a per-video basis or across all videos.
+The app's API also exposes operations such as `play`, `pause`, `stop`, `seekTo` and `bufferStatus`. These operations can be executed on a per-video basis or across all videos.
 
 To play videos using OVE APIs:
 
@@ -42,4 +42,4 @@ To play videos using OVE APIs:
 curl  --request POST http://OVE_APP_VIDEOS_HOST:PORT/operation/play
 ```
 
-Instructions on invoking other operations are available on the [API Documentation](http://OVE_APP_VIDEOS_HOST:PORT/api-docs#operation).
+Instructions on invoking other operations are available on the API Documentation, `http://OVE_APP_AUDIO_HOST:PORT/api-docs#operation`.
