@@ -16,7 +16,7 @@ $(function () {
 runOperation = function (message) {
     // Helper method to retrieve a property from an element
     const getFromElement = function (element, propertyName) {
-        if (!propertyName || propertyName.indexOf('.') === -1) {
+        if (!propertyName || !propertyName.includes('.')) {
             return element[propertyName] ||
                 (element.attributes ? element.attributes[propertyName] : undefined);
         }
@@ -70,7 +70,7 @@ runOperation = function (message) {
                     return firstArg.substring(evaluateN(element, args[1]));
                 case Constants.Evaluation.Function.SUBSTRING_OF:
                     // IMPORTANT: Order of arguments have been swapped in the specification.
-                    return secondArg.indexOf(firstArg) !== -1;
+                    return secondArg.includes(firstArg);
                 case Constants.Evaluation.Function.ENDS_WITH:
                     return firstArg.endsWith(secondArg);
                 case Constants.Evaluation.Function.STARTS_WITH:

@@ -35,7 +35,7 @@ initControl = function (data) {
     window.ove.socket.on(function (message) {
         if (message.operation) {
             // We first of all need to know if the operation was known
-            if (Object.values(Constants.Operation).indexOf(message.operation) === -1) {
+            if (!Object.values(Constants.Operation).includes(message.operation)) {
                 // This can only happen due to a user error
                 log.warn('Ignoring unknown operation:', message.operation);
                 return;
