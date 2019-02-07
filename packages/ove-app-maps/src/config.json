@@ -1,5 +1,5 @@
 {
-  "layers": [
+  "layers_leaflet": [
     {
       "type": "L.tileLayer",
       "visible": false,
@@ -28,7 +28,7 @@
       }
     }
   ],
-  "layers_leaflet": [
+  "layers": [
     { 
       "type": "ol.layer.Tile",
       "visible": false,
