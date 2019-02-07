@@ -77,7 +77,7 @@ function OVELeafletMap () {
     };
 
     this.setZoom = function (zoom) {
-        __private.map.setZoom(zoom);
+        __private.map.setZoom(zoom, { animate: false });
     };
 
     this.getZoom = function () {

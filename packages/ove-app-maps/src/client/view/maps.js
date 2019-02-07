@@ -48,12 +48,12 @@ updateMap = function () {
         context.map = context.library.initialize({
             center: center,
             resolution: +(p.resolution),
-            zoom: parseInt(p.zoom, 10),
+            zoom: +(p.zoom),
             enableRotation: false });
         context.isInitialized = true;
     }
-    log.debug('Updating map with zoom:', parseInt(p.zoom, 10), ', center:', center, ', and resolution:', +(p.resolution));
-    context.library.setZoom(parseInt(p.zoom, 10));
+    log.debug('Updating map with zoom:', +(p.zoom), ', center:', center, ', and resolution:', +(p.resolution));
+    context.library.setZoom(+(p.zoom));
     context.library.setCenter(center);
     context.library.setResolution(+(p.resolution));
 };
