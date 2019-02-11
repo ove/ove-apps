@@ -2,13 +2,64 @@ function OVEOpenLayersMap () {
     const log = OVE.Utils.Logger('OpenLayers', Constants.LOG_LEVEL);
     let __private = {};
 
+    // TWEAK: Resolution to https://github.com/CartoDB/torque/issues/302
+    if (window.ol.TorqueLayer) {
+        window.ol.TorqueLayer.prototype._render = function () {
+            if (this.currentAnimationFrame >= 0) {
+                this.cancelAnimationFrame.call(window, this.currentAnimationFrame);
+            }
+            if (this.requestAnimationFrame && this.requestAnimationFrame.call) {
+                this.currentAnimationFrame = this.requestAnimationFrame.call(window, this.render);
+            }
+        };
+    }
+
+    // TWEAK: Resolution to https://github.com/CartoDB/torque/issues/303
+    if (window.ol.TileLoader) {
+        window.ol.TileLoader.prototype._initTileLoader = function (map) {
+            const _that = this;
+            this._map = map;
+            this._view = map.getView();
+            this._centerChangedId = this._view.on('change:center', function (e) {
+                _that._updateTiles();
+            }, this);
+
+            this._postcomposeKey = undefined;
+
+            this._resolutionChangedId = this._view.on('change:resolution', function (evt) {
+                _that._currentResolution = _that._view.getResolution();
+                if (_that._postcomposeKey) return;
+                _that.fire('mapZoomStart');
+                _that._postcomposeKey = _that._map.on('postcompose', function (evt) {
+                    if (evt.frameState.viewState.resolution === _that._currentResolution) {
+                        _that._updateTiles();
+                        _that._map.un('postcompose', _that._postcomposeKey, _that);
+                        _that._postcomposeKey = undefined;
+                        _that.fire('mapZoomEnd');
+                    }
+                }, _that);
+            }, this);
+
+            this._updateTiles();
+        };
+    }
+
     this.initialize = function (config) {
         // Initialization code for Open Layers
         log.info('Loading OpenLayers with view configuration:', config);
+        let attachedLayers = [];
+        let otherLayers = [];
+        __private.layers.forEach(function (e) {
+            if (e.type === 'ol.TorqueLayer') {
+                otherLayers.push(e);
+            } else {
+                attachedLayers.push(e);
+            }
+        });
         __private.map = new window.ol.Map({
             target: 'map',
             controls: [],
-            layers: __private.layers,
+            layers: attachedLayers,
             // Mouse-wheel-zoom, pinch-zoom and drag-zoom interactions are enabled
             // in addition to the defaults.
             interactions: window.ol.interaction.defaults({
@@ -20,6 +71,11 @@ function OVEOpenLayersMap () {
                 new window.ol.interaction.DragZoom({ duration: Constants.OL_ZOOM_ANIMATION_DURATION })
             ]),
             view: new window.ol.View(config)
+        });
+        otherLayers.forEach(function (e) {
+            if (e.visible) {
+                showLayer(e);
+            }
         });
         return __private.map;
     };
@@ -81,6 +137,12 @@ function OVEOpenLayersMap () {
                     opacity: e.opacity
                 };
                 __private.layers[i] = new window.ol.layer.Vector(TileConfig);
+            } else if (e.type === 'ol.TorqueLayer') {
+                log.trace('Loading layer of type:', 'Torque', ', with source:',
+                    e.source, ', using config:', e);
+                __private.layers[i] = new window.ol.TorqueLayer(e.source);
+                __private.layers[i].type = e.type;
+                __private.layers[i].visible = e.visible;
             }
             __private.layers[i].wms = e.wms;
         });
@@ -134,11 +196,29 @@ function OVEOpenLayersMap () {
         return +(__private.map.getView().getResolution());
     };
 
-    this.showLayer = function (layer) {
-        layer.setVisible(true);
+    const showLayer = function (layer) {
+        if (layer.type === 'ol.TorqueLayer') {
+            layer.visible = true;
+            if (__private.map) {
+                layer.onAdd(__private.map);
+                layer.play();
+            }
+        } else {
+            layer.setVisible(true);
+        }
     };
 
+    this.showLayer = showLayer;
+
     this.hideLayer = function (layer) {
-        layer.setVisible(false);
+        if (layer.type === 'ol.TorqueLayer') {
+            layer.visible = false;
+            if (__private.map) {
+                layer.stop();
+                layer.remove(__private.map);
+            }
+        } else {
+            layer.setVisible(false);
+        }
     };
 }

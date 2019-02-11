@@ -66,7 +66,7 @@ function OVELeafletMap () {
                 __private.layers[i] = new window.L[e.type.substring('L.'.length)](e.data, e.options);
                 log.trace('Loading layer of type:', e.type, ', with data:', e.data,
                     ', and options:', e.options);
-            } else if (e.type === 'L.cartoDB') {
+            } else if (e.type === 'L.cartoDB' || e.type === 'L.TorqueLayer') {
                 __private.layers[i] = e;
             }
             if (e.visible) {
@@ -119,6 +119,19 @@ function OVELeafletMap () {
             if (!__private.initialLayers.includes(layer)) {
                 __private.initialLayers.push(layer);
             }
+        } else if (layer.type === 'L.TorqueLayer') {
+            if (layer.layer) {
+                if (!__private.map.hasLayer(layer.layer)) {
+                    __private.map.addLayer(layer.layer);
+                    layer.layer.play();
+                }
+            } else {
+                layer.layer = new window.L.TorqueLayer(layer.source);
+                log.trace('Loading layer of type:', layer.type, ', with source:', layer.source);
+                layer.layer.error(log.error);
+                layer.layer.addTo(__private.map);
+                layer.layer.play();
+            }
         } else if (layer.type === 'L.cartoDB') {
             if (layer.layer) {
                 if (!__private.map.hasLayer(layer.layer)) {
@@ -131,6 +144,7 @@ function OVELeafletMap () {
                         new window.carto.source.SQL(e.sql),
                         new window.carto.style.CartoCSS(e.cartocss)));
                 });
+                log.trace('Loading layer of type:', layer.type);
                 layer.layer = client.getLeafletLayer();
                 layer.layer.addTo(__private.map);
             }
@@ -145,6 +159,13 @@ function OVELeafletMap () {
         if (!__private.map) {
             if (__private.initialLayers.includes(layer)) {
                 __private.initialLayers.splice(__private.initialLayers.indexOf(layer), 1);
+            }
+        } else if (layer.type === 'L.TorqueLayer') {
+            if (layer.layer) {
+                if (__private.map.hasLayer(layer.layer)) {
+                    layer.layer.stop();
+                    __private.map.removeLayer(layer.layer);
+                }
             }
         } else if (layer.type === 'L.cartoDB') {
             if (layer.layer) {
