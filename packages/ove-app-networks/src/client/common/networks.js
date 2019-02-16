@@ -293,6 +293,10 @@ refreshSigma = function (sigma) {
 loadSigma = function () {
     let context = window.ove.context;
     if (!context.isInitialized) {
+        if (OVE.Utils.getViewId() && (window.ove.state.current.jsonURL || window.ove.state.current.gexfURL)) {
+            // Resize the viewers to span the entire section for non Neo4J-based graphs.
+            OVE.Utils.resizeViewer(Constants.CONTENT_DIV);
+        }
         // We render on WebGL by default, but this can be overridden for a specific visualization.
         const renderer = window.ove.state.current.renderer || 'webgl';
         const settings = window.ove.state.current.settings || { autoRescale: false, clone: false };
