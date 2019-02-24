@@ -47,12 +47,12 @@ beginInitialization = function () {
                 initControl(currentState);
             } else {
                 log.debug('Missing state information - loading default state');
-                OVE.Utils.initControl(Constants.DEFAULT_STATE_NAME, initControl);
+                OVE.Utils.initControlOnDemand(Constants.DEFAULT_STATE_NAME, initControl);
             }
         }).catch(function () {
             log.debug('State load failed - loading default state');
             // If the promise is rejected, that means no current state is existing.
-            OVE.Utils.initControl(Constants.DEFAULT_STATE_NAME, initControl);
+            OVE.Utils.initControlOnDemand(Constants.DEFAULT_STATE_NAME, initControl);
         });
     });
 };
