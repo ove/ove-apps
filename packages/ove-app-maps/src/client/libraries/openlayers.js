@@ -15,7 +15,7 @@ function OVEOpenLayersMap () {
     }
 
     // TWEAK: Resolution to https://github.com/CartoDB/torque/issues/303
-    if (window.ol.TileLoader) {
+    if (window.ol.CanvasLayer && window.ol.TorqueLayer && window.ol.TileLoader) {
         window.ol.TileLoader.prototype._initTileLoader = function (map) {
             const _that = this;
             this._map = map;
@@ -42,6 +42,41 @@ function OVEOpenLayersMap () {
 
             this._updateTiles();
         };
+
+        window.ol.TorqueLayer.prototype._removeTileLoader =
+            window.ol.TileLoader.prototype._removeTileLoader = function () {
+                this._view.un('change:center', this._centerChangedId, this);
+                this._view.un('change:resolution', this._resolutionChangedId, this);
+
+                this._removeTiles();
+            };
+
+        window.ol.TorqueLayer.prototype.setMap =
+            window.ol.CanvasLayer.prototype.setMap = function (map) {
+                if (this._map) {
+                    // remove
+                    this._map.un('pointerdrag', this.pointdragKey_, this);
+                    this._map.un('change:size', this.sizeChangedKey_, this);
+                    this._map.un('moveend', this.moveendKey_, this);
+                    this._map.getView().un('change:center', this.centerChanged_, this);
+                }
+                this._map = map;
+
+                if (map) {
+                    var overlayContainer = this._map.getViewport().getElementsByClassName('ol-overlaycontainer')[0];
+                    overlayContainer.appendChild(this.root_);
+
+                    this.pointdragKey_ = map.on('pointerdrag', this._render, this);
+                    this.moveendKey_ = map.on('moveend', this._render, this);
+                    this.centerChanged_ = map.getView().on('change:center', this._render, this);
+                    this.sizeChangedKey_ = map.on('change:size', this._reset, this);
+
+                    if (this.options.tileLoader) {
+                        window.ol.TileLoader.prototype._initTileLoader.call(this, map);
+                    }
+                    this._reset();
+                }
+            };
     }
 
     this.initialize = function (config) {
@@ -141,6 +176,7 @@ function OVEOpenLayersMap () {
                 log.trace('Loading layer of type:', 'Torque', ', with source:',
                     e.source, ', using config:', e);
                 __private.layers[i] = new window.ol.TorqueLayer(e.source);
+                __private.layers[i].options.layer = __private.layers[i];
                 __private.layers[i].type = e.type;
                 __private.layers[i].visible = e.visible;
             }
@@ -212,10 +248,14 @@ function OVEOpenLayersMap () {
 
     this.hideLayer = function (layer) {
         if (layer.type === 'ol.TorqueLayer') {
-            layer.visible = false;
-            if (__private.map) {
-                layer.stop();
-                layer.remove(__private.map);
+            // It is important to check if the layer was already visible as if not the map and view
+            // objects would not have been set on the ol.TorqueLayer.
+            if (layer.visible) {
+                layer.visible = false;
+                if (__private.map) {
+                    layer.stop();
+                    layer.onRemove(__private.map);
+                }
             }
         } else {
             layer.setVisible(false);
