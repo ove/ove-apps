@@ -35,24 +35,5 @@ getCSS = function () {
 
 beginInitialization = function () {
     log.debug('Starting controller initialization');
-
-    $(document).on(OVE.Event.LOADED, function () {
-        log.debug('Invoking OVE.Event.Loaded handler');
-
-        window.ove.state.load().then(function () {
-            const currentState = window.ove.state.current;
-
-            if (currentState) {
-                log.debug('Initializing controller with state:', currentState);
-                initControl(currentState);
-            } else {
-                log.debug('Missing state information - loading default state');
-                OVE.Utils.initControlOnDemand(Constants.DEFAULT_STATE_NAME, initControl);
-            }
-        }).catch(function () {
-            log.debug('State load failed - loading default state');
-            // If the promise is rejected, that means no current state is existing.
-            OVE.Utils.initControlOnDemand(Constants.DEFAULT_STATE_NAME, initControl);
-        });
-    });
+    OVE.Utils.initControl(Constants.DEFAULT_STATE_NAME, initControl);
 };

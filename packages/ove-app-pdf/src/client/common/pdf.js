@@ -50,6 +50,15 @@ renderPDF = function (pdf) {
     }
     context.renderingInProgress = true;
 
+    // Offsets may not be set
+    if (!state.offset) {
+        state.offset = { x: 0, y: 0 };
+    }
+    // Settings are optional
+    if (!state.settings) {
+        state.settings = {};
+    }
+
     pdf.getPage(state.settings.startPage || 1).then(function (firstPage) {
         const g = window.ove.geometry;
         const pageGap = parseInt(state.settings.pageGap || Constants.DEFAULT_PAGE_GAP, 10);

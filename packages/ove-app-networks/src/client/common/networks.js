@@ -293,13 +293,13 @@ refreshSigma = function (sigma) {
 loadSigma = function () {
     let context = window.ove.context;
     if (!context.isInitialized) {
-        if (OVE.Utils.getViewId() && (window.ove.state.current.jsonURL || window.ove.state.current.gexfURL)) {
+        if (OVE.Utils.getViewId() && !window.ove.state.current.neo4j) {
             // Resize the viewers to span the entire section for non Neo4J-based graphs.
             OVE.Utils.resizeViewer(Constants.CONTENT_DIV);
         }
         // We render on WebGL by default, but this can be overridden for a specific visualization.
         const renderer = window.ove.state.current.renderer || 'webgl';
-        const settings = window.ove.state.current.settings || { autoRescale: false, clone: false };
+        const settings = window.ove.state.current.settings || { autoRescale: true, clone: false };
         log.debug('Creating Sigma instance with renderer:', renderer, ', settings:', settings);
         context.sigma = new sigma({
             renderers: [{ type: renderer, container: $(Constants.CONTENT_DIV)[0] }],
@@ -307,6 +307,23 @@ loadSigma = function () {
         });
         context.isInitialized = true;
         log.debug('Application is initialized:', context.isInitialized);
+    }
+
+    const url = window.ove.state.current.url;
+    if (url && (url.endsWith('.json') || url.endsWith('.gexf'))) {
+        delete window.ove.state.current.url;
+        if (url.endsWith('.json')) {
+            log.debug('New jsonURL at controller:', url);
+            window.ove.state.current.jsonURL = url;
+        } else {
+            log.debug('New gexfURL at controller:', url);
+            // The jsonURL will take precedence if it exists, so it must be unset before a
+            // gexfURL can be set.
+            if (window.ove.state.current.jsonURL) {
+                delete window.ove.state.current.jsonURL;
+            }
+            window.ove.state.current.gexfURL = url;
+        }
     }
 
     // sigma.js supports two content formats, GEXF (Gephi) and JSON. The format is chosen based

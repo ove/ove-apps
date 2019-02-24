@@ -8,6 +8,13 @@ const Constants = {
     RENDERING_TIMEOUT: 350, // Unit: milliseconds
 
     /**************************************************************
+                                Server
+    **************************************************************/
+    HTTP_HEADER_CONTENT_TYPE: 'Content-Type',
+    HTTP_CONTENT_TYPE_JS: 'application/javascript',
+    UTF8: 'utf8',
+
+    /**************************************************************
                                 Common
     **************************************************************/
     CONTENT_DIV: '.wrapper',
