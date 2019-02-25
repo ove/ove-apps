@@ -14,7 +14,7 @@ There are several applications designed to run within [Open Visualisation Enviro
 * [Replicator](packages/ove-app-replicator/README.md) - replicating content of an OVE installation.
 * [SVG](packages/ove-app-svg/README.md) - supports rendering SVG using the OVE framework.
 * [Videos](packages/ove-app-videos/README.md) - supports playing videos using the OVE framework.
-* [WebRTC](packages/ove-app-webrtc/README.md) - supports video conferencing and screen sharing using the OVE framework.
+* [WebRTC](packages/ove-app-webrtc/README.md) - supports videoconferencing and screen sharing using the OVE framework.
 * [Whiteboard](packages/ove-app-whiteboard/README.md) - creates a whiteboard that can be used within the OVE framework.
 
 OVE needs to be installed before using OVE apps. The [OVE Documentation](https://ove.readthedocs.io/en/stable/) provides [installation instructions](https://ove.readthedocs.io/en/stable/docs/INSTALLATION.html) and a [user guide](https://ove.readthedocs.io/en/stable/docs/USAGE.html).
