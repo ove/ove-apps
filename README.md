@@ -1,14 +1,6 @@
 # Open Visualisation Environment - Apps
 
-This repository contains a collection of applications designed to run within [Open Visualisation Environment (OVE)](https://github.com/ove/ove).
-
-OVE is an open-source software stack, designed to be used in large high resolution display (LHRD) environments like the [Imperial College](http://www.imperial.ac.uk) [Data Science Institute's](http://www.imperial.ac.uk/data-science/) [Data Observatory](http://www.imperial.ac.uk/data-science/data-observatory/).
-
-We welcome collaboration under our [Code of Conduct](https://github.com/ove/ove-apps/blob/master/CODE_OF_CONDUCT.md).
-
-OVE needs to be installed before using OVE apps. The [OVE Documentation](https://ove.readthedocs.io/en/stable/) provides [installation instructions](https://ove.readthedocs.io/en/stable/docs/INSTALLATION.html) and a [user guide](https://ove.readthedocs.io/en/stable/docs/USAGE.html).
-
-This repository contains the following OVE Apps:
+There are several applications designed to run within [Open Visualisation Environment (OVE)](https://github.com/ove/ove):
 
 * [Alignment](packages/ove-app-alignment/README.md) - helps align the monitors in an OVE installation.
 * [Audio](packages/ove-app-audio/README.md) - supports the playing of audio files within the OVE Framework.
@@ -24,3 +16,5 @@ This repository contains the following OVE Apps:
 * [Videos](packages/ove-app-videos/README.md) - supports playing videos using the OVE framework.
 * [WebRTC](packages/ove-app-webrtc/README.md) - supports video conferencing and screen sharing using the OVE framework.
 * [Whiteboard](packages/ove-app-whiteboard/README.md) - creates a whiteboard that can be used within the OVE framework.
+
+OVE needs to be installed before using OVE apps. The [OVE Documentation](https://ove.readthedocs.io/en/stable/) provides [installation instructions](https://ove.readthedocs.io/en/stable/docs/INSTALLATION.html) and a [user guide](https://ove.readthedocs.io/en/stable/docs/USAGE.html).

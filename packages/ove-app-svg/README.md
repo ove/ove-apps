@@ -1,6 +1,6 @@
 # SVG App
 
-This app supports rendering SVG using the OVE framework. It is based on [Tuoris](https://github.com/fvictor/tuoris), a middleware for distributed SVG rendering.
+This app supports rendering SVG using the OVE framework. It is based on [Tuoris](https://github.com/fvictor/tuoris), a middleware for distributed SVG rendering. An installation of [Tuoris](https://github.com/fvictor/tuoris) is required to use the SVG app. More information on installing [Tuoris](https://github.com/fvictor/tuoris) can be found in the [OVE installation guide](https://ove.readthedocs.io/en/stable/docs/INSTALLATION.html).
 
 The SVG app depends on an environment variable named `TUORIS_HOST`, that points to the URL at which the Tuoris instance runs.
 
@@ -31,6 +31,8 @@ curl --header "Content-Type: application/json" --request POST --data "{\"app\": 
 ```
 
 The SVG app has a transparent background. If required, a background colour of choice can be set using the [Background Utility](../ove-app-html/docs/UTIL_BACKGROUND.md) provided by OVE.
+
+If the SVG app is used to display static SVGs no further controlling would be required after the SVG has been loaded. The app provides a controller that can used to control interactive SVGs.
 
 ## Controlling the App
 

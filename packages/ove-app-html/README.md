@@ -37,6 +37,8 @@ Windows:
 curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_HTML_HOST:PORT\", \"states\": {\"load\": {\"url\": \"http://my.domain\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
+If the HTML app is used to display static web pages no further controlling would be required after the web page has been loaded. The app provides a controller and exposes API that can used to control interactive web pages.
+
 ## Controlling the App
 
 The controller of the app can be loaded by accessing the URL `http://OVE_APP_HTML_HOST:PORT/control.html?oveSectionId=SECTION_ID`.

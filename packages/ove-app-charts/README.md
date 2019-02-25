@@ -38,6 +38,8 @@ curl --header "Content-Type: application/json" --request POST --data "{\"app\": 
 
 The charts app has a transparent background. If required, a background colour of choice can be set using the [Background Utility](../ove-app-html/docs/UTIL_BACKGROUND.md) provided by OVE.
 
+If the charts app is used to display static charts no further controlling would be required after the chart has been loaded. The app provides a controller that can used to control interactive charts.
+
 ## Controlling the App
 
 The controller of the app can be loaded by accessing the URL `http://OVE_APP_CHARTS_HOST:PORT/control.html?oveSectionId=SECTION_ID`.

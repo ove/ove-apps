@@ -66,6 +66,8 @@ curl --header "Content-Type: application/json" --request POST --data "{\"app\": 
 
 The networks app has a transparent background. If required, a background colour of choice can be set using the [Background Utility](../ove-app-html/docs/UTIL_BACKGROUND.md) provided by OVE.
 
+If the networks app is used to display static networks no further controlling would be required after the node-link diagram has been loaded. The app provides a controller and exposes API that can used to control interactive graphs.
+
 ## Controlling the App
 
 The controller of the app can be loaded by accessing the URL `http://OVE_APP_NETWORKS_HOST:PORT/control.html?oveSectionId=SECTION_ID`.
