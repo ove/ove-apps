@@ -29,7 +29,10 @@ initControl = function (data) {
 
 beginInitialization = function () {
     log.debug('Starting controller initialization');
-    OVE.Utils.initControl(Constants.DEFAULT_STATE_NAME, initControl);
+    $(document).on(OVE.Event.LOADED, function () {
+        log.debug('Invoking OVE.Event.Loaded handler');
+        OVE.Utils.initControlOnDemand(Constants.DEFAULT_STATE_NAME, initControl);
+    });
 };
 
 loadVideo = function () {
@@ -133,7 +136,8 @@ loadControls = function () {
             $(Constants.Button.END).addClass(Constants.State.ACTIVE);
             $(Constants.Background.END).addClass(Constants.State.ACTIVE);
             // If the Session Id was random we generate a 10 character string.
-            if (window.ove.state.current.sessionId.toLowerCase() === Constants.RANDOM_SESSION) {
+            if (window.ove.state.current.randomSessionId ||
+                window.ove.state.current.sessionId.toLowerCase() === Constants.RANDOM_SESSION) {
                 const getRandomString = function (length) {
                     const chars = String.fromCharCode.apply(null,
                         Array.from({ length: 26 }, (_v, k) => k + 'A'.charCodeAt()).concat(
@@ -141,6 +145,7 @@ loadControls = function () {
                     return Array.from({ length: length },
                         () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
                 };
+                window.ove.state.current.randomSessionId = true;
                 window.ove.state.current.sessionId = getRandomString(10);
                 log.debug('Generated Session Id:', window.ove.state.current.sessionId);
             }
@@ -157,6 +162,7 @@ loadControls = function () {
             $(Constants.Button.CREATE).removeClass(Constants.State.INACTIVE);
             $(Constants.Button.END).removeClass(Constants.State.ACTIVE);
             $(Constants.Background.END).removeClass(Constants.State.ACTIVE);
+            $(Constants.NOTICE).html('');
             window.ove.state.current.sessionActive = false;
             log.debug('OpenVidu section is active:', window.ove.state.current.sessionActive);
             log.debug('Broadcasting state');
