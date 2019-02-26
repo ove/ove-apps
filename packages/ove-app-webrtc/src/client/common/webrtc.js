@@ -36,7 +36,6 @@ updateSession = function () {
         });
         context.session.on(Constants.Event.STREAM_DESTROYED, event => {
             changeUserData(event.stream.connection);
-            $(Constants.NOTICE).html('');
         });
 
         const username = (OVE.Utils.getViewId() || OVE.Utils.getSpace()) + '_user';
