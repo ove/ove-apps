@@ -15,7 +15,7 @@
   "author": "Senaka Fernando <senaka.fernando15@imperial.ac.uk>",
   "license": "MIT",
   "dependencies": {
-    "@ove-lib/appbase": "0.3.3",
+    "@ove-lib/appbase": "0.3.2",
     "d3": "5.9.1",
     "jquery": "3.3.1",
     "pdfjs-dist": "2.0.943"
