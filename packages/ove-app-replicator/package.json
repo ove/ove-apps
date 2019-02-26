@@ -1,7 +1,7 @@
 {
   "name": "@ove/ove-app-replicator",
   "private": true,
-  "version": "0.3.2",
+  "version": "0.3.3",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"No tests specified\" && exit 0",
@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@fortawesome/fontawesome-free": "5.7.2",
-    "@ove-lib/appbase": "0.3.2",
+    "@ove-lib/appbase": "0.3.3",
     "d3": "5.9.1",
     "jquery": "3.3.1"
   }
