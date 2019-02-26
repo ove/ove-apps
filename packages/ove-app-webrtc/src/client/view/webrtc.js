@@ -15,6 +15,10 @@ initView = function () {
 };
 
 loadVideo = function () {
+    if (window.ove.context.mainVideoLoader) {
+        clearInterval(window.ove.context.mainVideoLoader);
+        delete window.ove.context.mainVideoLoader;
+    }
     const setMainVideo = function () {
         const mainVideo = $(Constants.MAIN_VIDEO);
         const selectedVideo = $('#' + window.ove.context.videos[window.ove.state.current.connection]);
@@ -34,11 +38,14 @@ loadVideo = function () {
             }, Constants.RESCALE_DURING_REFRESH_TIMEOUT);
         }
     };
-    if ($('#' + window.ove.context.videos[window.ove.state.current.connection])[0]) {
-        setMainVideo();
-    } else {
-        setTimeout(setMainVideo, Constants.LOAD_MAIN_VIDEO_TIMEOUT);
-    }
+    const selectedVideo = $('#' + window.ove.context.videos[window.ove.state.current.connection])[0];
+    window.ove.context.mainVideoLoader = setInterval(function () {
+        if (selectedVideo && selectedVideo.srcObject) {
+            setMainVideo();
+            clearInterval(window.ove.context.mainVideoLoader);
+            delete window.ove.context.mainVideoLoader;
+        }
+    }, Constants.LOAD_MAIN_VIDEO_TIMEOUT);
 };
 
 changeUserData = function (connection, video) {
