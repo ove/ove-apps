@@ -79,9 +79,11 @@ let transformURL;
 })();
 ```
 
-## Loading the App
+## Launching the App
 
-A map can be loaded using the OVE APIs:
+All OVE applications can be launched using the [Launcher UI](https://ove.readthedocs.io/en/stable/ove-ui/packages/ove-ui-launcher/README.html), the [Python Client Library](https://github.com/ove/ove-sdks/tree/master/python), and the OVE APIs. The API used to launch an application is the same for all applications, but the data that is passed into it is application-specific.
+
+To launch the maps app and display a map using the OVE APIs:
 
 Linux/Mac:
 

@@ -17,9 +17,11 @@ The state of this app has a format similar to:
 
 The `sessionId` property can be a new or existing [OpenVidu](https://openvidu.io/) session identifier. If this is set to random, the controller will generate a random `sessionId`. The `maxSessions` property is optional. It defines the maximum number of external users that can connect to this session. It is also possible to provide a `url` property which contains the `sessionId` in it. In such situations, the controller with extract the last path segment and use it as the `sectionId`.
 
-## Loading the App
+## Launching the App
 
-The WebRTC app can be loaded using the OVE APIs:
+All OVE applications can be launched using the [Launcher UI](https://ove.readthedocs.io/en/stable/ove-ui/packages/ove-ui-launcher/README.html), the [Python Client Library](https://github.com/ove/ove-sdks/tree/master/python), and the OVE APIs. The API used to launch an application is the same for all applications, but the data that is passed into it is application-specific.
+
+To launch the WebRTC app using the OVE APIs:
 
 Linux/Mac:
 

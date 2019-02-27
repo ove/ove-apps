@@ -4,9 +4,11 @@ This app exists to help align the monitors in an OVE installation.
 
 When installing monitors to create a tiled display, the aim is typically to physically align screens with as little gap between them as possible. However, in practice it is difficult to achieve a perfect alignment and monitors have bezels with non-zero widths. To compensate for this, adjustments can be made to the coordinates recorded for the geometry in the `Spaces.json` file.
 
-## Loading the App
+## Launching the App
 
-The alignment app can be loaded using the OVE APIs:
+All OVE applications can be launched using the [Launcher UI](https://ove.readthedocs.io/en/stable/ove-ui/packages/ove-ui-launcher/README.html), the [Python Client Library](https://github.com/ove/ove-sdks/tree/master/python), and the OVE APIs. The API used to launch an application is the same for all applications, but the data that is passed into it is application-specific.
+
+To launch the alignment app using the OVE APIs:
 
 Linux/Mac:
 

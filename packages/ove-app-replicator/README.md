@@ -34,9 +34,11 @@ The optional `oveHost` property must be set in order to connect to a remote OVE 
 
 The replicator app can only work with one `space` at a time. If the `mode` was set to `group` or `section` the `spaceName` will be taken into consideration. If the `spaceName` was not provided, the `space` with the most number of items will be chosen.
 
-## Loading the App
+## Launching the App
 
-Content within the OVE framework can be replicated using the OVE APIs:
+All OVE applications can be launched using the [Launcher UI](https://ove.readthedocs.io/en/stable/ove-ui/packages/ove-ui-launcher/README.html), the [Python Client Library](https://github.com/ove/ove-sdks/tree/master/python), and the OVE APIs. The API used to launch an application is the same for all applications, but the data that is passed into it is application-specific.
+
+To replicate content using the OVE APIs:
 
 ```sh
 curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_REPLICATOR_HOST:PORT","states": {"load": {"mode": "space", "spaceName": "LocalNine"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section

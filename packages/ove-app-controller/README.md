@@ -18,9 +18,11 @@ The `mode` property is mandatory and should have a value of `space`, `group` or 
 
 The app will assume control of the entire `space` if the `mode` is set to `space`. But, if the mode is `geometry` it will however be limited to the geometry defined by the `x`, `y`, `w` and `h` properties set when creating the app. In both cases, the visible area of the controllers and the touch surfaces, would be limited to the `x`, `y`, `w` and `h` properties set when creating the app.
 
-## Loading the App
+## Launching the App
 
-An instance of the controller can be loaded using the OVE APIs:
+All OVE applications can be launched using the [Launcher UI](https://ove.readthedocs.io/en/stable/ove-ui/packages/ove-ui-launcher/README.html), the [Python Client Library](https://github.com/ove/ove-sdks/tree/master/python), and the OVE APIs. The API used to launch an application is the same for all applications, but the data that is passed into it is application-specific.
+
+To launch the controller app using the OVE APIs:
 
 ```sh
 curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_CONTROLLER_HOST:PORT","states": {"load": {"mode": "space"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section

@@ -20,9 +20,11 @@ The state of this app has a format similar to:
 
 The `url` property points to a URL of a [Vega-Embed specification](https://vega.github.io/vega/docs/#specification). Alternatively, the specification be embedded in the state using a `spec` property.
 
-## Loading the App
+## Launching the App
 
-A chart can be loaded using the OVE APIs:
+All OVE applications can be launched using the [Launcher UI](https://ove.readthedocs.io/en/stable/ove-ui/packages/ove-ui-launcher/README.html), the [Python Client Library](https://github.com/ove/ove-sdks/tree/master/python), and the OVE APIs. The API used to launch an application is the same for all applications, but the data that is passed into it is application-specific.
+
+To launch the chart app and display a chart using the OVE APIs:
 
 Linux/Mac:
 

@@ -18,9 +18,11 @@ Optionally, a `url` property can be set instead of the `tileSources` property. I
 
 The app also supports alternative types of content using other types of [tile sources supported by OpenSeadragon](https://openseadragon.github.io/#examples-and-features).
 
-## Loading the App
+## Launching the App
 
-An image can be loaded using the OVE APIs:
+All OVE applications can be launched using the [Launcher UI](https://ove.readthedocs.io/en/stable/ove-ui/packages/ove-ui-launcher/README.html), the [Python Client Library](https://github.com/ove/ove-sdks/tree/master/python), and the OVE APIs. The API used to launch an application is the same for all applications, but the data that is passed into it is application-specific.
+
+To launch the images app and display an image using the OVE APIs:
 
 Linux/Mac:
 

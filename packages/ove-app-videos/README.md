@@ -14,9 +14,11 @@ The state of this app has a format similar to:
 
 The player is selected automatically based on the URL: Any YouTube URL uses the YouTube player and all other URLs use the HTML5 player.
 
-## Loading the App
+## Launching the App
 
-A video can be loaded using the OVE APIs:
+All OVE applications can be launched using the [Launcher UI](https://ove.readthedocs.io/en/stable/ove-ui/packages/ove-ui-launcher/README.html), the [Python Client Library](https://github.com/ove/ove-sdks/tree/master/python), and the OVE APIs. The API used to launch an application is the same for all applications, but the data that is passed into it is application-specific.
+
+To launch the SVG app and load a video using the OVE APIs:
 
 Linux/Mac:
 
