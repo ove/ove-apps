@@ -10,8 +10,8 @@ initPage = function () {
             const patternChanged = (message.patternType && message.patternType !== window.ove.state.current.patternType);
 
             if (svgEmpty || patternChanged) {
-                const maxX = d3.max(message.monitors.map(d => d.x));
-                const maxY = d3.max(message.monitors.map(d => d.y));
+                const maxX = d3.max(message.monitors.map(d => d.x + d.w));
+                const maxY = d3.max(message.monitors.map(d => d.y + d.h));
 
                 let drawingFunctions = { 'Grid': createGrid, 'Diagonal': createDiagonal, 'Triangles': createTriangles };
                 drawingFunctions[message.patternType](maxX, maxY);

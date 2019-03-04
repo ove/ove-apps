@@ -197,7 +197,7 @@ function broadcastMessage () {
 
 displayJSON = function () {
     // Construct array listing the position of each screen after applying shift
-    let id = OVE.Utils.getQueryParam('oveClientId');
+    let id = OVE.Utils.getQueryParam('oveSpace');
     let newGeometry = {};
     newGeometry[id] = d3.selectAll('.monitor')
         .data()
