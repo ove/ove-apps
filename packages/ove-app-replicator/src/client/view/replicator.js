@@ -45,7 +45,7 @@ initView = function (data) {
                 return;
             }
             JSON.parse(data.sectionIds).forEach(function (id, i) {
-                urls[i] = hostname + '/section/' + id;
+                urls[i] = hostname + '/sections/' + id;
             });
             break;
         default:

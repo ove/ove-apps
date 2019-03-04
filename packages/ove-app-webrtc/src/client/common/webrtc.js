@@ -9,7 +9,7 @@ $(function () {
         log.debug('Completed loading OVE');
         let context = window.ove.context;
         if (!context.isInitialized) {
-            const url = window.ove.context.hostname + '/section/' + OVE.Utils.getSectionId();
+            const url = window.ove.context.hostname + '/sections/' + OVE.Utils.getSectionId();
             $.ajax({ url: url, dataType: 'json' }).done(section => {
                 context.appUrl = section.app.url;
                 context.ov = new OpenVidu();
