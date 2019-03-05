@@ -39,7 +39,7 @@ function drawMonitors () {
 
             // Use the contents of Spaces.json to construct a list recording the id and position of each monitor,
             // and the horizontal and vertical shifts applied to it.
-            const id = OVE.Utils.getQueryParam('oveSpace');
+            const id = OVE.Utils.getSpace();
             let geometry = spaces[id];
             geometry = geometry.map(function (d, i) {
                 d.clientId = i;
@@ -197,7 +197,7 @@ function broadcastMessage () {
 
 displayJSON = function () {
     // Construct array listing the position of each screen after applying shift
-    let id = OVE.Utils.getQueryParam('oveClientId');
+    let id = OVE.Utils.getSpace();
     let newGeometry = {};
     newGeometry[id] = d3.selectAll('.monitor')
         .data()
