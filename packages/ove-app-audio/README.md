@@ -10,7 +10,7 @@ The state of this app has a format similar to:
 
 ```json
 {
-    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/%22Going_Home%22%2C_performed_by_the_United_States_Air_Force_Band.oga"
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/74/%22Goin'_Home%22%2C_performed_by_the_United_States_Air_Force_Band.oga"
 }
 ```
 
@@ -23,13 +23,13 @@ To launch the audio app and load an audio file using the OVE APIs:
 Linux/Mac:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_AUDIO_HOST:PORT","states": {"load": {"url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/%22Going_Home%22%2C_performed_by_the_United_States_Air_Force_Band.oga"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_AUDIO_HOST:PORT\",\"states\": {\"load\": {\"url\": \"https://upload.wikimedia.org/wikipedia/commons/7/74/%22Goin'_Home%22%2C_performed_by_the_United_States_Air_Force_Band.oga\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 Windows:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_AUDIO_HOST:PORT\", \"states\": {\"load\": {\"url\": \"https://upload.wikimedia.org/wikipedia/commons/b/bd/%22Going_Home%22%2C_performed_by_the_United_States_Air_Force_Band.oga\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_AUDIO_HOST:PORT\",\"states\": {\"load\": {\"url\": \"https://upload.wikimedia.org/wikipedia/commons/7/74/%22Goin'_Home%22%2C_performed_by_the_United_States_Air_Force_Band.oga\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 ## Controlling the App
