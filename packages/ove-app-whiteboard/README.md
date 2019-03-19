@@ -2,6 +2,8 @@
 
 This app creates a whiteboard that can be used within the OVE framework. The app creates a collaborative canvas that accepts handwriting and text input.
 
+The app's background is transparent, so it can be used to annotate content displayed using a different OVE App.
+
 The controller UI design of the whiteboard app is based on [codoodler](https://github.com/pubnub/codoodler).
 
 ## Launching the App
