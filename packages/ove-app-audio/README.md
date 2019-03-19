@@ -2,7 +2,9 @@
 
 This app supports the playing of audio files within the OVE Framework. It is powered by the Howler.js audio library, so supports the Web Audio API by default and falls back to HTML5 Audio if required. This app is intended to provide a distributed layer on top of the Howler Library.
 
-The Audio App does not display any visible content and will, by default, play audio on all browsers a section covers. You may select where within the section the audio plays by using the setPosition method (implementation pending [blocker](https://github.com/ove/ove-apps/issues/33)). Currently supported Audio files include `webm`, `mp3` and `sound.wav`.
+The Audio App does not display any visible content and will, by default, play audio on all browsers a section covers.
+
+The app currently supports `webm`, `mp3` and `wav` files.
 
 ## Application State
 
