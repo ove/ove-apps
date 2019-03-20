@@ -2,6 +2,10 @@
 
 This app supports displaying HTML web pages using the OVE framework.
 
+Each OVE Client which overlaps the section in which the HTML App is loaded creates an [`iframe`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe) that containing the whole web page: the `width` and `height` properties of this frame are set to the dimensions of the whole section, and a CSS `transform` of type `translate` is applied to shift the content so that the correct portion is displayed.
+
+Loading the whole page within each OVE Client is inevitably somewhat inefficient. If you are loading a map or tiled image, it will be more efficient to use the corresponding OVE App, for which each client will load and render only what it needs to display.
+
 ## Utilities
 
 The HTML app hosts within it a number of utilities useful for another OVE app or a generic web page:
