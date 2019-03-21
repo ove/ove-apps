@@ -15,7 +15,7 @@
   "author": "Senaka Fernando <senaka.fernando15@imperial.ac.uk>",
   "license": "MIT",
   "dependencies": {
-    "@fortawesome/fontawesome-free": "5.7.2",
+    "@fortawesome/fontawesome-free": "5.8.1",
     "@ove-lib/appbase": "0.3.3",
     "d3": "5.9.1",
     "jquery": "3.3.1"
