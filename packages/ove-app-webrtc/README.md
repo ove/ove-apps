@@ -1,6 +1,6 @@
 # WebRTC App
 
-![photograph of the WebRTC app](https://media.githubusercontent.com/media/ove/ove-docs/master/resources/358A4421.JPG "photograph of the WebRTC app")
+![photograph of the WebRTC app](https://media.githubusercontent.com/media/ove/ove-docs/master/resources/358A4455.JPG "photograph of the WebRTC app")
 
 This app supports one-to-one, one-to-many and many-to-many videoconferencing and screen sharing using the OVE framework. It is based on [OpenVidu](https://openvidu.io/), a platform designed to facilitate the addition of WebRTC videoconferencing into existing web and mobile applications. An installation of [OpenVidu](https://openvidu.io/) is required to use the WebRTC app. More information on installing [OpenVidu](https://openvidu.io/) can be found in the [OVE installation guide](https://ove.readthedocs.io/en/stable/docs/INSTALLATION.html).
 
