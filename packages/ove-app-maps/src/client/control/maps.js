@@ -129,6 +129,9 @@ beginInitialization = function () {
                 log.debug('Successfully loaded state and found position');
                 const data = { center: p.center, resolution: p.resolution, zoom: p.zoom, scaled: true };
                 log.debug('Initializing controller with config:', data);
+                $(window).resize(function () {
+                    location.reload();
+                });
                 initControl(data);
             } else {
                 log.debug('State loaded successfully, but position details not set - loading default state');

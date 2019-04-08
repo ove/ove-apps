@@ -115,12 +115,18 @@ beginInitialization = function () {
                 // the viewport information is already available.
                 log.debug('Initializing controller with state:', currentState,
                     'and viewport:', currentState.viewport);
+                $(window).resize(function () {
+                    location.reload();
+                });
                 initControl(currentState, currentState.viewport);
             } else if (currentState && !currentState.viewport) {
                 // This is when an image state has been pre-loaded and the controller is
                 // attempting to load the image for the first time. We don't care if the
                 // state was existing or not at this point.
                 log.debug('Initializing controller with state:', currentState);
+                $(window).resize(function () {
+                    location.reload();
+                });
                 initControl(currentState);
             } else {
                 // There could be a situation where a current state exists but without

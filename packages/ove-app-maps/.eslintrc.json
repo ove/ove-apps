@@ -19,6 +19,7 @@
             "files": [ "**/control/*.js" ],
             "globals": {
                 "initControl": true,
+                "location": true,
                 "log": true,
                 "uploadMapPosition": true
             }

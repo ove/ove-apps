@@ -21,6 +21,7 @@
             "globals": {
                 "changeEvent": true,
                 "initControl": true,
+                "location": true,
                 "log": true,
                 "OpenSeadragon": true,
                 "sendViewportDetails": true

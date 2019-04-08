@@ -55,6 +55,9 @@ initControl = function () {
 beginInitialization = function () {
     log.debug('Starting controller initialization');
     $(document).on(OVE.Event.LOADED, function () {
+        $(window).resize(function () {
+            location.reload();
+        });
         initControl();
     });
 };

@@ -19,6 +19,7 @@
             "globals": {
                 "FileReader": true,
                 "initControl": true,
+                "location": true,
                 "log": true,
                 "prompt": true
             }
