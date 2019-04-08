@@ -47,13 +47,13 @@ initControl = function (data) {
                 context.sections.splice(i, 1);
                 return;
             }
-            const endpoint = section.app.url + '/state/base';
+            const endpoint = section.app.url + '/states/base';
             $.ajax({ url: endpoint, dataType: 'json' }).always(function (data) {
                 // If 'data.status' exists, that is an indication of an error. However, if the state of some app
                 // also has a 'status' property, the outcome can be confusing. This check is to ensure it is an
                 // error state.
                 if (data.status === 400) {
-                    $.ajax({ url: section.app.url + '/' + section.id + '/state', dataType: 'json' }).done(
+                    $.ajax({ url: section.app.url + '/instances/' + section.id + '/state', dataType: 'json' }).done(
                         function (payload) {
                             log.debug('Saving base state for section using URL:', endpoint, ', payload:', payload);
                             $.ajax({ url: endpoint, type: 'POST', data: JSON.stringify(payload), contentType: 'application/json' });
@@ -157,7 +157,7 @@ applyTransformation = function () {
         log.debug('Applying transformation:', context.transformation.current);
         context.sections.forEach(function (section) {
             if (section.id !== triggeredBy) {
-                const endpoint = section.app.url + '/' + section.id + '/state/transform';
+                const endpoint = section.app.url + '/instances/' + section.id + '/state/transform';
                 const payload = JSON.stringify(context.transformation.current);
                 log.trace('Applying transformation on section using URL:', endpoint, ', payload:', payload);
                 $.ajax({ url: endpoint, type: 'POST', data: payload, contentType: 'application/json' }).done(
@@ -207,9 +207,9 @@ loadControls = function () {
 
         const context = window.ove.context;
         context.sections.forEach(function (section) {
-            $.ajax({ url: section.app.url + '/state/base', dataType: 'json' }).done(function (payload) {
+            $.ajax({ url: section.app.url + '/states/base', dataType: 'json' }).done(function (payload) {
                 section.current = payload;
-                $.ajax({ url: section.app.url + '/' + section.id + '/state', type: 'POST', data: JSON.stringify(payload), contentType: 'application/json' });
+                $.ajax({ url: section.app.url + '/instances/' + section.id + '/state', type: 'POST', data: JSON.stringify(payload), contentType: 'application/json' });
                 section.ove.socket.send(payload);
                 log.debug('Restored state of section:', section.id, 'to:', payload);
             });
