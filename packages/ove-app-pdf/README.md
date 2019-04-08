@@ -1,6 +1,10 @@
 # PDF App
 
+![photograph of the PDF app](https://media.githubusercontent.com/media/ove/ove-docs/master/resources/358A4459.JPG "photograph of the PDF app")
+
 This app supports displaying PDF documents using the OVE framework. It is based on [PDF.js](https://github.com/mozilla/pdf.js), a Portable Document Format (PDF) viewer that is built with HTML5.
+
+Seen above is an image of the PDF app displaying the [OVE documentation in PDF format](https://buildmedia.readthedocs.org/media/pdf/ove/stable/ove.pdf) photographed at the [Imperial College](http://www.imperial.ac.uk) [Data Science Institute's](http://www.imperial.ac.uk/data-science/) [Data Observatory](http://www.imperial.ac.uk/data-science/data-observatory/).
 
 ## Application State
 

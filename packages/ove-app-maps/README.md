@@ -1,8 +1,12 @@
 # Maps App
 
+![photograph of the maps app](https://media.githubusercontent.com/media/ove/ove-docs/master/resources/358A4315.JPG "photograph of the maps app")
+
 This app supports visualisation of dynamic maps using the OVE framework. It gives users the option of using either [OpenLayers](https://openlayers.org/) or [Leaflet](https://leafletjs.com/) as the underlying mapping library and supports tiled map layers (from Bing, OSM, etc), the [CARTO](https://carto.com) platform, vector data described in formats such as [GeoJSON](http://geojson.org/) and custom overlays built using JavaScript libraries such as [D3.js](https://d3js.org/).
 
 The maps app depends on a [Map Layers configuration](../ove-app-maps/docs/MAP_LAYERS_JSON.md) that can be provided within the `config.json` file (either embedded or as a URL) or as an environment variable named `OVE_MAPS_LAYERS`, that points to a URL.
+
+Seen above is an image of the maps app displaying the [ArcGIS world topographic map](https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer) photographed at the [Imperial College](http://www.imperial.ac.uk) [Data Science Institute's](http://www.imperial.ac.uk/data-science/) [Data Observatory](http://www.imperial.ac.uk/data-science/data-observatory/).
 
 ## Application State
 

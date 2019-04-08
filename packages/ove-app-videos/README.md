@@ -1,6 +1,10 @@
 # Videos App
 
+[![click to play the video of the videos app](https://media.githubusercontent.com/media/ove/ove-docs/master/resources/358A4464.JPG)](https://media.githubusercontent.com/media/ove/ove-docs/master/resources/358A4462.MOV "click to play the video of the videos app")
+
 This app supports playing videos using the OVE framework. It provides a generic player for any video (`HTML5`), and a player based on the [YouTube IFrame Player API](https://developers.google.com/youtube/iframe_api_reference) (`YouTube`).
+
+Seen above is a video of the videos app playing the [2030.wikimedia.org YouTube video in 4K resolution](https://www.youtube.com/watch?v=5CKFKyc7We4) published by the [Wikimedia Foundation](https://www.youtube.com/channel/UCgIIsBhcseFH1Kghmo0ULbA) recorded in HD resolution at the [Imperial College](http://www.imperial.ac.uk) [Data Science Institute's](http://www.imperial.ac.uk/data-science/) [Data Observatory](http://www.imperial.ac.uk/data-science/data-observatory/).
 
 ## Application State
 

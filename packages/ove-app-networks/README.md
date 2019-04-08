@@ -1,6 +1,10 @@
 # Networks App
 
+![photograph of the networks app](https://media.githubusercontent.com/media/ove/ove-docs/master/resources/358A4335.JPG "photograph of the networks app")
+
 This app supports visualisation of networks with node-link diagrams using the OVE framework. It is based on [Sigma](http://sigmajs.org/), a JavaScript library dedicated to drawing graphs. This supports datasets specified in Sigma's JSON format or [GEXF](https://gephi.org/gexf/format/). Sigma supports Canvas, SVG and WebGL rendering.
+
+Seen above is an image of the networks app displaying a [network topology graph](https://www.imperial.ac.uk/business-school/department-news/imperial-business-analytics/understanding-cyber-attacks-a-keystroke-in-a-haystack/) photographed at the [Imperial College](http://www.imperial.ac.uk) [Data Science Institute's](http://www.imperial.ac.uk/data-science/) [Data Observatory](http://www.imperial.ac.uk/data-science/data-observatory/).
 
 ## Application State
 

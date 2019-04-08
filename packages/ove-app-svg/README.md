@@ -1,8 +1,12 @@
 # SVG App
 
+![photograph of the SVG app](https://media.githubusercontent.com/media/ove/ove-docs/master/resources/358A4421.JPG "photograph of the SVG app")
+
 This app supports rendering SVG using the OVE framework. It is based on [Tuoris](https://github.com/fvictor/tuoris), a middleware for distributed SVG rendering. An installation of [Tuoris](https://github.com/fvictor/tuoris) is required to use the SVG app. More information on installing [Tuoris](https://github.com/fvictor/tuoris) can be found in the [OVE installation guide](https://ove.readthedocs.io/en/stable/docs/INSTALLATION.html).
 
 The SVG app depends on an environment variable named `TUORIS_HOST`, that points to the URL at which the Tuoris instance runs.
+
+Seen above is an image of the SVG app displaying the [Les Misérables co-occurrence matrix diagram by Mike Bostok](https://bost.ocks.org/mike/miserables/) photographed at the [Imperial College](http://www.imperial.ac.uk) [Data Science Institute's](http://www.imperial.ac.uk/data-science/) [Data Observatory](http://www.imperial.ac.uk/data-science/data-observatory/).
 
 ## Application State
 
