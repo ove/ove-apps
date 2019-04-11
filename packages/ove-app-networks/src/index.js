@@ -2,7 +2,8 @@ const { Constants } = require('./client/constants/networks');
 const HttpStatus = require('http-status-codes');
 const path = require('path');
 const parser = require('odata-parser');
-const { express, app, log, nodeModules, Utils } = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
+const base = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
+const { express, app, log, nodeModules, Utils } = base;
 const server = require('http').createServer(app);
 
 log.debug('Using module:', 'sigma');
@@ -124,6 +125,61 @@ app.post('/operation/:name(' + operationsList.join('|') + ')', handleOperation);
 
 // BACKWARDS-COMPATIBILITY: For <= v0.2.0
 app.get('/operation/:name(' + operationsList.join('|') + ')', handleOperation);
+
+log.debug('Setting up state validation operation');
+
+// BACKWARDS-COMPATIBILITY: For <= v0.4.0
+Utils.validateState = function (state, combinations) {
+    let valid = true;
+    // Example rules:
+    // 1. An optional property which is a literal.
+    // {
+    //     prefix: ['state', 'state.a']
+    // }
+    // 2. An optional property which is an object. x and y are mandatory properties of this object.
+    // {
+    //     prefix: ['state', 'state.a'],
+    //     value: ['state.a.x', 'state.a.y']
+    // }
+    // 3. All mandatory properties - literals and objects
+    // {
+    //     value: ['state.a', 'state.b', 'state.b.x']
+    // }
+    combinations.forEach(function (e) {
+        let prefixExists = !Utils.isNullOrEmpty(Utils.JSON.getDescendant('state', { state: state }));
+        (e.prefix || []).forEach(function (x) {
+            prefixExists = prefixExists && !Utils.isNullOrEmpty(Utils.JSON.getDescendant(x, { state: state }));
+        });
+        if (!prefixExists) {
+            return;
+        }
+        let result = true;
+        if (e.value) {
+            e.value.forEach(function (x) {
+                result = result && !Utils.isNullOrEmpty(Utils.JSON.getDescendant(x, { state: state }));
+            });
+        }
+        valid = valid && result;
+    });
+    return valid;
+};
+
+base.operations.validateState = function (state) {
+    return Utils.validateState(state, [
+        { value: ['state.jsonURL'] }, { prefix: ['state.settings'] }, { prefix: ['state.renderer'] }
+    ]) ||
+    Utils.validateState(state, [
+        { value: ['state.gexfURL'] }, { prefix: ['state.settings'] }, { prefix: ['state.renderer'] }
+    ]) ||
+    Utils.validateState(state, [
+        { value: ['state.neo4j', 'state.neo4j.db', 'state.neo4j.db.url', 'state.neo4j.query'] },
+        { prefix: ['state.settings'] },
+        { prefix: ['state.renderer'] },
+        { prefix: ['state.neo4j.db.user', 'state.neo4j.db.password'] },
+        { prefix: ['state.neo4j.x'], value: ['state.neo4j.x.min', 'state.neo4j.x.max'] },
+        { prefix: ['state.neo4j.y'], value: ['state.neo4j.y.min', 'state.neo4j.y.max'] }
+    ]);
+};
 
 const port = process.env.PORT || 8080;
 server.listen(port);
