@@ -18,7 +18,7 @@ loadOSD = function (state) {
     return new Promise(function (resolve, reject) {
         let config = JSON.parse(JSON.stringify(state));
         config.id = Constants.CONTENT_DIV.substring(1);
-        config.prefixUrl = '/images/';
+        config.prefixUrl = 'images/';
         config.animationTime = 0;
         if (config.tileSources && config.tileSources.getTileUrl) {
             config.tileSources.getTileUrl =

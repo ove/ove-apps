@@ -61,13 +61,13 @@ To launch the networks app and display a node-link diagram using the OVE APIs:
 Linux/Mac:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_NETWORKS_HOST:PORT","states": {"load": {"jsonURL": "/data/sample.json", "settings": { "autoRescale": true, "clone": false, "defaultNodeColor": "#ec5148"}, "renderer": "canvas"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_CORE_HOST:PORT/app/networks","states": {"load": {"jsonURL": "/data/sample.json", "settings": { "autoRescale": true, "clone": false, "defaultNodeColor": "#ec5148"}, "renderer": "canvas"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
 ```
 
 Windows:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_NETWORKS_HOST:PORT\", \"states\": {\"load\": {\"jsonURL\": \"/data/sample.json\", \"settings\": { \"autoRescale\": true, \"clone\": false, \"defaultNodeColor\": \"#ec5148\"}, \"renderer\": \"canvas\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_CORE_HOST:PORT/app/networks\", \"states\": {\"load\": {\"jsonURL\": \"/data/sample.json\", \"settings\": { \"autoRescale\": true, \"clone\": false, \"defaultNodeColor\": \"#ec5148\"}, \"renderer\": \"canvas\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 The networks app has a transparent background. If required, a background colour of choice can be set using the [Background Utility](../ove-app-html/docs/UTIL_BACKGROUND.md) provided by OVE.
@@ -76,7 +76,7 @@ If the networks app is used to display static networks no further controlling wo
 
 ## Controlling the App
 
-The controller of the app can be loaded by accessing the URL `http://OVE_APP_NETWORKS_HOST:PORT/control.html?oveSectionId=SECTION_ID`.
+The controller of the app can be loaded by accessing the URL `http://OVE_CORE_HOST:PORT/app/networks/control.html?oveSectionId=SECTION_ID`.
 
 The app's API also exposes operations such as `showOnly`, `color`, `labelNodes`, `neighborsOf` and `reset`. These operations can be executed on a per-network basis or across all networks.
 
@@ -87,13 +87,13 @@ The implementation makes it possible to query on all properties of nodes and edg
 To show only the nodes having a size greater than or equal to 2, using OVE APIs:
 
 ```sh
-curl  --request POST http://OVE_APP_NETWORKS_HOST:PORT/operation/showOnly?filter=size%20ge%202
+curl  --request POST http://OVE_CORE_HOST:PORT/app/networks/operation/showOnly?filter=size%20ge%202
 ```
 
 To reset the network to its original state:
 
 ```sh
-curl  --request POST http://OVE_APP_NETWORKS_HOST:PORT/operation/reset
+curl  --request POST http://OVE_CORE_HOST:PORT/app/networks/operation/reset
 ```
 
-Instructions on invoking all operations are available on the API Documentation, `http://OVE_APP_AUDIO_HOST:PORT/api-docs#operation`.
+Instructions on invoking all operations are available on the API Documentation, `http://OVE_CORE_HOST:PORT/app/networks/api-docs#operation`.

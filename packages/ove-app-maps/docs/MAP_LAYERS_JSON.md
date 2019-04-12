@@ -112,7 +112,7 @@ The implementation supports the use of [CARTO](https://carto.com) base maps, [To
 
 The configuration of the `source` property of the `ol.TorqueLayer` type (which is similar to `L.TorqueLayer`) is explained in the [Torque.js reference documentation](https://carto.com/developers/torque-js/reference/#ltorquelayer). The configuration of the `ol.source.CartoDB` is explained in the [OpenLayers API documentation](https://openlayers.org/en/latest/apidoc/module-ol_source_CartoDB-CartoDB.html).
 
-To see [CARTO](https://carto.com) platform examples in OVE, load the controller by accessing the URL `http://OVE_APP_MAPS_HOST:PORT/control.html?oveSectionId=SECTION_ID&layers=2,3,4&state=World`. To learn more, see [examples on using OpenLayers with the CARTO Platform](https://openlayers.org/en/latest/examples/cartodb.html) and the [example on using Torque.js with OpenLayers](https://carto.com/developers/torque-js/examples/#example-navy).
+To see [CARTO](https://carto.com) platform examples in OVE, load the controller by accessing the URL `http://OVE_CORE_HOST:PORT/app/maps/control.html?oveSectionId=SECTION_ID&layers=2,3,4&state=World`. To learn more, see [examples on using OpenLayers with the CARTO Platform](https://openlayers.org/en/latest/examples/cartodb.html) and the [example on using Torque.js with OpenLayers](https://carto.com/developers/torque-js/examples/#example-navy).
 
 ## [Leaflet](https://leafletjs.com/) configuration format
 
@@ -204,4 +204,4 @@ The implementation supports the use of [CARTO](https://carto.com) base maps, [To
 
 The configuration of the `source` property of the `L.TorqueLayer` type is explained in the [Torque.js reference documentation](https://carto.com/developers/torque-js/reference/#ltorquelayer). The `source` property of the `L.cartoDB` type includes the `apiKey` and `username` required by the [CARTO.js client](https://carto.com/developers/carto-js/reference/#cartoclient) and a `layers` property which defines a list of [carto.layer.Layer objects](https://carto.com/developers/carto-js/reference/#cartolayerlayer).
 
-To see [CARTO](https://carto.com) platform examples in OVE, load the controller by accessing the URL `http://OVE_APP_MAPS_HOST:PORT/control.html?oveSectionId=SECTION_ID&layers=2,3,4&state=World`. To learn more, see [examples on using CARTO.js](https://carto.com/developers/carto-js/examples/) and the [example on using Torque.js with Leaflet](https://carto.com/developers/torque-js/examples/#example-navy-ships-leaflet).
+To see [CARTO](https://carto.com) platform examples in OVE, load the controller by accessing the URL `http://OVE_CORE_HOST:PORT/app/maps/control.html?oveSectionId=SECTION_ID&layers=2,3,4&state=World`. To learn more, see [examples on using CARTO.js](https://carto.com/developers/carto-js/examples/) and the [example on using Torque.js with Leaflet](https://carto.com/developers/torque-js/examples/#example-navy-ships-leaflet).

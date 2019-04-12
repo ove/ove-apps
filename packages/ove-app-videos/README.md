@@ -27,25 +27,25 @@ To launch the SVG app and load a video using the OVE APIs:
 Linux/Mac:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_VIDEOS_HOST:PORT","states": {"load": {"url": "http://www.youtube.com/embed/XY3NP4JHXZ4"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_CORE_HOST:PORT/app/videos","states": {"load": {"url": "http://www.youtube.com/embed/XY3NP4JHXZ4"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
 ```
 
 Windows:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_VIDEOS_HOST:PORT\", \"states\": {\"load\": {\"url\": \"http://www.youtube.com/embed/XY3NP4JHXZ4\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_CORE_HOST:PORT/app/videos\", \"states\": {\"load\": {\"url\": \"http://www.youtube.com/embed/XY3NP4JHXZ4\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 ## Controlling the App
 
-The controller of the app can be loaded by accessing the URL `http://OVE_APP_VIDEOS_HOST:PORT/control.html?oveSectionId=SECTION_ID`.
+The controller of the app can be loaded by accessing the URL `http://OVE_CORE_HOST:PORT/app/videos/control.html?oveSectionId=SECTION_ID`.
 
 The app's API also exposes operations such as `play`, `pause`, `stop`, `seekTo` and `bufferStatus`. These operations can be executed on a per-video basis or across all videos.
 
 To play videos using OVE APIs:
 
 ```sh
-curl  --request POST http://OVE_APP_VIDEOS_HOST:PORT/operation/play
+curl  --request POST http://OVE_CORE_HOST:PORT/app/videos/operation/play
 ```
 
-Instructions on invoking other operations are available on the API Documentation, `http://OVE_APP_AUDIO_HOST:PORT/api-docs#operation`.
+Instructions on invoking other operations are available on the API Documentation, `http://OVE_CORE_HOST:PORT/app/videos/api-docs#operation`.

@@ -25,15 +25,15 @@ All OVE applications can be launched using the [Launcher UI](https://ove.readthe
 To launch the controller app using the OVE APIs:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_CONTROLLER_HOST:PORT","states": {"load": {"mode": "space"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_CORE_HOST:PORT/app/controller","states": {"load": {"mode": "space"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
 ```
 
 Windows:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_CONTROLLER_HOST:PORT\", \"states\": {\"load\": {\"mode\": \"space\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_CORE_HOST:PORT/app/controller\", \"states\": {\"load\": {\"mode\": \"space\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 ## Controlling the App
 
-The controller of the app can be loaded by accessing the URL `http://OVE_APP_CONTROLLER_HOST:PORT/control.html?oveSectionId=SECTION_ID`. The controller supports panning and zooming operations.
+The controller of the app can be loaded by accessing the URL `http://OVE_CORE_HOST:PORT/app/controller/control.html?oveSectionId=SECTION_ID`. The controller supports panning and zooming operations.

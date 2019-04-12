@@ -33,17 +33,17 @@ To launch the WebRTC app using the OVE APIs:
 Linux/Mac:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_WEBRTC_HOST:PORT","states": {"load": {"sessionId": "random"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_CORE_HOST:PORT/app/webrtc","states": {"load": {"sessionId": "random"}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
 ```
 
 Windows:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_WEBRTC_HOST:PORT\", \"states\": {\"load\": {\"sessionId\": \"random\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_CORE_HOST:PORT/app/webrtc\", \"states\": {\"load\": {\"sessionId\": \"random\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 ## Controlling the App
 
-A vidoconferencing call must first be initialized using the controller, which is accessible at  `http://OVE_APP_WEBRTC_HOST:PORT/control.html?oveSectionId=SECTION_ID`.
+A vidoconferencing call must first be initialized using the controller, which is accessible at  `http://OVE_CORE_HOST:PORT/app/webrtc/control.html?oveSectionId=SECTION_ID`.
 
 Participants can then join this call by connecting to the  [OpenVidu](https://openvidu.io/) client (accessible by opening `OPENVIDU_HOST` with a web browser) and providing the `sessionId` as the name of the call room.

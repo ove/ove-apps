@@ -25,25 +25,25 @@ To launch the audio app and load an audio file using the OVE APIs:
 Linux/Mac:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_AUDIO_HOST:PORT\",\"states\": {\"load\": {\"url\": \"https://upload.wikimedia.org/wikipedia/commons/7/74/%22Goin'_Home%22%2C_performed_by_the_United_States_Air_Force_Band.oga\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_CORE_HOST:PORT/app/audio\",\"states\": {\"load\": {\"url\": \"https://upload.wikimedia.org/wikipedia/commons/7/74/%22Goin'_Home%22%2C_performed_by_the_United_States_Air_Force_Band.oga\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 Windows:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_AUDIO_HOST:PORT\",\"states\": {\"load\": {\"url\": \"https://upload.wikimedia.org/wikipedia/commons/7/74/%22Goin'_Home%22%2C_performed_by_the_United_States_Air_Force_Band.oga\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_CORE_HOST:PORT/app/audio\",\"states\": {\"load\": {\"url\": \"https://upload.wikimedia.org/wikipedia/commons/7/74/%22Goin'_Home%22%2C_performed_by_the_United_States_Air_Force_Band.oga\"}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 ## Controlling the App
 
-The controller of the app can be loaded by accessing the URL `http://OVE_APP_AUDIO_HOST:PORT/control.html?oveSectionId=SECTION_ID`.
+The controller of the app can be loaded by accessing the URL `http://OVE_CORE_HOST:PORT/app/audio/control.html?oveSectionId=SECTION_ID`.
 
 The app's API also exposes operations such as `play`, `pause`, `stop`, `seekTo` and `bufferStatus` related to playback. Volume may be controlled by operations such as `mute`, `unmute`, `volUp`, `volDown`. These operations can be executed on a per-section basis or across all sections.
 
 To play audio using OVE APIs:
 
 ```sh
-curl --request POST http://OVE_APP_AUDIO_HOST:PORT/operation/play
+curl --request POST http://OVE_CORE_HOST:PORT/app/audio/operation/play
 ```
 
-Instructions on invoking other operations are available on the API Documentation, `http://OVE_APP_AUDIO_HOST:PORT/api-docs#operation`.
+Instructions on invoking other operations are available on the API Documentation, `http://OVE_CORE_HOST:PORT/app/audio/api-docs#operation`.

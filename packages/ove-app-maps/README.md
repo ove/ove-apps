@@ -92,18 +92,18 @@ To launch the maps app and display a map using the OVE APIs:
 Linux/Mac:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_APP_MAPS_HOST:PORT","states": {"load": {"center": ["-11137.70850550061", "6710544.04980525"], "resolution": "77", "zoom": "12", "enabledLayers":["23"], "scripts":["http://my.domain/customLayer.js"]}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data '{"app": {"url": "http://OVE_CORE_HOST:PORT/app/maps","states": {"load": {"center": ["-11137.70850550061", "6710544.04980525"], "resolution": "77", "zoom": "12", "enabledLayers":["23"], "scripts":["http://my.domain/customLayer.js"]}}}, "space": "OVE_SPACE", "h": 500, "w": 500, "y": 0, "x": 0}' http://OVE_CORE_HOST:PORT/section
 ```
 
 Windows:
 
 ```sh
-curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_APP_MAPS_HOST:PORT\", \"states\": {\"load\": {\"center\": [\"-11137.70850550061\", \"6710544.04980525\"], \"resolution\": \"77\", \"zoom\": \"12\", \"enabledLayers\":[\"23\"], \"scripts\":[\"http://my.domain/customLayer.js\"]}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
+curl --header "Content-Type: application/json" --request POST --data "{\"app\": {\"url\": \"http://OVE_CORE_HOST:PORT/app/maps\", \"states\": {\"load\": {\"center\": [\"-11137.70850550061\", \"6710544.04980525\"], \"resolution\": \"77\", \"zoom\": \"12\", \"enabledLayers\":[\"23\"], \"scripts\":[\"http://my.domain/customLayer.js\"]}}}, \"space\": \"OVE_SPACE\", \"h\": 500, \"w\": 500, \"y\": 0, \"x\": 0}" http://OVE_CORE_HOST:PORT/section
 ```
 
 ## Controlling the App
 
-The controller of the app can be loaded by accessing the URL `http://OVE_APP_MAPS_HOST:PORT/control.html?oveSectionId=SECTION_ID&layers=23`. The `layers` parameter in the URL is optional and can have more than one value at a time separated by commas. The controller supports panning and zooming of maps.
+The controller of the app can be loaded by accessing the URL `http://OVE_CORE_HOST:PORT/app/maps/control.html?oveSectionId=SECTION_ID&layers=23`. The `layers` parameter in the URL is optional and can have more than one value at a time separated by commas. The controller supports panning and zooming of maps.
 
 ## Key considerations when using the App
 
