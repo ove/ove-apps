@@ -47,7 +47,7 @@ $(function () {
     // This is what happens first. After OVE is loaded, the system will be ready for distributed operation.
     $(document).ready(function () {
         log.debug('Starting library');
-        window.ove = new OVE(Constants.APP_NAME, '__OVEHOST__', window.name.split('-')[1]);
+        window.ove = new OVE(Constants.APP_NAME, '__OVEHOST__', window.name.substring(window.name.lastIndexOf('/') + 1).split('-')[1]);
         log.debug('Completed loading OVE');
         let context = window.ove.context;
         // Within the OVE context, this application stores shared operations, event handlers and state.
@@ -57,7 +57,7 @@ $(function () {
         context.state = {};
         context.watching = [];
         context.operations = [];
-        context.isController = (window.name.split('-')[0] === Constants.CONTROLLER_WINDOW_NAME);
+        context.isController = (window.name.substring(window.name.lastIndexOf('/') + 1).split('-')[0] === Constants.CONTROLLER_WINDOW_NAME);
         if (context.isController) {
             context.isInitialized = false;
             setTimeout(function () {
