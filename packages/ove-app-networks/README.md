@@ -96,4 +96,4 @@ To reset the network to its original state:
 curl  --request POST http://OVE_CORE_HOST:PORT/app/networks/operation/reset
 ```
 
-Instructions on invoking all operations are available on the API Documentation, `http://OVE_CORE_HOST:PORT/app/networks/api-docs#operation`.
+Instructions on invoking all operations are available on the API Documentation, `http://OVE_CORE_HOST:PORT/app/networks/api-docs/#operation`.

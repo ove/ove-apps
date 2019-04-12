@@ -48,4 +48,4 @@ To play videos using OVE APIs:
 curl  --request POST http://OVE_CORE_HOST:PORT/app/videos/operation/play
 ```
 
-Instructions on invoking other operations are available on the API Documentation, `http://OVE_CORE_HOST:PORT/app/videos/api-docs#operation`.
+Instructions on invoking other operations are available on the API Documentation, `http://OVE_CORE_HOST:PORT/app/videos/api-docs/#operation`.

@@ -46,4 +46,4 @@ To play audio using OVE APIs:
 curl --request POST http://OVE_CORE_HOST:PORT/app/audio/operation/play
 ```
 
-Instructions on invoking other operations are available on the API Documentation, `http://OVE_CORE_HOST:PORT/app/audio/api-docs#operation`.
+Instructions on invoking other operations are available on the API Documentation, `http://OVE_CORE_HOST:PORT/app/audio/api-docs/#operation`.
