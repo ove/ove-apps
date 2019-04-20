@@ -293,7 +293,8 @@ refreshSigma = function (sigma) {
 loadSigma = function () {
     let context = window.ove.context;
     if (!context.isInitialized) {
-        if (OVE.Utils.getViewId() && !window.ove.state.current.neo4j) {
+        if (OVE.Utils.getViewId() &&
+            (!window.ove.state.current.neo4j || window.ove.state.current.neo4j.disableTiling)) {
             // Resize the viewers to span the entire section for non Neo4J-based graphs.
             OVE.Utils.resizeViewer(Constants.CONTENT_DIV);
         }
