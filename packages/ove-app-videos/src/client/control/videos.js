@@ -40,6 +40,7 @@ loadControls = function () {
     $(Constants.Button.PLAY).click(function () {
         if (!$(Constants.Button.PLAY).hasClass(Constants.State.ACTIVE)) {
             $(Constants.Button.PLAY).addClass(Constants.State.ACTIVE);
+            $(Constants.Button.STOP).addClass(Constants.State.ACTIVE);
             $.ajax({
                 url: window.ove.context.appUrl + '/operation/play' +
                     '?oveSectionId' + OVE.Utils.getSectionId(),
@@ -82,12 +83,16 @@ loadControls = function () {
     });
 
     $(Constants.Button.STOP).click(function () {
-        $.ajax({
-            url: window.ove.context.appUrl + '/operation/stop' +
-                '?oveSectionId' + OVE.Utils.getSectionId(),
-            type: 'POST',
-            data: {},
-            contentType: 'application/json'
-        }).catch(log.error);
+        if ($(Constants.Button.STOP).hasClass(Constants.State.ACTIVE)) {
+            $(Constants.Button.PLAY).removeClass(Constants.State.ACTIVE);
+            $(Constants.Button.STOP).removeClass(Constants.State.ACTIVE);
+            $.ajax({
+                url: window.ove.context.appUrl + '/operation/stop' +
+                    '?oveSectionId' + OVE.Utils.getSectionId(),
+                type: 'POST',
+                data: {},
+                contentType: 'application/json'
+            }).catch(log.error);
+        }
     });
 };
