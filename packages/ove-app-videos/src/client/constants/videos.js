@@ -9,6 +9,7 @@ const Constants = {
                               Controller
     **************************************************************/
     DEFAULT_STATE_NAME: 'DSIIntro',
+    CONTROLLER: '.operations',
 
     /**************************************************************
                              Video Player
@@ -46,6 +47,12 @@ Constants.Operation = {
     STOP: 'stop',
     SEEK: 'seekTo',
     BUFFER_STATUS: 'bufferStatus'
+};
+
+Constants.Button = {
+    PLAY: '#btnPlay',
+    PAUSE: '#btnPause',
+    STOP: '#btnStop'
 };
 
 Constants.BufferStatus = {

@@ -17,6 +17,7 @@
             "files": [ "**/control/*.js" ],
             "globals": {
                 "initControl": true,
+                "loadControls": true,
                 "log": true
             }
         },

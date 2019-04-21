@@ -1,8 +1,12 @@
 const { Constants } = require('./client/constants/videos');
 const HttpStatus = require('http-status-codes');
+const path = require('path');
 const base = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
-const { app, appState, log, Utils } = base;
+const { express, app, appState, log, nodeModules, Utils } = base;
 const server = require('http').createServer(app);
+
+log.debug('Using module:', 'fontawesome-free');
+app.use('/images', express.static(path.join(nodeModules, '@fortawesome', 'fontawesome-free', 'svgs', 'solid')));
 
 let ws;
 appState.set('bufferStatus', []);

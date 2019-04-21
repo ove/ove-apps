@@ -5,6 +5,9 @@
     -o-user-select: none;
     user-select: none;
 }
+.outer {
+    pointer-events: none;
+}
 body {
     background: #222;
     color: #FFF;

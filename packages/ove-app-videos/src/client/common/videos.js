@@ -97,6 +97,10 @@ handleStateChange = function (state) {
         };
 
         if (!context.isInitialized) {
+            const url = context.hostname + '/sections/' + OVE.Utils.getSectionId();
+            $.ajax({ url: url, dataType: 'json' }).done(section => {
+                context.appUrl = section.app.url;
+            });
             // The player is decided based on the URL.
             if (state.url.includes('youtube')) {
                 log.info('Starting YouTube video player');
