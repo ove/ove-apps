@@ -58,6 +58,29 @@ paths:
       responses:
         200:
           description: "successful operation"
+  /operation/mute:
+    post:
+      tags:
+      - "operations"
+      summary: "Mutes playback of one or all videos"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "mute"
+        in: "query"
+        type: "string"
+        enum: ["true", "false"]
+        description: "Mute playback or not"
+        required: true
+      - name: "oveSectionId"
+        in: "query"
+        type: "integer"
+        format: "int32"
+        description: "Section ID"
+        required: false
+      responses:
+        200:
+          description: "successful operation"
   /operation/seekTo:
     post:
       tags:

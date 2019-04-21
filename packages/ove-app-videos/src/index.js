@@ -97,11 +97,14 @@ const handleOperation = function (req, res) {
         return;
     }
 
-    // Play and SeekTo commands receive additional query parameters.
+    // Play, Mute and SeekTo commands receive additional query parameters.
     let message = { operation: { name: name, executionTime: (new Date().getTime() + Constants.OPERATION_SYNC_DELAY) } };
     if (name === Constants.Operation.SEEK) {
         // We assume that the seek time is properly set instead of enforcing any strict type checks.
         message.operation.time = req.query.time;
+    } else if (name === Constants.Operation.MUTE) {
+        message.operation.mute = (typeof req.query.mute !== 'undefined' &&
+            JSON.parse(String(req.query.mute).toLowerCase()));
     } else if (name === Constants.Operation.PLAY) {
         // Checks whether the loop parameter is defined and it equals to true.
         // The typeof check is better than an equals check since undefined can

@@ -45,6 +45,7 @@ Constants.Operation = {
     PLAY: 'play',
     PAUSE: 'pause',
     STOP: 'stop',
+    MUTE: 'mute',
     SEEK: 'seekTo',
     BUFFER_STATUS: 'bufferStatus'
 };

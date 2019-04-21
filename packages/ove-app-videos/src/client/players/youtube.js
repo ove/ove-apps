@@ -1,6 +1,6 @@
-function OVEYouTubePlayer () {
+function OVEYouTubePlayer (muted) {
     const log = OVE.Utils.Logger('YouTubePlayer', Constants.LOG_LEVEL);
-    let __private = {};
+    let __private = { muted: muted };
 
     this.initialize = function () {
         return new Promise(function (resolve) {
@@ -49,6 +49,17 @@ function OVEYouTubePlayer () {
         log.debug('Video ready to play');
         this.stop();
         setPlaybackRate(1);
+        if (!__private.muted) {
+            this.mute(false);
+        }
+    };
+
+    this.mute = function (mute) {
+        if (mute) {
+            __private.player.mute();
+        } else {
+            __private.player.unMute();
+        }
     };
 
     this.play = function (loop) {

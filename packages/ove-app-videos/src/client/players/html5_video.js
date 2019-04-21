@@ -1,5 +1,7 @@
-function OVEHTML5VideoPlayer () {
+function OVEHTML5VideoPlayer (muted) {
     const log = OVE.Utils.Logger('HTML5VideoPlayer', Constants.LOG_LEVEL);
+    let __private = { muted: muted };
+
     const getPlayer = function () {
         return $('#video')[0];
     };
@@ -49,8 +51,18 @@ function OVEHTML5VideoPlayer () {
         this.seekTo(Constants.STARTING_TIME);
     };
 
+    this.mute = function (mute) {
+        getPlayer().muted = mute;
+    };
+
     // The ready function is similar to the stop function in this case.
-    this.ready = this.stop;
+    this.ready = function () {
+        log.debug('Video ready to play');
+        this.stop();
+        if (!__private.muted) {
+            this.mute(false);
+        }
+    };
 
     this.isVideoLoaded = function () {
         return getPlayer() && getPlayer().duration > 0;

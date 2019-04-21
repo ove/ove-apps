@@ -48,7 +48,7 @@ If the content is available on a [Neo4j](https://neo4j.com/docs) database the st
 
 A [Cypher](https://neo4j.com/docs/cypher-refcard/current/) query should be provided as the `query` along with the database connection details as the value of the `db` property. The `min` and `max` values along the `x` and `y` axes also needs to be provided if the graph coordinates does not map to pixel coordinates on the screens.
 
-The optional `boundingBoxColor` property specifies the colour of the bounding box. The optional `boundingBoxNodeSize` property specifies the size of the nodes used to draw the bounding box. Both of these properties must be defined within the `neo4j` property.
+The optional `boundingBoxColor` property specifies the colour of the bounding box. The optional `boundingBoxNodeSize` property specifies the size of the nodes used to draw the bounding box. The optional `disableTiling` disables tiling of the graph on a per-client basis. All these properties must be defined within the `neo4j` property.
 
 Information on all available `settings` can be found in [Sigma documentation](https://github.com/jacomyal/sigma.js/wiki/Settings). The `renderer` property is optional and defaults to `webgl`.
 

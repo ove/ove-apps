@@ -52,6 +52,10 @@ initCommon = function () {
                         log.info('Seeking to time:', op.time);
                         context.player.seekTo(op.time);
                         break;
+                    case Constants.Operation.MUTE:
+                        log.info('Muting playback:', op.mute);
+                        context.player.mute(op.mute);
+                        break;
                     default:
                         log.warn('Ignoring unknown operation:', op.name);
                 }
@@ -104,10 +108,10 @@ handleStateChange = function (state) {
             // The player is decided based on the URL.
             if (state.url.includes('youtube')) {
                 log.info('Starting YouTube video player');
-                context.player = new window.OVEYouTubePlayer();
+                context.player = new window.OVEYouTubePlayer(!state.unmuted);
             } else {
                 log.info('Starting HTML5 video player');
-                context.player = new window.OVEHTML5VideoPlayer();
+                context.player = new window.OVEHTML5VideoPlayer(!state.unmuted);
             }
             context.player.initialize().then(function () {
                 context.isInitialized = true;

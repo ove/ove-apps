@@ -16,7 +16,7 @@ The state of this app has a format similar to:
 }
 ```
 
-The player is selected automatically based on the URL: Any YouTube URL uses the YouTube player and all other URLs use the HTML5 player.
+The player is selected automatically based on the URL: Any YouTube URL uses the YouTube player and all other URLs use the HTML5 player. By default, all videos will play muted. An optional property, `unmuted` can be set to `true` to play videos unmuted.
 
 ## Launching the App
 
@@ -40,7 +40,7 @@ curl --header "Content-Type: application/json" --request POST --data "{\"app\": 
 
 The controller of the app can be loaded by accessing the URL `http://OVE_CORE_HOST:PORT/app/videos/control.html?oveSectionId=SECTION_ID`.
 
-The app's API also exposes operations such as `play`, `pause`, `stop`, `seekTo` and `bufferStatus`. These operations can be executed on a per-video basis or across all videos.
+The app's API also exposes operations such as `play`, `pause`, `stop`, `mute`, `seekTo` and `bufferStatus`. These operations can be executed on a per-video basis or across all videos.
 
 To play videos using OVE APIs:
 
