@@ -21,5 +21,7 @@ label, .background {
 .background {background: snow;}
 
 #btnPlay { background: url(images/play.svg) center/35% no-repeat; opacity: 0.8; padding-left: 2.5px; }
-#btnPause { background: url(images/pause.svg) center/35% no-repeat; opacity: 0.8; }
+#btnPlay.active { background: url(images/pause.svg) center/35% no-repeat; opacity: 0.8; padding-left: 0px; }
+#btnMute { background: url(images/microphone-slash.svg) center/35% no-repeat; opacity: 0.8; padding-left: 0px; }
+#btnMute.active { background: url(images/microphone.svg) center/35% no-repeat; opacity: 0.8; padding-left: 1px; }
 #btnStop { background: url(images/stop.svg) center/35% no-repeat; opacity: 0.8; padding-left: 1px; }

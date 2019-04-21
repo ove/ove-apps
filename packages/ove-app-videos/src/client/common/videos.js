@@ -162,6 +162,10 @@ handleBufferStatusChange = function (status) {
             if (context.bufferStatus.clients.length === 0) {
                 log.info('Video buffering complete');
                 context.player.ready();
+                if (window.ove.state.current.unmuted) {
+                    this.mute(false);
+                    $(Constants.Button.PLAY).removeClass(Constants.State.ACTIVE);
+                }
 
                 log.debug('Displaying video player');
                 $(Constants.CONTENT_DIV).show();

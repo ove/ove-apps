@@ -52,8 +52,12 @@ Constants.Operation = {
 
 Constants.Button = {
     PLAY: '#btnPlay',
-    PAUSE: '#btnPause',
-    STOP: '#btnStop'
+    STOP: '#btnStop',
+    MUTE: '#btnMute'
+};
+
+Constants.State = {
+    ACTIVE: 'active'
 };
 
 Constants.BufferStatus = {
