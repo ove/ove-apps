@@ -31,7 +31,7 @@ The configuration format for [OpenLayers](https://openlayers.org/) has a structu
         "source": {
             "type": "ol.source.Vector",
             "config": {
-                "url": "/data/sampleGeo.json"
+                "url": "data/sampleGeo.json"
             }
         },
         "style": {

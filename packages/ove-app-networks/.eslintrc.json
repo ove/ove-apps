@@ -36,7 +36,8 @@
                 "beginInitialization": true,
                 "getClientSpecificURL": true,
                 "loadSigma": true,
-                "runOperation": true
+                "runOperation": true,
+                "setupCoordinatesUpdateEventListener": true
             }
         }
     ],

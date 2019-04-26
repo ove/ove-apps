@@ -59,6 +59,35 @@ getClientSpecificURL = function (url) {
     return url; // View-only operation
 };
 
+setupCoordinatesUpdateEventListener = function (sigma) {
+    const horizontalScalingFactor = window.ove.geometry.section.w /
+        Math.min(document.documentElement.clientWidth, window.innerWidth);
+    const verticalScalingFactor = window.ove.geometry.section.h /
+        Math.min(document.documentElement.clientHeight, window.innerHeight);
+    const factor = Math.max(horizontalScalingFactor, verticalScalingFactor);
+    log.debug('Calculated scaling factor:', factor);
+
+    // Camera position changes trigger COORDINATES_UPDATED_EVENT
+    let camera = sigma.camera;
+    camera.bind(Constants.COORDINATES_UPDATED_EVENT, function () {
+        window.ove.context.coordinates = {
+            x: camera.x * factor,
+            y: camera.y * factor,
+            ratio: camera.ratio,
+            angle: camera.angle
+        };
+    });
+    // We want to reduce the high volume of events
+    setInterval(function () {
+        if (window.ove.context.coordinates &&
+            !OVE.Utils.JSON.equals(window.ove.context.coordinates, window.ove.state.current.coordinates)) {
+            window.ove.state.current.coordinates = window.ove.context.coordinates;
+            OVE.Utils.broadcastState();
+        }
+    }, Constants.COORDINATES_UPDATE_TIMEOUT);
+    log.debug('Registered coordinates update event listener');
+};
+
 beginInitialization = function () {
     log.debug('Starting controller initialization');
     OVE.Utils.initControl(Constants.DEFAULT_STATE_NAME, initControl);

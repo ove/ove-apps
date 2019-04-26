@@ -3,6 +3,8 @@ const Constants = {
                               Controller
     **************************************************************/
     DEFAULT_STATE_NAME: 'SigmaSample',
+    COORDINATES_UPDATED_EVENT: 'coordinatesUpdated',
+    COORDINATES_UPDATE_TIMEOUT: 500, // Unit: milliseconds
 
     /**************************************************************
                                 Server

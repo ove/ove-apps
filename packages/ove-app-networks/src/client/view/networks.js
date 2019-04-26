@@ -13,8 +13,19 @@ initView = function () {
 
             runOperation(message);
         } else {
-            window.ove.state.current = message;
-            loadSigma();
+            if (!OVE.Utils.JSON.equals(message, window.ove.state.current)) {
+                if (window.ove.state.current && message.coordinates &&
+                    !OVE.Utils.JSON.equals(message.coordinates, window.ove.state.current.coordinates)) {
+                    window.ove.state.current = message;
+                    if (!window.ove.state.current.neo4j || window.ove.state.current.neo4j.disableTiling) {
+                        // Pan or Zoom operations will not happen if Tiling of graphs is enabled (as of now)
+                        context.sigma.camera.goTo(window.ove.state.current.coordinates);
+                    }
+                } else {
+                    window.ove.state.current = message;
+                    loadSigma();
+                }
+            }
         }
     });
 };
@@ -25,6 +36,8 @@ getClientSpecificURL = function (url) {
     log.debug('Using client-specific URL:', csURL);
     return csURL;
 };
+
+setupCoordinatesUpdateEventListener = function () {}; // Control-only operation
 
 beginInitialization = function () {
     log.debug('Starting viewer initialization');

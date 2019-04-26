@@ -440,4 +440,6 @@ loadSigma = function () {
         log.info('Loading content from Neo4j database:', config.db.url, ', with query:', query);
         sigma.neo4j.cypher(config.db, query, context.sigma, refreshSigma);
     }
+
+    setupCoordinatesUpdateEventListener(context.sigma);
 };

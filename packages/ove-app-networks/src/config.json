@@ -1,7 +1,7 @@
 {
   "states": {
     "SigmaSample": {
-      "jsonURL": "/data/sample.json",
+      "jsonURL": "data/sample.json",
       "settings": {
         "autoRescale": true,
         "clone": false,
