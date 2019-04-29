@@ -18,7 +18,7 @@
     "@ove-lib/appbase": "0.4.0",
     "d3-dsv": "1.1.1",
     "jquery": "3.3.1",
-    "vega": "4.4.0",
+    "vega": "5.3.5",
     "vega-embed": "4.0.0"
   }
 }
