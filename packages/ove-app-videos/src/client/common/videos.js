@@ -106,7 +106,7 @@ handleStateChange = function (state) {
                 context.appUrl = section.app.url;
             });
             // The player is decided based on the URL.
-            if (state.url.includes('youtube')) {
+            if (new URL(state.url).hostname.includes('youtube')) {
                 log.info('Starting YouTube video player');
                 context.player = new window.OVEYouTubePlayer(!state.unmuted);
             } else {
