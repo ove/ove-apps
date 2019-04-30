@@ -103,6 +103,18 @@ handleStateChange = function (state) {
         const loadPlayer = function () {
             log.debug('Hiding video player');
             $(Constants.CONTENT_DIV).hide();
+            if (!$(Constants.WAITING_MSG).length) {
+                $('<p>', {
+                    class: Constants.WAITING_MSG.substring(1)
+                }).css({
+                    height: '100vh',
+                    width: '100%',
+                    textAlign: 'center',
+                    transform: 'translate(0%,50%)'
+                }).appendTo(Constants.WRAPPER_DIV);
+            }
+            displayWaitingMessage();
+            $(Constants.WAITING_MSG).show();
 
             requestRegistration();
             log.debug('Reloading video player with new state:', state);
@@ -178,6 +190,7 @@ handleBufferStatusChange = function (status) {
                 }
 
                 log.debug('Displaying video player');
+                $(Constants.WAITING_MSG).hide();
                 $(Constants.CONTENT_DIV).show();
                 refresh();
             }

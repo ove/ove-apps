@@ -35,6 +35,8 @@ const Constants = {
     MIN_BUFFERED_PERCENTAGE: 15,
     MIN_BUFFERED_DURATION: 15, // Unit: seconds
     CONTENT_DIV: '#video_player',
+    WRAPPER_DIV: '.outer',
+    WAITING_MSG: '.waiting',
     APP_NAME: 'videos'
 };
 

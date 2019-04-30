@@ -24,6 +24,10 @@ requestRegistration = function () {
     OVE.Utils.broadcastState({ state: window.ove.state.current });
 };
 
+displayWaitingMessage = function () {
+    $(Constants.WAITING_MSG).text('Waiting for viewers to load');
+};
+
 doRegistration = function () { }; // View-only operation
 
 beginInitialization = function () {

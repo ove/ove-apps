@@ -51,6 +51,7 @@
             "files": [ "**/*.js" ],
             "globals": {
                 "doRegistration": true,
+                "displayWaitingMessage": true,
                 "handleBufferStatusChange": true,
                 "initCommon": true,
                 "beginInitialization": true,
