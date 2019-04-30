@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@ove-lib/appbase": "0.4.0",
-    "jquery": "3.3.1",
+    "jquery": "3.4.0",
     "openseadragon": "2.4.0"
   }
 }
