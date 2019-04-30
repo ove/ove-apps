@@ -39,14 +39,19 @@ initCommon = function () {
                     case Constants.Operation.PLAY:
                         log.info('Starting video playback ' + (op.loop ? 'with' : 'without') + ' loop');
                         context.player.play(op.loop);
+                        $(Constants.Button.PLAY).addClass(Constants.State.ACTIVE);
+                        $(Constants.Button.STOP).addClass(Constants.State.ACTIVE);
                         break;
                     case Constants.Operation.PAUSE:
                         log.info('Pausing video playback');
                         context.player.pause();
+                        $(Constants.Button.PLAY).removeClass(Constants.State.ACTIVE);
                         break;
                     case Constants.Operation.STOP:
                         log.info('Stopping video playback');
                         context.player.stop();
+                        $(Constants.Button.PLAY).removeClass(Constants.State.ACTIVE);
+                        $(Constants.Button.STOP).removeClass(Constants.State.ACTIVE);
                         break;
                     case Constants.Operation.SEEK:
                         log.info('Seeking to time:', op.time);
@@ -55,6 +60,11 @@ initCommon = function () {
                     case Constants.Operation.MUTE:
                         log.info('Muting playback:', op.mute);
                         context.player.mute(op.mute);
+                        if (JSON.parse(op.mute)) {
+                            $(Constants.Button.MUTE).addClass(Constants.State.ACTIVE);
+                        } else {
+                            $(Constants.Button.MUTE).removeClass(Constants.State.ACTIVE);
+                        }
                         break;
                     default:
                         log.warn('Ignoring unknown operation:', op.name);
