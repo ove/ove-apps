@@ -1,7 +1,7 @@
 {
   "name": "@ove/ove-app-controller",
   "private": true,
-  "version": "0.3.3",
+  "version": "0.4.0",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"No tests specified\" && exit 0",
@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@fortawesome/fontawesome-free": "5.8.1",
-    "@ove-lib/appbase": "0.4.0",
+    "@ove-lib/appbase": "0.4.1",
     "d3": "5.9.2",
     "jquery": "3.4.1"
   }

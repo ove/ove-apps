@@ -1,7 +1,7 @@
 {
   "name": "@ove/ove-app-charts",
   "private": true,
-  "version": "0.3.3",
+  "version": "0.4.0",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"No tests specified\" && exit 0",
@@ -15,7 +15,7 @@
   "author": "James Scott-Brown <james.scott-brown@imperial.ac.uk>",
   "license": "MIT",
   "dependencies": {
-    "@ove-lib/appbase": "0.4.0",
+    "@ove-lib/appbase": "0.4.1",
     "d3-dsv": "1.1.1",
     "jquery": "3.4.1",
     "vega": "5.3.5",

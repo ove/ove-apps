@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/ove/ove-apps/compare/v0.3.3...v0.4.0) (2019-05-02)
+
+### Features
+
+**feat:** Health check service for OVE.
+**feat:** New controller and audio playback support in Videos App.
+**feat:** Pan and zoom support in Networks App.
+**feat:** Support for validating application state on a per-application basis.
+**feat:** Using nginx instead of multiple OVE ports.
+
+### Docs
+
+**docs:** Inclusion of photographs depicting apps in operation.
+**docs:** Review and fixes to documentation of all apps.
+
+### Fixes
+
+**fix:** Long standing issue fixes in Alignment, Audio, Charts and Videos apps
+**fix:** Standardising OVE APIs.
+**fix:** Version upgrades to all dependencies.
+
 <a name="0.3.3"></a>
 # [0.3.3](https://github.com/ove/ove-apps/compare/v0.3.2...v0.3.3) (2019-02-27)
 
