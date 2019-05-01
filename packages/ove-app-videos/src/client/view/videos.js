@@ -53,6 +53,8 @@ requestRegistration = function () {
     window.ove.socket.send({ bufferStatus: status });
 };
 
+displayWaitingMessage = function () { };
+
 doRegistration = function () {
     const context = window.ove.context;
 
