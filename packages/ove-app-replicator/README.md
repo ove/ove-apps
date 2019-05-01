@@ -1,8 +1,8 @@
 # Replicator App
 
-This app is capable of replicating content from within an OVE environment, as a space (either entirely or a portion of it), as a group or as one or more individual sections. It makes it possible to render content at different dimensions (scaling) while retaining the same aspect ratios. The app also makes it possible for interactive and non-interactive.
+This app is capable of replicating content from an OVE `space` (or a portion of a space), a `group` or one or more individual `sections`. The displayed content may be replicated from either from the same OVE instance as the replicator app, or a remote instance. It can render content at different pixel dimensions by scaling whilst preserving retaining the same aspect ratios.
 
-The replicator app is instantiated just like any other app, but, it however does not have a controller, and therefore behaves slightly differently to other apps, at runtime. This app can also display content from remote OVE deployments, unlike other apps.
+The replicator app is instantiated just like any other app. However, it does not have a controller, and therefore behaves slightly differently to other apps at runtime.
 
 ## Application State
 
@@ -26,13 +26,25 @@ The state of this app has a format similar to:
 }
 ```
 
-The `mode` property is mandatory and should have a value of `space`, `group`, or `section`. If the `mode` has been set to `space`, the `spaceName` property must usually be provided. An app will replicate its own space (and thereby provide a mini-map sort of an experience), if the `spaceName` property is omitted.
+### Selecting what to replicate
 
-The `groupIds` property is optional, and must be provided if `mode` is `group`. Similarly, the `sectionIds` property becomes mandatory if the `mode` is `section`. The optional `crop` property defines the region that will be replicated. Everything outside this region will not be visible. The content rendered within the app will scale to fit the app's own dimensions defined as `w` and `h` of the geometry when creating the app. The `crop` area can have its own geometry that is independent of the app's own geometry.
+The `mode` property is mandatory and should have a value of `space`, `group`, or `section`.
 
-The optional `oveHost` property must be set in order to connect to a remote OVE environment.  The `spaceName` must always be provided if `oveHost` has been set, whenever the `mode` is `space`. The optional `border` property is useful when the replication is deployed as an overlay (for example, as a mini-map). Setting a `border` will set an opaque background to the replication. The optional `background` property can be set to change the colour and the opacity of the background. Please note that the border width cannot be set using this property.
+If the `mode` has been set to `space`, the `spaceName` property should generally be provided. It must be set if content is replicated from a remote OVE instance, and will otherwise default to the name of the space in which the replicator section is created (creating a mini-map view of the space).
 
-The replicator app can only work with one `space` at a time. If the `mode` was set to `group` or `section` the `spaceName` will be taken into consideration. If the `spaceName` was not provided, the `space` with the most number of items will be chosen.
+If the `mode` is `group`, then the `groupIds` property must be provided.
+
+If the `mode` is `section`, then the `sectionIds` property must be provided.
+
+If the `mode` is `group` or `section`, then the `spaceName` property will default to the name of the space that contains the most sections.
+
+The optional `oveHost` property can be set in order to connect to a remote OVE instance; if it is not set, content will be replicated from the same OVE instance that the replicator app is created on.
+
+Regardless of which `mode` is used, the optional `crop` property can be set: this defines a rectangular region, and nothing outside this region is replicated. The contents of the region selected by `spaceName`/`groupIds`/`sectionIds` will be scaled proportionally so that the crop rectangle fits within the replicator app's own dimensions (defined as `w` and `h` of the geometry when creating the app).
+
+The optional `border` property can be used to set the [border-style](https://developer.mozilla.org/en-US/docs/Web/CSS/border-style) and [border-color](https://developer.mozilla.org/en-US/docs/Web/CSS/border-color) (but not border-width) of the replicated region. This can be useful when the replication is deployed as an overlay (for example, as a mini-map).
+
+Setting a `border` will also make the replicator app's background opaque. The optional `background` property can be set to change the colour and the opacity of the background.
 
 ## Launching the App
 
