@@ -127,14 +127,30 @@ handleStateChange = function (state) {
             $.ajax({ url: url, dataType: 'json' }).done(section => {
                 context.appUrl = section.app.url;
             });
+
             // The player is decided based on the URL.
-            if (new URL(state.url).hostname.includes('youtube')) {
+            let stateURL;
+            try {
+                stateURL = new URL(state.url);
+            } catch (error) {
+                log.error(`Provided video URL is not a valid URL: ${state.url}`);
+                return;
+            }
+
+            const YOUTUBE_URL_REGEX = new RegExp('^(?:(?:(?:https?|ftp):)?\\/\\/)' +
+                '(?:www.youtube.com\\/embed\\/)(?:[a-z0-9_-]{0,11})$', 'i');
+
+            if (!stateURL.hostname.includes('youtube')) {
+                log.info('Starting HTML5 video player');
+                context.player = new window.OVEHTML5VideoPlayer(!state.unmuted);
+            } else if (YOUTUBE_URL_REGEX.test(state.url)) {
                 log.info('Starting YouTube video player');
                 context.player = new window.OVEYouTubePlayer(!state.unmuted);
             } else {
-                log.info('Starting HTML5 video player');
-                context.player = new window.OVEHTML5VideoPlayer(!state.unmuted);
+                log.error(`Youtube URL ${state.url} is not in format http://www.youtube.com/embed/<VIDEO_ID>`);
+                return;
             }
+
             context.player.initialize().then(function () {
                 context.isInitialized = true;
                 log.debug('Application is initialized:', context.isInitialized);
