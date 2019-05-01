@@ -1,11 +1,7 @@
 {
   "states": {
     "VegaSample": {
-      "url": "https://raw.githubusercontent.com/vega/vega/master/docs/examples/bar-chart.vg.json",
-      "options": {
-        "width": 800,
-        "height": 800
-      }
+      "url": "https://raw.githubusercontent.com/vega/vega/master/docs/examples/bar-chart.vg.json"
     }
   }
 }
