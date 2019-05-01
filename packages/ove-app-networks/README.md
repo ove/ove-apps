@@ -54,7 +54,7 @@ Information on all available `settings` can be found in [Sigma documentation](ht
 
 ## Launching the App
 
-All OVE applications can be launched using the [Launcher UI](https://ove.readthedocs.io/en/stable/ove-ui/packages/ove-ui-launcher/README.html), the [Python Client Library](https://github.com/ove/ove-sdks/tree/master/python), and the OVE APIs. The API used to launch an application is the same for all applications, but the data that is passed into it is application-specific.
+All OVE applications can be launched using the [Launcher UI](https://ove.readthedocs.io/en/stable/ove-ui/packages/ove-ui-launcher/README.html), the [Python Client Library](https://ove.readthedocs.io/en/stable/ove-sdks/python/README.html), and the OVE APIs. The API used to launch an application is the same for all applications, but the data that is passed into it is application-specific.
 
 To launch the networks app and display a node-link diagram using the OVE APIs:
 
