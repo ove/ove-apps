@@ -44,13 +44,13 @@ Constants.Operation = {
     PAUSE: 'pause',
     STOP: 'stop',
     SEEK: 'seekTo',
-    BUFFER_STATUS: 'bufferStatus',
     MUTE: 'mute',
     UNMUTE: 'unmute',
     SET_VOLUME: 'setVolume',
     SET_POSITION: 'setPosition',
     VOLUME_UP: 'volUp',
-    VOLUME_DOWN: 'volDown'
+    VOLUME_DOWN: 'volDown',
+    BUFFER_STATUS: 'bufferStatus'
 };
 
 Constants.BufferStatus = {

@@ -139,7 +139,7 @@ paths:
       responses:
         200:
           description: "successful operation"
-      summary: "sets the positional audio (in 3D) for one or all audio files"
+      summary: "Sets the positional audio (in 3D) for one or all audio files. The position varies from 0.0 to 1.0 along each Axis. Setting a value greater than one or lesser than zero would make the volume reduce proportionally to provide an approximate pan-effect."
       tags:
       - operations
   /operation/setVolume:
