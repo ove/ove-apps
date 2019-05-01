@@ -17,7 +17,7 @@
   "dependencies": {
     "@ove-lib/appbase": "0.4.0",
     "http-status-codes": "1.3.2",
-    "jquery": "3.4.0",
+    "jquery": "3.4.1",
     "odata-parser": "1.4.1",
     "sigma": "1.2.1",
     "ws": "6.2.1"
