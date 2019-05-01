@@ -18,7 +18,7 @@ The state of this app has a format similar to:
 }
 ```
 
-The `url` property points to a URL of a [Vega-Embed specification](https://vega.github.io/vega/docs/#specification). Alternatively, the specification be embedded in the state using a `spec` property.
+The `url` property points to a URL of a [Vega-Embed specification](https://vega.github.io/vega/docs/#specification). Alternatively, the specification be embedded in the state using a `spec` property. The optional `options` property can be used to specify the `width` and `height` of a chart.
 
 ## Launching the App
 

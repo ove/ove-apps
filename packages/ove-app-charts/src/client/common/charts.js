@@ -20,6 +20,18 @@ loadVega = function () {
     }
 
     const state = window.ove.state.current;
+
+    // Default to sizing graph to fill section
+    if (!state.options) {
+        state.options = {};
+    }
+    if (!state.options.width) {
+        state.options.width = window.ove.geometry.section.w;
+    }
+    if (!state.options.height) {
+        state.options.height = window.ove.geometry.section.h;
+    }
+
     // Vega specification can either be inline or provided at some URL.
     if (state.url) {
         log.info('Loading Vega spec at url:', state.url, ', with options:', state.options);
