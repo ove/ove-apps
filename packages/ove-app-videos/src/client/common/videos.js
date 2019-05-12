@@ -102,7 +102,13 @@ handleStateChange = function (state) {
         // initialization to complete.
         const loadPlayer = function () {
             log.debug('Hiding video player');
-            $(Constants.CONTENT_DIV).hide();
+            // The players expect the videos to be displayed for them to start buffering.
+            // Therefore, we display them with zero width/height and rescale them to
+            // actual width/height once the buffering has completed.
+            context.width = parseInt($(Constants.CONTENT_DIV).css('width'), 10);
+            context.height = parseInt($(Constants.CONTENT_DIV).css('height'), 10);
+            $(Constants.CONTENT_DIV).css({ width: 0, height: 0 });
+            $(Constants.CONTENT_DIV).show();
             if (!$(Constants.WAITING_MSG).length) {
                 $('<p>', {
                     class: Constants.WAITING_MSG.substring(1)
@@ -119,7 +125,6 @@ handleStateChange = function (state) {
             requestRegistration();
             log.debug('Reloading video player with new state:', state);
             context.player.load(state);
-            refresh();
         };
 
         if (!context.isInitialized) {
@@ -207,7 +212,10 @@ handleBufferStatusChange = function (status) {
 
                 log.debug('Displaying video player');
                 $(Constants.WAITING_MSG).hide();
-                $(Constants.CONTENT_DIV).show();
+                $(Constants.CONTENT_DIV).css({
+                    width: context.width,
+                    height: context.height
+                });
                 refresh();
             }
         }
