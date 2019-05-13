@@ -147,10 +147,10 @@ handleStateChange = function (state) {
 
             if (!stateURL.hostname.includes('youtube')) {
                 log.info('Starting HTML5 video player');
-                context.player = new window.OVEHTML5VideoPlayer(!state.unmuted);
+                context.player = new window.OVEHTML5VideoPlayer();
             } else if (YOUTUBE_URL_REGEX.test(state.url)) {
                 log.info('Starting YouTube video player');
-                context.player = new window.OVEYouTubePlayer(!state.unmuted);
+                context.player = new window.OVEYouTubePlayer();
             } else {
                 log.error(`Youtube URL ${state.url} is not in format http://www.youtube.com/embed/<VIDEO_ID>`);
                 return;

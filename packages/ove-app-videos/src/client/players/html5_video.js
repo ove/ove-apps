@@ -19,7 +19,7 @@ function OVEHTML5VideoPlayer () {
 
     this.load = function (config) {
         log.debug('Loading video at URL:', config.url);
-        getPlayer().src = config.url;
+        getPlayer().src = config.url + '?nonce=' + OVE.Utils.getViewId();
         setTimeout(function () {
             // Wait for the player to be ready.
             getPlayer().playbackRate = Constants.STANDARD_RATE;
