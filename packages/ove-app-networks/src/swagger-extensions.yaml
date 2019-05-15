@@ -45,7 +45,7 @@ paths:
       - name: "color"
         in: "query"
         type: "string"
-        description: "New color for nodes in the format rgb(x, y, z) (where x, y, z are integers in the range 0-255)"
+        description: "New color for nodes in the format rgb(x, y, z) or rgba(x, y, z, a), where x, y, z are integers in the range 0-255 and a is a number between 0.0 (fully transparent) and 1.0 (fully opaque)"
         required: false
       - name: "edgeFilter"
         in: "query"
@@ -55,7 +55,7 @@ paths:
       - name: "edgeColor"
         in: "query"
         type: "string"
-        description: "New color for edges in the format rgb(x, y, z) (where x, y, z are integers in the range 0-255)"
+        description: "New color for edges in the format rgb(x, y, z) or rgba(x, y, z, a), where x, y, z are integers in the range 0-255 and a is a number between 0.0 (fully transparent) and 1.0 (fully opaque)"
         required: false
       - name: "oveSectionId"
         in: "query"

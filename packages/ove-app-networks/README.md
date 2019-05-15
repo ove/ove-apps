@@ -80,7 +80,7 @@ The controller of the app can be loaded by accessing the URL `http://OVE_CORE_HO
 
 The app's API also exposes operations such as `showOnly`, `color`, `labelNodes`, `neighborsOf` and `reset`. These operations can be executed on a per-network basis or across all networks.
 
-The implementation makes it possible to query on all properties of nodes and edges. The filters used must confirm to the [OData v3.0 specification](https://www.odata.org/documentation/odata-version-3-0/odata-version-3-0-core-protocol/#thefiltersystemqueryoption) and the colors used must have the format `rgb(x, y, z)` (where x, y, z are integers in the range 0-255).
+The implementation makes it possible to query on all properties of nodes and edges. The filters used must confirm to the [OData v3.0 specification](https://www.odata.org/documentation/odata-version-3-0/odata-version-3-0-core-protocol/#thefiltersystemqueryoption) and the colors used must have the format `rgb(x, y, z)` or `rgba(x, y, z, a)`, where x, y, z are integers in the range 0-255 and a is a number between 0.0 (fully transparent) and 1.0 (fully opaque).
 
 [Sigma](http://sigmajs.org/) supports chaining of multiple filters and operations such as `showOnly` and `color` operations combine node and edge filters if provided together: which has the effect of a logical AND.
 
