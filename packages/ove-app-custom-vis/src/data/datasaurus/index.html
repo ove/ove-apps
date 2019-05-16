@@ -1,0 +1,118 @@
+<html>
+
+<head>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="../custom-vis-lib.js"></script>
+
+    <script>
+
+        let x_scale, y_scale, zoom, svg;
+
+        window.addEventListener('stateSet', m => {
+            console.log('Received custom event: ' + JSON.stringify(m.detail));
+
+            if (window.VisAppStatus === 'launching') {
+                x_scale = m.detail.xScale;
+                y_scale = m.detail.yScale;
+                drawStuff(x_scale, y_scale);
+            } else if (window.VisAppStatus === 'launched') {
+                adjustStuff(m.detail.xScale, m.detail.yScale);
+            }
+        });
+
+        window.addEventListener('stateTransformed', m => {
+            console.log('Received custom transform event: ' + JSON.stringify(m.detail));
+
+            let t = d3.zoomIdentity
+                .translate(m.detail.pan.x, m.detail.pan.y)
+                .scale(m.detail.zoom);
+
+            t.source = 'message'; // this is an addition to the zoom object that is non-standard
+            svg.call(zoom.transform, t);
+        });
+
+
+        function drawStuff(x, y) {
+            console.log('DRAWING');
+            d3.tsv("data.tsv")
+                .then(res => {
+                    let data = res.filter(d => d.dataset === 'dino');
+
+                    // In a more sophisticated example, we could make an API call to request data only within the
+                    // domain covered by this window (and fetch more data as needed after a pan)
+
+                    d3.selectAll('svg').html("").remove();
+
+                    svg = d3.select("body")
+                        .append('svg')
+                        .attr('width', '100vw')
+                        .attr('height', '100vw');
+
+                    let container = svg.append("g");
+
+                    let view = container
+                        .selectAll('points')
+                        .data(data)
+                        .enter()
+                        .append('circle')
+                        .attr('r', 5)
+                        .attr('cx', d => x(d.x))
+                        .attr('cy', d => y(100 - d.y)) // the tsv file uses the opposite sign convention for the y-axis
+                        .attr('fill', 'red');
+
+                    let width = x.range()[1] - x.range()[0];
+                    let height = y.range()[1] - y.range()[0];
+
+                    zoom = d3.zoom()
+                        .scaleExtent([1, 40])
+                        .on("zoom", zoomed);
+
+                    svg.call(zoom);
+
+                    function zoomed() {
+                        view.attr("transform", d3.event.transform);
+
+                        console.log("Transform", d3.event.transform.toString());
+
+                        xScaled = d3.event.transform.rescaleX(x);
+                        console.log("x domain: " + xScaled.domain());
+
+                        yScaled = d3.event.transform.rescaleY(y);
+                        console.log("y domain: " + yScaled.domain());
+
+                        if (d3.event.transform.source !== 'message'){
+                            broadcastTransform(d3.event.transform);
+                        }
+
+                        // If we had drawn axes, we can re-label them after a scaling with:
+                        //gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
+                        //gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
+                    }
+
+                    function resetted() {
+                        svg.transition()
+                            .duration(750)
+                            .call(zoom.transform, d3.zoomIdentity);
+                    }
+
+                    window.VisAppStatus = 'launched';
+                })
+        }
+
+        function adjustStuff(x, y) {
+            console.log('ADJUSTING');
+
+            d3.select('svg')
+                .selectAll('circle')
+                .attr('cx', d => x(d.x))
+                .attr('cy', d => y(100 - d.y)) // the image is upside down!
+        }
+
+    </script>
+
+</head>
+
+<body onload="begin()">
+
+</body>

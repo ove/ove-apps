@@ -1,0 +1,11 @@
+{
+  "states": {
+    "Datasaurus": {
+      "url": "http://146.169.10.86:8094/data/datasaurus/index.html",
+      "x_domain": [0, 100],
+      "y_domain": [0, 100],
+      "x_range": [0, 4320],
+      "y_range": [0, 2424]
+    }
+  }
+}

@@ -144,14 +144,14 @@
       }
     },
     {
-      "name": "@ove/ove-app-webrtc",
-      "cwd": "./packages/ove-app-webrtc",
+      "name": "@ove/ove-app-custom-vis",
+      "cwd": "./packages/ove-app-custom-vis",
       "kill_timeout": 3000,
       "restart_delay": 3000,
       "script": "npm",
       "args": "run start",
       "env": {
-          "PORT": "8094"
+        "PORT": "8094"
       }
     }
   ]
