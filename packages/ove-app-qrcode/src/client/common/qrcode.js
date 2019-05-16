@@ -40,4 +40,6 @@ updateURL = function () {
         padding: state.padding ? state.padding : null,
         size: state.size ? state.size : 100
     });
+
+    $(Constants.CONTENT_DIV).css(getCSS());
 };
