@@ -1,5 +1,4 @@
 const { Constants } = require('./client/constants/qrcode');
-const HttpStatus = require('http-status-codes');
 const path = require('path');
 const base = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const { express, app, log, Utils, nodeModules } = base;

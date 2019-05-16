@@ -16,9 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@ove-lib/appbase": "0.4.1",
-    "http-status-codes": "1.3.2",
     "jquery": "3.4.1",
-    "request": "2.88.0",
     "qrious": "4.0.2"
   }
 }
