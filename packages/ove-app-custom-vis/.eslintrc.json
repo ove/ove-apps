@@ -27,7 +27,9 @@
             "globals": {
                 "beginInitialization": true,
                 "getCSS": true,
-                "updateURL": true
+                "updateURL": true,
+                "d3": true,
+                "CustomEvent": true
             }
         }
     ],

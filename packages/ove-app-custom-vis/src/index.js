@@ -2,7 +2,7 @@ const { Constants } = require('./client/constants/custom-vis');
 const HttpStatus = require('http-status-codes');
 const path = require('path');
 const fs = require('fs');
-const { express, app, log, Utils } = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
+const { app, log, Utils } = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const request = require('request');
 const server = require('http').createServer(app);
 

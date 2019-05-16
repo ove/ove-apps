@@ -12,7 +12,7 @@ $(function () {
     });
 });
 
-shareDetails = function () {
+const shareDetails = function () {
     // This listens to messages passed up from the custom vis loaded within an iFrame
     window.addEventListener('message', m => {
         console.log('Custom Vis App received Message: ' + JSON.stringify(m.data));

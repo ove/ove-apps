@@ -1,4 +1,4 @@
-function begin () {
+function begin () { // eslint-disable-line no-unused-vars
     window.addEventListener('message', m => handleMessage(m), false);
 
     window.VisAppStatus = 'launching';
@@ -7,7 +7,7 @@ function begin () {
     window.parent.postMessage({ type: 'READY' }, '*');
 }
 
-function broadcastTransform (event) {
+function broadcastTransform (event) { // eslint-disable-line no-unused-vars
     const transform = {
         zoom: event.k,
         pan: {
