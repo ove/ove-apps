@@ -28,7 +28,7 @@ const init = function () {
 updateURL = function () {
     const state = window.ove.state.current;
 
-    new QRious({
+    new QRious({ // eslint-disable-line
         element: document.querySelector('canvas'),
         value: state.url,
 
