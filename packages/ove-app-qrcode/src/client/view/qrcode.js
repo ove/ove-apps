@@ -1,8 +1,7 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
 
 $(function () {
-    // This is what happens first. After OVE is loaded, either the viewer or controller
-    // will be initialized.
+    // This is what happens first. After OVE is loaded, the viewer will be initialized.
     $(document).ready(function () {
         log.debug('Starting application');
         window.ove = new OVE(Constants.APP_NAME);
@@ -20,9 +19,6 @@ beginInitialization = function () {
 const init = function () {
     window.ove.context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
-    window.ove.socket.on(function (message) {
-        updateURL();
-    });
 };
 
 updateURL = function () {

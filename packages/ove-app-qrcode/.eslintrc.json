@@ -16,13 +16,6 @@
             }
         },
         {
-            "files": [ "**/control/*.js" ],
-            "globals": {
-                "initControl": true,
-                "log": true
-            }
-        },
-        {
             "files": [ "**/*.js" ],
             "globals": {
                 "beginInitialization": true,
