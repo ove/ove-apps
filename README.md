@@ -11,6 +11,7 @@ There are several applications designed to run within [Open Visualisation Enviro
 * [Maps](packages/ove-app-maps/README.md) - supports visualisation of dynamic maps using the OVE framework.
 * [Networks](packages/ove-app-networks/README.md) - supports visualisation of networks with node-link diagrams using the OVE framework.
 * [PDF](packages/ove-app-pdf/README.md) - supports displaying PDF documents using the OVE framework.
+* [QR code](packages/ove-app-qrcode/README.md) - displays a QR code using the OVE framework.
 * [Replicator](packages/ove-app-replicator/README.md) - replicating content of an OVE installation.
 * [SVG](packages/ove-app-svg/README.md) - supports rendering SVG using the OVE framework.
 * [Videos](packages/ove-app-videos/README.md) - supports playing videos using the OVE framework.

@@ -155,6 +155,18 @@
           "OVE_HOST": "localhost:8080",
           "OPENVIDU_HOST": "localhost:4443"
       }
+    },
+    {
+      "name": "@ove/ove-app-qrcode",
+      "cwd": "./packages/ove-app-qrcode",
+      "kill_timeout": 3000,
+      "restart_delay": 3000,
+      "script": "dist/index.js",
+      "env": {
+        "PORT": "8095",
+        "OVE_HOST": "localhost:8080"
+      }
     }
+
   ]
 }
