@@ -11,7 +11,7 @@ RUN npm run install:prod
 RUN npm uninstall -global lerna
 RUN apk del git
 
-EXPOSE 8081-8094
+EXPOSE 8081-8095
 
 CMD [ "pm2-runtime", "pm2.json" ]
 
