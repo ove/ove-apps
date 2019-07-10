@@ -292,11 +292,22 @@ refreshSigma = function (sigma) {
 
 loadSigma = function () {
     let context = window.ove.context;
+    let overlap = (window.ove.state.current.neo4j.overlap || 1) / 100;
     if (!context.isInitialized) {
         if (OVE.Utils.getViewId() &&
             (!window.ove.state.current.neo4j || window.ove.state.current.neo4j.disableTiling)) {
             // Resize the viewers to span the entire section for non Neo4J-based graphs.
             OVE.Utils.resizeViewer(Constants.CONTENT_DIV);
+        } else {
+            const g = window.ove.geometry;
+            const css = {
+                transform: 'translate(-' + (g.w * overlap) + 'px,-' + (g.h * overlap) + 'px)',
+                width: g.w * (1 + overlap * 2) + 'px',
+                height: g.h * (1 + overlap * 2) + 'px'
+            };
+            log.debug('Resizing viewer with height:', css.height, ', width:', css.width);
+            log.debug('Performing CSS transform on viewer', css.transform);
+            $(Constants.CONTENT_DIV).css(css);
         }
         // We render on WebGL by default, but this can be overridden for a specific visualization.
         const renderer = window.ove.state.current.renderer || 'webgl';
@@ -405,7 +416,7 @@ loadSigma = function () {
             let coords;
             if (OVE.Utils.getViewId()) {
                 // Viewer
-                coords = [[g.x, g.y], [g.x, g.y + g.h], [g.x + g.w, g.y], [g.x + g.w, g.y + g.h]];
+                coords = [[g.x - g.w * overlap, g.y - g.h * overlap], [g.x - g.w * overlap, g.y + g.h * (1 + overlap)], [g.x + g.w * (1 + overlap), g.y - g.h * overlap], [g.x + g.w * (1 + overlap), g.y + g.h * (1 + overlap)]];
             } else {
                 // Controller
                 coords = [[0, 0], [0, g.section.h], [g.section.w, 0], [g.section.w, g.section.h]];
@@ -425,15 +436,15 @@ loadSigma = function () {
         let query = config.query;
         if (transformX) {
             let range = {
-                min: g.x !== undefined ? (g.x / g.section.w * (config.x.max - config.x.min) + config.x.min) : config.x.min,
-                max: g.x !== undefined ? ((g.x + g.w) / g.section.w * (config.x.max - config.x.min) + config.x.min) : config.x.max
+                min: g.x !== undefined ? ((g.x - g.w * overlap) / g.section.w * (config.x.max - config.x.min) + config.x.min) : config.x.min,
+                max: g.x !== undefined ? ((g.x + g.w * (1 + overlap)) / g.section.w * (config.x.max - config.x.min) + config.x.min) : config.x.max
             };
             query = query.replace(/X_MIN/g, range.min).replace(/X_MAX/g, range.max);
         }
         if (transformY) {
             let range = {
-                min: g.y !== undefined ? (g.y / g.section.h * (config.y.max - config.y.min) + config.y.min) : config.y.min,
-                max: g.y !== undefined ? ((g.y + g.h) / g.section.h * (config.y.max - config.y.min) + config.y.min) : config.y.max
+                min: g.y !== undefined ? ((g.y - g.h * overlap) / g.section.h * (config.y.max - config.y.min) + config.y.min) : config.y.min,
+                max: g.y !== undefined ? ((g.y + g.h * (1 + overlap)) / g.section.h * (config.y.max - config.y.min) + config.y.min) : config.y.max
             };
             query = query.replace(/Y_MIN/g, range.min).replace(/Y_MAX/g, range.max);
         }
