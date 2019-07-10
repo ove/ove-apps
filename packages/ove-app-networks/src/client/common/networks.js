@@ -292,13 +292,16 @@ refreshSigma = function (sigma) {
 
 loadSigma = function () {
     let context = window.ove.context;
-    let overlap = (window.ove.state.current.neo4j.overlap || 1) / 100;
+    const overlap = (window.ove.state.current.neo4j.overlap || 1) / 100;
     if (!context.isInitialized) {
         if (OVE.Utils.getViewId() &&
             (!window.ove.state.current.neo4j || window.ove.state.current.neo4j.disableTiling)) {
             // Resize the viewers to span the entire section for non Neo4J-based graphs.
             OVE.Utils.resizeViewer(Constants.CONTENT_DIV);
         } else {
+            // Resize the viewers to span a client along with additional overlap defined as
+            // a percentage for Neo4J-based graphs. This ensures nodes that lie across multiple
+            // clients do not get clipped.
             const g = window.ove.geometry;
             const css = {
                 transform: 'translate(-' + (g.w * overlap) + 'px,-' + (g.h * overlap) + 'px)',
