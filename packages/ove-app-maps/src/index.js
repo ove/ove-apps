@@ -3,29 +3,37 @@ const path = require('path');
 const base = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const { express, app, Utils, log, nodeModules, config } = base;
 const request = require('request');
+const fs = require('fs');
 const server = require('http').createServer(app);
 
 let layers = [];
 // The map layers can be provided as an embedded JSON data structure or as a URL pointing
 // to a location at which it is stored externally.
+const loadMapLayers = function ($path) {
+    try {
+        if (new URL($path)) {
+            request($path, { json: true }, function (err, _res, body) {
+                if (err) {
+                    log.error('Failed to load map layers:', err);
+                } else {
+                    layers = body;
+                }
+            });
+            return;
+        }
+    } catch (_ignore) {}
+    if (fs.existsSync($path)) {
+        layers = JSON.parse(fs.readFileSync($path));
+    } else {
+        log.error('Failed to load map layers from path:', $path);
+    }
+};
 if (process.env.OVE_MAPS_LAYERS) {
     log.info('Loading map layers from environment variable:', process.env.OVE_MAPS_LAYERS);
-    request(process.env.OVE_MAPS_LAYERS, { json: true }, function (err, _res, body) {
-        if (err) {
-            log.error('Failed to load map layers:', err);
-        } else {
-            layers = body;
-        }
-    });
+    loadMapLayers(process.env.OVE_MAPS_LAYERS);
 } else if (typeof config.layers === 'string') {
     log.info('Loading map layers from URL:', config.layers);
-    request(config.layers, { json: true }, function (err, _res, body) {
-        if (err) {
-            log.error('Failed to load map layers:', err);
-        } else {
-            layers = body;
-        }
-    });
+    loadMapLayers(config.layers);
 } else {
     log.info('Loading map layers from configuration');
     layers = config.layers;

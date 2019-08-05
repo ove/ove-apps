@@ -1,6 +1,6 @@
 # MapLayers.json File
 
-The maps app can be configured by embedding the map layers configuration within the `config.json` file, or by providing a URL that points to a `MapLayers.json` file. The format of the JSON configuration remains the same in either of these two approaches.
+The maps app can be configured by embedding the map layers configuration within the `config.json` file, or by providing a URL (or path) that points to a `MapLayers.json` file. The format of the JSON configuration remains the same in either of these two approaches.
 
 The `MapLayers.json` file contains an array of map layers. There are two different configuration formats for [OpenLayers](https://openlayers.org/) and [Leaflet](https://leafletjs.com/). These as described below. The mapping library is selected according to the configuration format of the first layer and assumes all other layers follow the same format. If no layers were defined, [OpenLayers](https://openlayers.org/) will be selected as the mapping library.
 
