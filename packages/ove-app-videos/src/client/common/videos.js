@@ -146,8 +146,13 @@ handleStateChange = function (state) {
                 '(?:www.youtube.com\\/embed\\/)(?:[a-z0-9_-]{0,11})$', 'i');
 
             if (!stateURL.hostname.includes('youtube')) {
-                log.info('Starting HTML5 video player');
-                context.player = new window.OVEHTML5VideoPlayer();
+                if (stateURL.pathname.endsWith('.otv')) {
+                    log.info('Starting Tiled video player');
+                    context.player = new window.OVETiledVideoPlayer();
+                } else {
+                    log.info('Starting HTML5 video player');
+                    context.player = new window.OVEHTML5VideoPlayer();
+                }
             } else if (YOUTUBE_URL_REGEX.test(state.url)) {
                 log.info('Starting YouTube video player');
                 context.player = new window.OVEYouTubePlayer();

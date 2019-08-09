@@ -133,7 +133,7 @@ replicate = function (sections, config) {
         offset.y = (maxHeight - maxWidth * bounds.h / bounds.w) / 2;
     } else {
         scale = maxHeight / bounds.h;
-        offset.y = (maxWidth - maxHeight * bounds.w / bounds.h) / 2;
+        offset.x = (maxWidth - maxHeight * bounds.w / bounds.h) / 2;
     }
     $('<div>', {
         class: Constants.SPACE_DIV.substring(1)

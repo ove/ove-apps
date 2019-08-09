@@ -2,7 +2,7 @@
 
 [![click to play the video of the videos app](https://media.githubusercontent.com/media/ove/ove-docs/master/resources/358A4464.JPG)](https://media.githubusercontent.com/media/ove/ove-docs/master/resources/358A4462.MOV "click to play the video of the videos app")
 
-This app supports playing videos using the OVE framework. It provides a generic player for any video (`HTML5`), and a player based on the [YouTube IFrame Player API](https://developers.google.com/youtube/iframe_api_reference) (`YouTube`).
+This app supports playing videos using the OVE framework. It provides a generic player for any video (`HTML5`), a player for tiled videos in an [`.OTV` format](../ove-app-videos/docs/ORV_FILE_FORMAT.md), and a player based on the [YouTube IFrame Player API](https://developers.google.com/youtube/iframe_api_reference) (`YouTube`).
 
 Seen above is a video of the videos app playing the [2030.wikimedia.org YouTube video in 4K resolution](https://www.youtube.com/watch?v=5CKFKyc7We4) published by the [Wikimedia Foundation](https://www.youtube.com/channel/UCgIIsBhcseFH1Kghmo0ULbA) recorded in HD resolution at the [Imperial College](http://www.imperial.ac.uk) [Data Science Institute's](http://www.imperial.ac.uk/data-science/) [Data Observatory](http://www.imperial.ac.uk/data-science/data-observatory/).
 
@@ -16,7 +16,7 @@ The state of this app has a format similar to:
 }
 ```
 
-The player is selected automatically based on the URL: Any YouTube URL uses the YouTube player and all other URLs use the HTML5 player. By default, all videos will play muted. An optional property, `unmuted` can be set to `true` to play videos unmuted.
+The player is selected automatically based on the URL: Any YouTube URL uses the YouTube player, any URL for a file with an `.otv` extension uses the tiled video player, and all other URLs use the HTML5 player. By default, all videos will play muted. An optional property, `unmuted` can be set to `true` to play videos unmuted.
 
 ## Launching the App
 
