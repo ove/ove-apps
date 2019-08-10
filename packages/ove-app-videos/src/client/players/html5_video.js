@@ -68,4 +68,8 @@ function OVEHTML5VideoPlayer () {
     this.getLoadedDuration = function () {
         return getPlayer().duration * this.getLoadedPercentage() / 100;
     };
+
+    this.getCurrentTime = function () {
+        return Math.round(getPlayer().currentTime * 1000);
+    };
 }

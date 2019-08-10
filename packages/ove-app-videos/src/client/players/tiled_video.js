@@ -142,4 +142,12 @@ function OVETiledVideoPlayer () {
         });
         return duration;
     };
+
+    this.getCurrentTime = function () {
+        let position = 0;
+        $('.video').each(function (_i, video) {
+            position = Math.min(position, Math.round(video.currentTime * 1000));
+        });
+        return position;
+    };
 }

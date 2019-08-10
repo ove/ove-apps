@@ -10,6 +10,7 @@ $(function () {
         log.debug('Completed loading OVE');
         window.ove.context.isInitialized = false;
         window.ove.context.bufferStatus = { clients: [] };
+        window.ove.context.sync = { clients: {} };
         beginInitialization();
     });
 });
@@ -17,6 +18,49 @@ $(function () {
 // Initialization that is common to viewers and controllers.
 initCommon = function () {
     const context = window.ove.context;
+
+    const correctPosition = function () {
+        try {
+            // We are doing nothing if the player is not initialized or if
+            // no video is loaded as yet.
+            if (context.player && context.player.isVideoLoaded()) {
+                // The position of this player
+                const my = {
+                    position: context.player.getCurrentTime(),
+                    time: new Date().getTime()
+                };
+                let timePenalty = 0;
+                Object.values(context.sync.clients).forEach(function (peer) {
+                    // We assume that the peer has been playing continuously since the
+                    // last position broadcast. If so, they should currently be at
+                    // peer.position - peer.time + my.time. The time penalty would be
+                    // the greatest amount of time that this player is ahead of a peer.
+                    if (peer.time) {
+                        timePenalty = Math.max(timePenalty,
+                            my.position - peer.position + peer.time - my.time);
+                    }
+                });
+                if (timePenalty > 1000 / Constants.POSITION_SYNC_ACCURACY) {
+                    let t1 = new Date().getTime();
+                    setTimeout(function () {
+                        // There is an overhead in terms of setting a timeout. This must be
+                        // accounted for when penalising the video for playing faster than its
+                        // peers.
+                        timePenalty -= new Date().getTime() - t1 - Constants.SET_TIMEOUT_TEST_DURATION;
+
+                        // To correct the speeds we pause and play the video
+                        context.player.pause();
+                        setTimeout(function () {
+                            context.player.play();
+                            log.debug('Fixed playback by delaying video by:', timePenalty);
+                        }, timePenalty);
+                    }, Constants.SET_TIMEOUT_TEST_DURATION);
+                }
+            }
+        } catch (e) { } // Random player errors
+    };
+    setInterval(correctPosition, Constants.POSITION_CORRECTION_FREQUENCY);
+
     window.ove.socket.on(function (message) {
         // We can receive a stat update before the application has been initialized.
         // this happens for controller-initiated flows.
@@ -27,6 +71,12 @@ initCommon = function () {
         } else if (message.bufferStatus && context.isInitialized) {
             log.debug('Got buffer status change request: ', message.bufferStatus);
             handleBufferStatusChange(message.bufferStatus);
+            return;
+        } else if (message.sync && context.isInitialized) {
+            // A sync request will tell this player the position at which the other
+            // videos are at a specific point in time.
+            log.debug('Got position sync request: ', message.sync);
+            handlePositionSync(message.sync);
             return;
         }
 
@@ -172,6 +222,15 @@ handleStateChange = function (state) {
     }
 };
 
+handlePositionSync = function (message) {
+    const context = window.ove.context;
+    if (context.sync.clients[message.clientId] !== undefined) {
+        context.sync.clients[message.clientId] = {
+            position: message.position, time: message.time
+        };
+    }
+};
+
 handleBufferStatusChange = function (status) {
     // The handling of the buffer status updates operates in a model as noted below:
     //   1. One or more peers in a group receives a new video URL
@@ -195,6 +254,7 @@ handleBufferStatusChange = function (status) {
 
         // This code is executed when a response to a registration request has been received.
         context.bufferStatus.clients.push(status.clientId);
+        context.sync.clients[status.clientId] = { position: 0 };
     } else if (status.type.update && context.bufferStatus.clients.includes(status.clientId)) {
         // This code is executed when a registered peer sends a buffer status update.
         log.debug('Got buffer status update from client:', status.clientId,

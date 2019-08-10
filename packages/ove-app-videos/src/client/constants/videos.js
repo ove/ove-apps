@@ -3,6 +3,7 @@ const Constants = {
                                 Viewer
     **************************************************************/
     BUFFER_STATUS_BROADCAST_FREQUENCY: 700, // Unit: milliseconds
+    POSITION_BROADCAST_FREQUENCY: 350, // Unit: milliseconds
     RESCALE_DURING_REFRESH_TIMEOUT: 1000, // Unit: milliseconds
 
     /**************************************************************
@@ -34,6 +35,9 @@ const Constants = {
     **************************************************************/
     MIN_BUFFERED_PERCENTAGE: 15,
     MIN_BUFFERED_DURATION: 15, // Unit: seconds
+    POSITION_CORRECTION_FREQUENCY: 50, // Unit: milliseconds
+    SET_TIMEOUT_TEST_DURATION: 10, // Unit: milliseconds
+    POSITION_SYNC_ACCURACY: 120, // Unit: FPS
     CONTENT_DIV: '#video_player',
     WRAPPER_DIV: '.outer',
     WAITING_MSG: '.waiting',

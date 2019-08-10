@@ -53,6 +53,7 @@
                 "doRegistration": true,
                 "displayWaitingMessage": true,
                 "handleBufferStatusChange": true,
+                "handlePositionSync": true,
                 "initCommon": true,
                 "beginInitialization": true,
                 "loadURL": true,

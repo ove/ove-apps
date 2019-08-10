@@ -30,7 +30,42 @@ initView = function () {
             }
         } catch (e) { } // Random player errors
     };
+    const broadcastPosition = function () {
+        try {
+            const context = window.ove.context;
+            // We are doing nothing if the player is not initialized or if
+            // no video is loaded as yet.
+            if (context.player && context.player.isVideoLoaded()) {
+                // The position update includes a UUID that is unique to this peer
+                // along with the current position of the video. Updates are broadcasted
+                // as per POSITION_BROADCAST_FREQUENCY.
+                const position = {
+                    clientId: context.uuid,
+                    position: context.player.getCurrentTime(),
+                    time: new Date().getTime()
+                };
+                // If the position does not change compared to the last update there
+                // is no point in broadcasting it - simply ignore and proceed. Stuck
+                // videos will not cause other videos to stop until they start playing
+                // once again. This helps deal with frozen screens and also situations
+                // where the playback has been paused.
+                if (!context.sync.self || (position.position !== context.sync.self.position &&
+                    (position.position - context.sync.self.position - position.time +
+                        context.sync.self.time >= 500 / Constants.POSITION_SYNC_ACCURACY))) {
+                    log.debug('Broadcasting and updating position:', position);
+
+                    // The status sync is handled locally as well.
+                    handlePositionSync(position);
+                    window.ove.socket.send({ sync: position });
+                    context.sync.self = position;
+                } else if (position.position !== context.sync.self.position) {
+                    context.sync.self = position;
+                }
+            }
+        } catch (e) { } // Random player errors
+    };
     setInterval(broadcastBufferStatus, Constants.BUFFER_STATUS_BROADCAST_FREQUENCY);
+    setInterval(broadcastPosition, Constants.POSITION_BROADCAST_FREQUENCY);
 };
 
 refresh = function () {

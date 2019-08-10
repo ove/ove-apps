@@ -115,6 +115,10 @@ function OVEYouTubePlayer () {
         return __private.player.getDuration() * this.getLoadedPercentage() / 100;
     };
 
+    this.getCurrentTime = function () {
+        return Math.round(__private.player.getCurrentTime() * 1000);
+    };
+
     // This is a callback provided by YouTube to instantiate their Player.
     window.onYouTubeIframeAPIReady = function () {
         log.debug('YouTube iFrame API ready');
