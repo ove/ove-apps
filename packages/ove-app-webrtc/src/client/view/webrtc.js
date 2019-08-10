@@ -32,10 +32,13 @@ loadVideo = function () {
 
             // A refresh operation takes place when a player is loaded or when a video is
             // ready to be played. This ensures that proper CSS settings are applied.
-            $(Constants.CONTENT_DIV).css('transform', 'scale(' + (window.ove.context.scale + 0.001) + ')');
-            setTimeout(function () {
-                $(Constants.CONTENT_DIV).css('transform', 'scale(' + window.ove.context.scale + ')');
-            }, Constants.RESCALE_DURING_REFRESH_TIMEOUT);
+            let context = window.ove.context;
+            if (context.scale !== 1) {
+                $(Constants.CONTENT_DIV).css('transform', 'scale(' + (context.scale + 0.001) + ')');
+                setTimeout(function () {
+                    $(Constants.CONTENT_DIV).css('transform', 'scale(' + context.scale + ')');
+                }, Constants.RESCALE_DURING_REFRESH_TIMEOUT);
+            }
         }
     };
     const selectedVideo = $('#' + window.ove.context.videos[window.ove.state.current.connection])[0];
@@ -67,13 +70,23 @@ beginInitialization = function () {
         let width = (g.section.w / context.scale) + 'px';
         let height = (g.section.h / context.scale) + 'px';
         log.debug('Scaling viewer:', context.scale, ', height:', height, ', width:', width);
-        $(Constants.CONTENT_DIV).css({
-            zoom: 1,
-            transformOrigin: 100 * g.x / (g.section.w - g.section.w / context.scale) + '% ' +
-                             100 * g.y / (g.section.h - g.section.h / context.scale) + '%',
-            transform: 'scale(' + context.scale + ')',
-            width: width,
-            height: height
-        });
+        if (context.scale === 1) {
+            $(Constants.CONTENT_DIV).css({
+                zoom: 1,
+                transformOrigin: '0% 0%',
+                transform: 'translate(-' + g.x + 'px,-' + g.y + 'px)',
+                width: width,
+                height: height
+            });
+        } else {
+            $(Constants.CONTENT_DIV).css({
+                zoom: 1,
+                transformOrigin: 100 * g.x / (g.section.w - g.section.w / context.scale) + '% ' +
+                                100 * g.y / (g.section.h - g.section.h / context.scale) + '%',
+                transform: 'scale(' + context.scale + ')',
+                width: width,
+                height: height
+            });
+        }
     });
 };

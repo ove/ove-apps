@@ -51,15 +51,23 @@ initCommon = function () {
                         // To correct the speeds we pause and play the video
                         context.player.pause();
                         setTimeout(function () {
-                            context.player.play();
+                            if (!context.sync.notPlaying) {
+                                context.player.play();
+                            }
                             log.debug('Fixed playback by delaying video by:', timePenalty);
+                            setTimeout(correctPosition, Constants.POSITION_CORRECTION_FREQUENCY);
                         }, timePenalty);
                     }, Constants.SET_TIMEOUT_TEST_DURATION);
+                } else {
+                    setTimeout(correctPosition, Constants.POSITION_CORRECTION_FREQUENCY);
                 }
+            } else {
+                setTimeout(correctPosition, Constants.POSITION_CORRECTION_FREQUENCY);
             }
         } catch (e) { } // Random player errors
     };
-    setInterval(correctPosition, Constants.POSITION_CORRECTION_FREQUENCY);
+    // Do not run this at a fixed interval to avoid call-stacking
+    setTimeout(correctPosition, Constants.POSITION_CORRECTION_FREQUENCY);
 
     window.ove.socket.on(function (message) {
         // We can receive a stat update before the application has been initialized.
@@ -89,16 +97,19 @@ initCommon = function () {
                     case Constants.Operation.PLAY:
                         log.info('Starting video playback ' + (op.loop ? 'with' : 'without') + ' loop');
                         context.player.play(op.loop);
+                        context.sync.notPlaying = false;
                         $(Constants.Button.PLAY).addClass(Constants.State.ACTIVE);
                         $(Constants.Button.STOP).addClass(Constants.State.ACTIVE);
                         break;
                     case Constants.Operation.PAUSE:
                         log.info('Pausing video playback');
+                        context.sync.notPlaying = true;
                         context.player.pause();
                         $(Constants.Button.PLAY).removeClass(Constants.State.ACTIVE);
                         break;
                     case Constants.Operation.STOP:
                         log.info('Stopping video playback');
+                        context.sync.notPlaying = true;
                         context.player.stop();
                         $(Constants.Button.PLAY).removeClass(Constants.State.ACTIVE);
                         $(Constants.Button.STOP).removeClass(Constants.State.ACTIVE);

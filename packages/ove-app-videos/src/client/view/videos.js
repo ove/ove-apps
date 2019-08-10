@@ -29,6 +29,7 @@ initView = function () {
                 }
             }
         } catch (e) { } // Random player errors
+        setTimeout(broadcastBufferStatus, Constants.BUFFER_STATUS_BROADCAST_FREQUENCY);
     };
     const broadcastPosition = function () {
         try {
@@ -50,8 +51,8 @@ initView = function () {
                 // once again. This helps deal with frozen screens and also situations
                 // where the playback has been paused.
                 if (!context.sync.self || (position.position !== context.sync.self.position &&
-                    (position.position - context.sync.self.position - position.time +
-                        context.sync.self.time >= 500 / Constants.POSITION_SYNC_ACCURACY))) {
+                    (position.time - context.sync.self.time - position.position +
+                        context.sync.self.position >= 500 / Constants.POSITION_SYNC_ACCURACY))) {
                     log.debug('Broadcasting and updating position:', position);
 
                     // The status sync is handled locally as well.
@@ -63,9 +64,10 @@ initView = function () {
                 }
             }
         } catch (e) { } // Random player errors
+        setTimeout(broadcastPosition, Constants.POSITION_BROADCAST_FREQUENCY);
     };
-    setInterval(broadcastBufferStatus, Constants.BUFFER_STATUS_BROADCAST_FREQUENCY);
-    setInterval(broadcastPosition, Constants.POSITION_BROADCAST_FREQUENCY);
+    setTimeout(broadcastBufferStatus, Constants.BUFFER_STATUS_BROADCAST_FREQUENCY);
+    setTimeout(broadcastPosition, Constants.POSITION_BROADCAST_FREQUENCY);
 };
 
 refresh = function () {
@@ -73,10 +75,13 @@ refresh = function () {
 
     // A refresh operation takes place when a player is loaded or when a video is
     // ready to be played. This ensures that proper CSS settings are applied.
-    $(Constants.CONTENT_DIV).css('transform', 'scale(' + (window.ove.context.scale + 0.001) + ')');
-    setTimeout(function () {
-        $(Constants.CONTENT_DIV).css('transform', 'scale(' + window.ove.context.scale + ')');
-    }, Constants.RESCALE_DURING_REFRESH_TIMEOUT);
+    let context = window.ove.context;
+    if (context.scale !== 1) {
+        $(Constants.CONTENT_DIV).css('transform', 'scale(' + (context.scale + 0.001) + ')');
+        setTimeout(function () {
+            $(Constants.CONTENT_DIV).css('transform', 'scale(' + context.scale + ')');
+        }, Constants.RESCALE_DURING_REFRESH_TIMEOUT);
+    }
 };
 
 requestRegistration = function () {
@@ -114,13 +119,23 @@ beginInitialization = function () {
         let width = (g.section.w / context.scale) + 'px';
         let height = (g.section.h / context.scale) + 'px';
         log.debug('Scaling viewer:', context.scale, ', height:', height, ', width:', width);
-        $(Constants.CONTENT_DIV).css({
-            zoom: 1,
-            transformOrigin: 100 * g.x / (g.section.w - g.section.w / context.scale) + '% ' +
-                             100 * g.y / (g.section.h - g.section.h / context.scale) + '%',
-            transform: 'scale(' + context.scale + ')',
-            width: width,
-            height: height
-        });
+        if (context.scale === 1) {
+            $(Constants.CONTENT_DIV).css({
+                zoom: 1,
+                transformOrigin: '0% 0%',
+                transform: 'translate(-' + g.x + 'px,-' + g.y + 'px)',
+                width: width,
+                height: height
+            });
+        } else {
+            $(Constants.CONTENT_DIV).css({
+                zoom: 1,
+                transformOrigin: 100 * g.x / (g.section.w - g.section.w / context.scale) + '% ' +
+                                100 * g.y / (g.section.h - g.section.h / context.scale) + '%',
+                transform: 'scale(' + context.scale + ')',
+                width: width,
+                height: height
+            });
+        }
     });
 };
