@@ -116,7 +116,7 @@ function OVEYouTubePlayer () {
     };
 
     this.getCurrentTime = function () {
-        return Math.round(__private.player.getCurrentTime() * 1000);
+        return __private.player.getCurrentTime();
     };
 
     // This is a callback provided by YouTube to instantiate their Player.

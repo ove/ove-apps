@@ -10,7 +10,7 @@ $(function () {
         log.debug('Completed loading OVE');
         window.ove.context.isInitialized = false;
         window.ove.context.bufferStatus = { clients: [] };
-        window.ove.context.sync = { clients: {} };
+        window.ove.context.sync = { clients: {}, timePenalty: 0, notPlaying: true };
         beginInitialization();
     });
 });
@@ -26,7 +26,7 @@ initCommon = function () {
             if (context.player && context.player.isVideoLoaded()) {
                 // The position of this player
                 const my = {
-                    position: context.player.getCurrentTime(),
+                    position: Math.round(context.player.getCurrentTime() * 1000),
                     time: new Date().getTime()
                 };
                 let timePenalty = 0;
@@ -41,23 +41,28 @@ initCommon = function () {
                     }
                 });
                 if (timePenalty > 1000 / Constants.POSITION_SYNC_ACCURACY) {
-                    let t1 = new Date().getTime();
-                    setTimeout(function () {
-                        // There is an overhead in terms of setting a timeout. This must be
-                        // accounted for when penalising the video for playing faster than its
-                        // peers.
-                        timePenalty -= new Date().getTime() - t1 - Constants.SET_TIMEOUT_TEST_DURATION;
-
-                        // To correct the speeds we pause and play the video
-                        context.player.pause();
+                    if (context.sync.isLocallySyncing) {
+                        context.sync.timePenalty += timePenalty;
+                        setTimeout(correctPosition, Constants.POSITION_CORRECTION_FREQUENCY);
+                    } else {
+                        let t1 = new Date().getTime();
                         setTimeout(function () {
-                            if (!context.sync.notPlaying) {
-                                context.player.play();
-                            }
-                            log.debug('Fixed playback by delaying video by:', timePenalty);
-                            setTimeout(correctPosition, Constants.POSITION_CORRECTION_FREQUENCY);
-                        }, timePenalty);
-                    }, Constants.SET_TIMEOUT_TEST_DURATION);
+                            // There is an overhead in terms of setting a timeout. This
+                            // must be accounted for when penalising the video for
+                            // playing faster than its peers.
+                            timePenalty -= new Date().getTime() - t1 - Constants.SET_TIMEOUT_TEST_DURATION;
+
+                            // To correct the speeds we pause and play the video
+                            context.player.pause();
+                            setTimeout(function () {
+                                if (!context.sync.notPlaying) {
+                                    context.player.play();
+                                }
+                                log.debug('Fixed playback by delaying video by:', timePenalty);
+                                setTimeout(correctPosition, Constants.POSITION_CORRECTION_FREQUENCY);
+                            }, timePenalty);
+                        }, Constants.SET_TIMEOUT_TEST_DURATION);
+                    }
                 } else {
                     setTimeout(correctPosition, Constants.POSITION_CORRECTION_FREQUENCY);
                 }
@@ -209,6 +214,7 @@ handleStateChange = function (state) {
             if (!stateURL.hostname.includes('youtube')) {
                 if (stateURL.pathname.endsWith('.otv')) {
                     log.info('Starting Tiled video player');
+                    context.sync.isLocallySyncing = true;
                     context.player = new window.OVETiledVideoPlayer();
                 } else {
                     log.info('Starting HTML5 video player');

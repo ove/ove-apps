@@ -42,7 +42,7 @@ initView = function () {
                 // as per POSITION_BROADCAST_FREQUENCY.
                 const position = {
                     clientId: context.uuid,
-                    position: context.player.getCurrentTime(),
+                    position: Math.round(context.player.getCurrentTime() * 1000),
                     time: new Date().getTime()
                 };
                 // If the position does not change compared to the last update there

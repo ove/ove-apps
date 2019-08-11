@@ -70,6 +70,6 @@ function OVEHTML5VideoPlayer () {
     };
 
     this.getCurrentTime = function () {
-        return Math.round(getPlayer().currentTime * 1000);
+        return getPlayer().currentTime;
     };
 }
