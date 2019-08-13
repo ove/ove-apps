@@ -37,7 +37,7 @@ const handleOperation = function (req, res) {
             } else {
                 log.info('Refreshing all sections');
             }
-            message.changeAt = new Date().getTime() + Constants.OPERATION_SYNC_DELAY;
+            message.changeAt = window.ove.clock.getTime() + Constants.OPERATION_SYNC_DELAY;
             break;
     }
 

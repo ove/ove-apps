@@ -98,7 +98,7 @@ const handleOperation = function (req, res) {
     }
 
     // Play, Mute and SeekTo commands receive additional query parameters.
-    let message = { operation: { name: name, executionTime: (new Date().getTime() + Constants.OPERATION_SYNC_DELAY) } };
+    let message = { operation: { name: name, executionTime: (window.ove.clock.getTime() + Constants.OPERATION_SYNC_DELAY) } };
     if (name === Constants.Operation.SEEK) {
         // We assume that the seek time is properly set instead of enforcing any strict type checks.
         message.operation.time = req.query.time;

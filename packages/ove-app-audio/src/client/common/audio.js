@@ -80,7 +80,7 @@ initCommon = function () {
                         log.warn('Ignoring unknown operation:', op.name);
                 }
                 // Run operation precisely at the same time
-            }, op.executionTime - new Date().getTime());
+            }, op.executionTime - window.ove.clock.getTime());
         }
     });
 };

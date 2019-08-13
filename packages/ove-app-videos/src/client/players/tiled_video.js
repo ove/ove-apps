@@ -30,12 +30,12 @@ function OVETiledVideoPlayer () {
                     });
                     timePenalty += overallTimePenalty;
                     if (timePenalty > 1000 / Constants.POSITION_SYNC_ACCURACY) {
-                        let t1 = new Date().getTime();
+                        let t1 = window.ove.clock.getTime();
                         setTimeout(function () {
                             // There is an overhead in terms of setting a timeout. This must be
                             // accounted for when penalising the video for playing faster than its
                             // peers.
-                            timePenalty -= new Date().getTime() - t1 - Constants.SET_TIMEOUT_TEST_DURATION;
+                            timePenalty -= window.ove.clock.getTime() - t1 - Constants.SET_TIMEOUT_TEST_DURATION;
 
                             // To correct the speeds we pause and play the video
                             video.pause();

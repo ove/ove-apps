@@ -19,12 +19,12 @@ $(function () {
             switch (op.type) {
                 case window.Distributed.IMMEDIATE:
                 case window.Distributed.TIMEOUT:
-                    setTimeout(context.eventHandlers[op.name], op.runAt - new Date().getTime());
+                    setTimeout(context.eventHandlers[op.name], op.runAt - window.ove.clock.getTime());
                     break;
                 case window.Distributed.INTERVAL:
                     setTimeout(function () {
                         setInterval(context.eventHandlers[op.name], op.timeout);
-                    }, op.runAt - new Date().getTime());
+                    }, op.runAt - window.ove.clock.getTime());
                     break;
                 default:
                     log.warn('Ignoring unknown operation:', op.type);
@@ -36,7 +36,7 @@ $(function () {
         const op = {
             name: callback.name,
             type: arguments.length > 1 ? type : window.Distributed.SCHEDULE,
-            runAt: (arguments.length > 2 && type === window.Distributed.TIMEOUT ? new Date().getTime() + timeout : new Date().getTime()) + Constants.CALL_OVERHEAD,
+            runAt: (arguments.length > 2 && type === window.Distributed.TIMEOUT ? window.ove.clock.getTime() + timeout : window.ove.clock.getTime()) + Constants.CALL_OVERHEAD,
             timeout: arguments.length > 2 ? timeout : 0
         };
         log.debug('Forwarding event:', op);

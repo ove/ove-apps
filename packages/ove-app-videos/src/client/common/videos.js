@@ -27,7 +27,7 @@ initCommon = function () {
                 // The position of this player
                 const my = {
                     position: Math.round(context.player.getCurrentTime() * 1000),
-                    time: new Date().getTime()
+                    time: window.ove.clock.getTime()
                 };
                 let timePenalty = 0;
                 Object.values(context.sync.clients).forEach(function (peer) {
@@ -45,12 +45,12 @@ initCommon = function () {
                         context.sync.timePenalty += timePenalty;
                         setTimeout(correctPosition, Constants.POSITION_CORRECTION_FREQUENCY);
                     } else {
-                        let t1 = new Date().getTime();
+                        let t1 = window.ove.clock.getTime();
                         setTimeout(function () {
                             // There is an overhead in terms of setting a timeout. This
                             // must be accounted for when penalising the video for
                             // playing faster than its peers.
-                            timePenalty -= new Date().getTime() - t1 - Constants.SET_TIMEOUT_TEST_DURATION;
+                            timePenalty -= window.ove.clock.getTime() - t1 - Constants.SET_TIMEOUT_TEST_DURATION;
 
                             // To correct the speeds we pause and play the video
                             context.player.pause();
@@ -136,7 +136,7 @@ initCommon = function () {
                         log.warn('Ignoring unknown operation:', op.name);
                 }
             // Run operation precisely at the same time
-            }, op.executionTime - new Date().getTime());
+            }, op.executionTime - window.ove.clock.getTime());
         }
     });
 };

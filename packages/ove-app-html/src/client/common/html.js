@@ -39,7 +39,7 @@ updateURL = function () {
     }
 
     // A timed change helps browsers load content precisely at the same time.
-    const timeUntilChange = (state.changeAt || new Date().getTime()) - new Date().getTime();
+    const timeUntilChange = (state.changeAt || window.ove.clock.getTime()) - window.ove.clock.getTime();
 
     log.info('Loading URL:', state.url, ', launch delay:', launchDelay, ', time until change:', timeUntilChange);
     setTimeout(function () {

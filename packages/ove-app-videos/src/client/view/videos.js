@@ -43,7 +43,7 @@ initView = function () {
                 const position = {
                     clientId: context.uuid,
                     position: Math.round(context.player.getCurrentTime() * 1000),
-                    time: new Date().getTime()
+                    time: window.ove.clock.getTime()
                 };
                 // If the position does not change compared to the last update there
                 // is no point in broadcasting it - simply ignore and proceed. Stuck

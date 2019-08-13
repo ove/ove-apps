@@ -107,7 +107,7 @@ const handleOperation = function (req, res) {
     let message = {
         operation: {
             name: name,
-            executionTime: (new Date().getTime() + Constants.OPERATION_SYNC_DELAY)
+            executionTime: (window.ove.clock.getTime() + Constants.OPERATION_SYNC_DELAY)
         }
     };
     if (name === Constants.Operation.SEEK) {

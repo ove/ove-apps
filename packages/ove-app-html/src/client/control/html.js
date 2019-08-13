@@ -12,7 +12,7 @@ initControl = function (data) {
         window.ove.state.current.launchDelay = launchDelay;
     }
     // The changeAt time helps browsers load content precisely at the same time.
-    window.ove.state.current.changeAt = new Date().getTime() + Constants.OPERATION_SYNC_DELAY;
+    window.ove.state.current.changeAt = window.ove.clock.getTime() + Constants.OPERATION_SYNC_DELAY;
     log.debug('Scheduling change at time:', window.ove.state.current.changeAt);
     log.debug('Broadcasting state');
     OVE.Utils.broadcastState();
