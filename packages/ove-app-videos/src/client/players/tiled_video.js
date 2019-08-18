@@ -146,7 +146,14 @@ function OVETiledVideoPlayer () {
         log.debug('Playing video', 'loop:', loop);
         $('.video').each(function (_i, video) {
             video.loop = loop;
-            video.play();
+            let playPromise = video.play();
+            // Chrome autoplay features have kept changing over time and below is so that
+            // we are aware if anything doesn't work for some reason.
+            if (playPromise !== undefined) {
+                playPromise.catch(function (e) {
+                    log.error('Unexpected error:', e.message);
+                });
+            }
         });
     };
 

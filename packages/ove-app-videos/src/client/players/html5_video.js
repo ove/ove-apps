@@ -29,7 +29,14 @@ function OVEHTML5VideoPlayer () {
     this.play = function (loop) {
         log.debug('Playing video', 'loop:', loop);
         getPlayer().loop = loop;
-        getPlayer().play();
+        // Chrome autoplay features have kept changing over time and below is so that
+        // we are aware if anything doesn't work for some reason.
+        let playPromise = getPlayer().play();
+        if (playPromise !== undefined) {
+            playPromise.catch(function (e) {
+                log.error('Unexpected error:', e.message);
+            });
+        }
     };
 
     this.pause = function () {
