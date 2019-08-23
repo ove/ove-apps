@@ -292,9 +292,7 @@ refreshSigma = function (sigma) {
 
 loadSigma = function () {
     let context = window.ove.context;
-    
-    
-    
+
     const overlap = ((window.ove.state.current.neo4j && window.ove.state.current.neo4j.overlap) || 1) / 100;
     if (!context.isInitialized) {
         if (OVE.Utils.getViewId() &&
