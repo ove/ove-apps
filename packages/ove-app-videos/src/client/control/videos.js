@@ -11,7 +11,22 @@ initControl = function (data) {
         window.ove.state.current.url = url;
     }
     loadURL();
-    loadControls();
+    waitForBufferComplete().then(loadControls);
+};
+
+waitForBufferComplete = function () {
+    return new Promise(function (resolve) {
+        let counter = 0;
+        const x = setInterval(function () {
+            counter++;
+            if ($(Constants.WAITING_MSG).is(':hidden') ||
+                counter === (Constants.SHOW_CONTROLLER_AFTER_DURATION /
+                    Constants.WAIT_FOR_BUFFERING_DURATION) | 0) {
+                clearInterval(x);
+                resolve('buffering complete');
+            }
+        }, Constants.WAIT_FOR_BUFFERING_DURATION);
+    });
 };
 
 refresh = function () { }; // View-only operation

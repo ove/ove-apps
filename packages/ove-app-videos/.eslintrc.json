@@ -18,6 +18,7 @@
             "globals": {
                 "initControl": true,
                 "loadControls": true,
+                "waitForBufferComplete": true,
                 "log": true
             }
         },

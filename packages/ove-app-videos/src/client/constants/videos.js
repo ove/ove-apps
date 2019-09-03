@@ -9,6 +9,8 @@ const Constants = {
     /**************************************************************
                               Controller
     **************************************************************/
+    WAIT_FOR_BUFFERING_DURATION: 1000, // Unit: milliseconds
+    SHOW_CONTROLLER_AFTER_DURATION: 15000, // Unit: milliseconds
     DEFAULT_STATE_NAME: 'DSIIntro',
     CONTROLLER: '.operations',
 
