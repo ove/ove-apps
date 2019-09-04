@@ -138,4 +138,12 @@ beginInitialization = function () {
             });
         }
     });
+    // BACKWARDS-COMPATIBILITY: For <= v0.4.1
+    if (!Constants.Frame.PARENT) {
+        Constants.Frame.PARENT = 'parent';
+    }
+    // Cull occluded sections
+    setTimeout(function () {
+        window.ove.frame.send(Constants.Frame.PARENT, { cull: { sectionId: OVE.Utils.getSectionId() } }, 'core');
+    }, Constants.FRAME_LOAD_DELAY);
 };

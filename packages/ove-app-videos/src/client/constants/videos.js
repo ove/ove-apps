@@ -5,6 +5,7 @@ const Constants = {
     BUFFER_STATUS_BROADCAST_FREQUENCY: 700, // Unit: milliseconds
     POSITION_BROADCAST_FREQUENCY: 350, // Unit: milliseconds
     RESCALE_DURING_REFRESH_TIMEOUT: 1000, // Unit: milliseconds
+    FRAME_LOAD_DELAY: 100, // Unit: milliseconds
 
     /**************************************************************
                               Controller
