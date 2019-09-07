@@ -5,6 +5,24 @@ function OVELeafletMap () {
         initialLayers: []
     };
 
+    // Extension to provide support for TopoJSON proposed in
+    // http://bl.ocks.org/hpfast/2fb8de57c356d8c45ce511189eec5d6a
+    window.L.topoJSON = window.L.GeoJSON.extend({
+        addData: function (data) {
+            if (data.type === 'Topology') {
+                for (let key in data.objects) {
+                    if (data.objects.hasOwnProperty(key)) {
+                        window.L.GeoJSON.prototype.addData.call(this,
+                            window.topojson.feature(data, data.objects[key]));
+                    }
+                }
+                return this;
+            }
+            window.L.GeoJSON.prototype.addData.call(this, data);
+            return this;
+        }
+    });
+
     const fromEPSG3857toWGS84 = function (coords) {
         const point = (coords.x && coords.y) ? coords : new window.L.point(coords[0], coords[1]);
         const latLng = __private.projection.unproject(point);
@@ -41,12 +59,14 @@ function OVELeafletMap () {
         }
     };
 
-    this.loadLayers = function (config) {
+    /* jshint ignore:start */
+    // current version of JSHint does not support async/await
+    this.loadLayers = async function (config) {
         // The most complex operation in the initialization process is building
         // the layers of Leaflet based on the JSON configuration model of the
         // layers. There is special handling for CARTO layers
         __private.layers = [];
-        $.each(config, function (i, e) {
+        $.each(config, async function (i, e) {
             if (e.type === 'L.tileLayer') {
                 __private.layers[i] = e.wms ? new window.L.tileLayer.wms(
                     e.url, e.options) : new window.L.tileLayer(e.url, e.options);
@@ -62,8 +82,19 @@ function OVELeafletMap () {
                 __private.layers[i] = new window.L[e.type.substring('L.'.length)](e.bounds, e.options);
                 log.trace('Loading layer of type:', e.type, ', with bounds:', e.bounds,
                     ', and options:', e.options);
-            } else if (e.type === 'L.geoJSON') {
-                __private.layers[i] = new window.L[e.type.substring('L.'.length)](e.data, e.options);
+            } else if (e.type === 'L.geoJSON' || e.type === 'L.topoJSON') {
+                if (!e.data && e.url) {
+                    __private.layersLoading = true;
+                    __private.layers[i] = {};
+                    const payload = await fetch(e.url);
+                    e.data = await payload.json().then(function (data) {
+                        delete __private.layersLoading;
+                        return data;
+                    });
+                    __private.layers[i].layer = new window.L[e.type.substring('L.'.length)](e.data, e.options);
+                } else {
+                    __private.layers[i] = new window.L[e.type.substring('L.'.length)](e.data, e.options);
+                }
                 log.trace('Loading layer of type:', e.type, ', with data:', e.data,
                     ', and options:', e.options);
             } else if (e.type === 'L.cartoDB' || e.type === 'L.TorqueLayer') {
@@ -75,6 +106,7 @@ function OVELeafletMap () {
         });
         return __private.layers;
     };
+    /* jshint ignore:end */
 
     this.setZoom = function (zoom) {
         __private.map.setZoom(zoom, { animate: false });
@@ -115,6 +147,25 @@ function OVELeafletMap () {
     };
 
     const showLayer = function (layer) {
+        // Some layers such as GeoJSON and TopoJSON vector layers may take time to load
+        // if the data needs to be fetched from a URL.
+        if (!layer.type && __private.layersLoading) {
+            new Promise(function (resolve) {
+                const x = setInterval(function () {
+                    if (!__private.layersLoading) {
+                        clearInterval(x);
+                        resolve('layers loaded');
+                    }
+                }, Constants.LEAFLET_LAYER_LOAD_DELAY);
+            }).then(function () {
+                if (!layer.type && layer.layer) {
+                    layer = layer.layer;
+                }
+                showLayer(layer);
+            });
+            return;
+        }
+
         if (!__private.map) {
             if (!__private.initialLayers.includes(layer)) {
                 __private.initialLayers.push(layer);
@@ -156,6 +207,9 @@ function OVELeafletMap () {
     this.showLayer = showLayer;
 
     this.hideLayer = function (layer) {
+        if (!layer.type && layer.layer) {
+            layer = layer.layer;
+        }
         if (!__private.map) {
             if (__private.initialLayers.includes(layer)) {
                 __private.initialLayers.splice(__private.initialLayers.indexOf(layer), 1);

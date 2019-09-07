@@ -44,6 +44,31 @@ The configuration format for [OpenLayers](https://openlayers.org/) has a structu
             }
         },
         "opacity": 0.7
+    },
+    {
+        "type": "ol.layer.Vector",
+        "visible": false,
+        "wms": true,
+        "source": {
+            "type": "ol.source.Vector",
+            "config": {
+                "format": "ol.format.TopoJSON",
+                "options": {
+                    "layers": ["countries"]
+                },
+                "url": "https://d3js.org/world-110m.v1.json"
+            }
+        },
+        "style": {
+            "fill": {
+                "color": "rgba(255, 255, 255, 0.6)"
+            },
+            "stroke": {
+                "color": "#319FD3",
+                "width": 1
+            }
+        },
+        "opacity": 0.7
     }
 ]
 ```
@@ -52,7 +77,7 @@ The library supports two types of map layers, `ol.layer.Tile` and `ol.layer.Vect
 
 Both types of layer have a `visible` property that describes whether the layer is visible by default and a `wms` property which describes whether the layer is a displaying data from a [`Web Map Service`](https://www.opengeospatial.org/standards/wms). These properties have Boolean values.
 
-The layers also have a common `source` property, but their contents differ. The `source` of a vector layer always must have a `type` equal to `ol.source.Vector`, and the `url` of the `config` property must point to a [GeoJSON](http://geojson.org/) file. The `source` of a tile layer can be any [layer source for tile data supported by OpenLayers](https://geoadmin.github.io/ol3/apidoc/ol.source.html) such as [`ol.source.OSM`](https://geoadmin.github.io/ol3/apidoc/ol.source.OSM.html) or [`ol.source.BingMaps`](https://geoadmin.github.io/ol3/apidoc/ol.source.BingMaps.html). The `config` object is passed as an argument of the constructor for the specified source, and its properties depend on which source is used; more information can be found in the [OpenLayers documentation](http://geoadmin.github.io/ol3/apidoc/ol.source.html).
+The layers also have a common `source` property, but their contents differ. The `source` of a vector layer always must have a `type` equal to `ol.source.Vector`, and the `url` of the `config` property must point to a file in a supported format such as [GeoJSON](http://geojson.org/), [TopoJSON](https://github.com/topojson), [GML](https://www.opengeospatial.org/standards/gml), [KML](https://www.opengeospatial.org/standards/kml), [WKT CRS](https://www.opengeospatial.org/standards/wkt-crs), [OSM](https://wiki.openstreetmap.org/wiki/OSM_XML), [IGC](http://istitutogeograficocentrale.it/en/) or [Esri](https://www.esri.com). The `source` of a tile layer can be any [layer source for tile data supported by OpenLayers](https://geoadmin.github.io/ol3/apidoc/ol.source.html) such as [`ol.source.OSM`](https://geoadmin.github.io/ol3/apidoc/ol.source.OSM.html) or [`ol.source.BingMaps`](https://geoadmin.github.io/ol3/apidoc/ol.source.BingMaps.html). The `config` object is passed as an argument of the constructor for the specified source, and its properties depend on which source is used; more information can be found in the [OpenLayers documentation](http://geoadmin.github.io/ol3/apidoc/ol.source.html).
 
 Unlike tile layers, vector layers have two additional properties, `style` and `opacity` which can be used to customise their appearance. The `opacity` property has a numeric value between 0 and 1, and the `style` property accepts a JSON structure with two properties (`fill` and `stroke`) within it. These correspond to configuration provided when creating [`ol.style.Fill`](http://geoadmin.github.io/ol3/apidoc/ol.style.Fill.html) and [`ol.style.Stroke`](http://geoadmin.github.io/ol3/apidoc/ol.style.Stroke.html) objects, respectively.
 
@@ -149,17 +174,33 @@ The configuration format for [Leaflet](https://leafletjs.com/) has a structure s
                 "opacity": 0.7
             }
         }
+    },
+    {
+        "type": "L.topoJSON",
+        "visible": false,
+        "wms": false,
+        "url": "https://d3js.org/world-110m.v1.json",
+        "options": {
+            "style": {
+                "fill": true,
+                "fillColor": "#FFFFFF",
+                "fillOpacity": 0.6,
+                "color": "#319FD3",
+                "weight": 1,
+                "opacity": 0.7
+            }
+        }
     }
 ]
 ```
 
-The library supports raster and vector map layers as well as geoJSON layers. Unlike [OpenLayers](https://openlayers.org/), they are not grouped into two significant layers. A complete catalogue of all [Leaflet](https://leafletjs.com/) map layers are available in their [documentation](https://leafletjs.com/reference.html#layer).
+The library supports raster and vector map layers as well as [GeoJSON](http://geojson.org/) and [TopoJSON](https://github.com/topojson) layers. Unlike [OpenLayers](https://openlayers.org/), they are not grouped into two significant layers and all other vector formats must first be converted into [GeoJSON](http://geojson.org/) using a suitable converter. A complete catalogue of all [Leaflet](https://leafletjs.com/) map layers are available in their [documentation](https://leafletjs.com/reference.html#layer).
 
 Both types of layer have a `visible` property that describes whether the layer is visible by default and a `wms` property which describes whether the layer is a displaying data from a [`Web Map Service`](https://www.opengeospatial.org/standards/wms). These properties have Boolean values.
 
 Each layer has its own properties. `L.tileLayer` must have a `url` property. All vector layers must have a `bounds` property. `L.imageOverlay` and `L.videoOverlay` must have a `url` as well as a `bounds` property. All layers accept an optional `options` property as well. All of these combinations are explained in the [Leaflet documentation](https://leafletjs.com/reference.html#layer).
 
-Unlike in [OpenLayers](https://openlayers.org/), [Leaflet](https://leafletjs.com/) expects [GeoJSON](http://geojson.org/) to be embedded and defined using a `data` property. Like other layers it also accepts an optional `options` property. The `style` property is defined within this `options` property as seen above. `opacity` is a part of the `style` property.
+Unlike in [OpenLayers](https://openlayers.org/), [Leaflet](https://leafletjs.com/) expects [GeoJSON](http://geojson.org/) and [TopoJSON](https://github.com/topojson) to be embedded and defined using a `data` property or to be hosted externally and for the corresponding URL to be provided using the `url` property. Like other layers it also accepts an optional `options` property. The `style` property is defined within this `options` property as seen above. `opacity` is a part of the `style` property.
 
 ### Using the [CARTO](https://carto.com) platform with [Leaflet](https://leafletjs.com/)
 

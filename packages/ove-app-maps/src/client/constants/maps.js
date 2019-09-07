@@ -17,6 +17,7 @@ const Constants = {
     OL_ZOOM_ANIMATION_DURATION: 0, // Unit: milliseconds. 0 means no animation.
     OL_LOAD_WAIT_TIME: 3000, // Unit: milliseconds
     BING_MAPS_RELOAD_INTERVAL: 1000, // Unit: milliseconds
+    LEAFLET_LAYER_LOAD_DELAY: 350, // Unit: milliseconds
     LEAFLET_MONITORED_EVENTS: ['zoomend', 'moveend'],
 
     /**************************************************************

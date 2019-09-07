@@ -115,13 +115,12 @@ function OVEOpenLayersMap () {
         return __private.map;
     };
 
-    const changeEvent = function (eventHandler) {
-        // it takes a while for the all attributes of the map to be updated, especially after
-        // a resolution/zoom-level change.
-        setTimeout(eventHandler, Constants.OL_CHANGE_CENTER_AFTER_UPDATE_WAIT_TIME);
-    };
-
     this.registerHandlerForEvents = function (eventHandler) {
+        const changeEvent = function () {
+            // it takes a while for the all attributes of the map to be updated, especially after
+            // a resolution/zoom-level change.
+            setTimeout(eventHandler, Constants.OL_CHANGE_CENTER_AFTER_UPDATE_WAIT_TIME);
+        };
         // Handlers for OpenLayers events.
         for (const e of Constants.OL_MONITORED_EVENTS) {
             if (e === 'change:center') {
@@ -138,8 +137,10 @@ function OVEOpenLayersMap () {
         // the layers of OpenLayers based on the JSON configuration model of the
         // layers. Tile and Vector layers are supported by the app. There is
         // special handling for the BingMaps layer as it fails to load at times.
-        // The vector layers are of GeoJSON format. The fill and stroke styles
-        // are configurable.
+        // The vector layers can be one of the vector formats supported by OpenLayers
+        // such as GeoJSON and TopoJSON, the GML, KML and WKT CRS formats of the
+        // Open Geospatial Consortium as well as the proprietary OSM, IGC and Esri
+        // formats. The fill and stroke styles are configurable.
         __private.layers = [];
         $.each(config, function (i, e) {
             if (e.type === 'ol.layer.Tile') {
@@ -159,11 +160,12 @@ function OVEOpenLayersMap () {
             } else if (e.type === 'ol.layer.Vector') {
                 log.trace('Loading layer of type:', 'Vector', ', with source:',
                     e.source.config.url, ', using config:', e);
+                const format = (e.source.config.format || 'ol.format.GeoJSON').substring('ol.format.'.length);
                 const TileConfig = {
                     visible: e.visible,
                     source: new window.ol.source.Vector({
                         url: e.source.config.url,
-                        format: new window.ol.format.GeoJSON()
+                        format: new window.ol.format[format](e.source.config.options || {})
                     }),
                     style: new window.ol.style.Style({
                         fill: new window.ol.style.Fill(e.style.fill),

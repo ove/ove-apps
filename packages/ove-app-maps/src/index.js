@@ -49,6 +49,8 @@ log.debug('Using module:', 'carto.js');
 app.use('/', express.static(path.join(nodeModules, '@carto', 'carto.js')));
 log.debug('Using module:', 'torque.js');
 app.use('/', express.static(path.join(nodeModules, 'torque.js', 'dist')));
+log.debug('Using module:', 'topojson-client');
+app.use('/', express.static(path.join(nodeModules, 'topojson-client', 'dist')));
 
 log.debug('Setting up state transformation operations');
 base.operations.canTransform = function (state, transformation) {
