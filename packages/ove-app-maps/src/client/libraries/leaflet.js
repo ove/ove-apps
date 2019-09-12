@@ -85,7 +85,7 @@ function OVELeafletMap () {
             } else if (e.type === 'L.geoJSON' || e.type === 'L.topoJSON') {
                 if (!e.data && e.url) {
                     __private.layersLoading = true;
-                    __private.layers[i] = {};
+                    __private.layers[i] = { type: e.type };
                     const payload = await fetch(e.url);
                     e.data = await payload.json().then(function (data) {
                         delete __private.layersLoading;
@@ -149,21 +149,25 @@ function OVELeafletMap () {
     const showLayer = function (layer) {
         // Some layers such as GeoJSON and TopoJSON vector layers may take time to load
         // if the data needs to be fetched from a URL.
-        if (!layer.type && __private.layersLoading) {
-            new Promise(function (resolve) {
-                const x = setInterval(function () {
-                    if (!__private.layersLoading) {
-                        clearInterval(x);
-                        resolve('layers loaded');
+        if (layer.type === 'L.geoJSON' || layer.type === 'L.topoJSON') {
+            if (__private.layersLoading) {
+                new Promise(function (resolve) {
+                    const x = setInterval(function () {
+                        if (!__private.layersLoading) {
+                            clearInterval(x);
+                            resolve('layers loaded');
+                        }
+                    }, Constants.LEAFLET_LAYER_LOAD_DELAY);
+                }).then(function () {
+                    if (layer.layer) {
+                        layer = layer.layer;
                     }
-                }, Constants.LEAFLET_LAYER_LOAD_DELAY);
-            }).then(function () {
-                if (!layer.type && layer.layer) {
-                    layer = layer.layer;
-                }
-                showLayer(layer);
-            });
-            return;
+                    showLayer(layer);
+                });
+                return;
+            } else if (layer.layer) {
+                layer = layer.layer;
+            }
         }
 
         if (!__private.map) {
@@ -206,10 +210,30 @@ function OVELeafletMap () {
 
     this.showLayer = showLayer;
 
-    this.hideLayer = function (layer) {
-        if (!layer.type && layer.layer) {
-            layer = layer.layer;
+    const hideLayer = function (layer) {
+        // Some layers such as GeoJSON and TopoJSON vector layers may take time to load
+        // if the data needs to be fetched from a URL.
+        if (layer.type === 'L.geoJSON' || layer.type === 'L.topoJSON') {
+            if (__private.layersLoading) {
+                new Promise(function (resolve) {
+                    const x = setInterval(function () {
+                        if (!__private.layersLoading) {
+                            clearInterval(x);
+                            resolve('layers loaded');
+                        }
+                    }, Constants.LEAFLET_LAYER_LOAD_DELAY);
+                }).then(function () {
+                    if (layer.layer) {
+                        layer = layer.layer;
+                    }
+                    hideLayer(layer);
+                });
+                return;
+            } else if (layer.layer) {
+                layer = layer.layer;
+            }
         }
+
         if (!__private.map) {
             if (__private.initialLayers.includes(layer)) {
                 __private.initialLayers.splice(__private.initialLayers.indexOf(layer), 1);
@@ -231,4 +255,6 @@ function OVELeafletMap () {
             __private.map.removeLayer(layer);
         }
     };
+
+    this.hideLayer = hideLayer;
 }
