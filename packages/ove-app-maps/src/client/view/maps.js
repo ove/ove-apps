@@ -1,8 +1,20 @@
 initView = function () {
-    window.ove.context.isInitialized = false;
-    log.debug('Application is initialized:', window.ove.context.isInitialized);
-    OVE.Utils.setOnStateUpdate(updateMap);
-    initCommon();
+    let context = window.ove.context;
+    context.isInitialized = false;
+    context.isCommonInitialized = false;
+    log.debug('Application is initialized:', context.isInitialized && context.isCommonInitialized);
+    OVE.Utils.setOnStateUpdate(initThenUpdateMap);
+};
+
+initThenUpdateMap = function () {
+    if (!window.ove.context.isCommonInitialized) {
+        initCommon().then(function () {
+            window.ove.context.isCommonInitialized = true;
+            updateMap();
+        });
+    } else {
+        updateMap();
+    }
 };
 
 updateMap = function () {
@@ -19,6 +31,9 @@ updateMap = function () {
         return;
     }
     const p = window.ove.state.current.position;
+    if (!p) {
+        return;
+    }
     const center = [+(p.bounds.x) + (p.bounds.w * (0.5 * g.w + g.x) / g.section.w),
         +(p.bounds.y) + (p.bounds.h * (0.5 * g.h + g.y) / g.section.h)];
     // Unlike in the controller, all layers will be explicitly shown or hidden based
@@ -51,6 +66,7 @@ updateMap = function () {
             zoom: +(p.zoom),
             enableRotation: false });
         context.isInitialized = true;
+        log.debug('Application is initialized:', context.isInitialized && context.isCommonInitialized);
     }
     log.debug('Updating map with zoom:', +(p.zoom), ', center:', center, ', and resolution:', +(p.resolution));
     context.library.setZoom(+(p.zoom));
@@ -60,7 +76,7 @@ updateMap = function () {
 
 beginInitialization = function () {
     log.debug('Starting viewer initialization');
-    OVE.Utils.initView(initView, updateMap);
+    OVE.Utils.initView(initView, initThenUpdateMap);
     // BACKWARDS-COMPATIBILITY: For <= v0.4.1
     if (!Constants.Frame.PARENT) {
         Constants.Frame.PARENT = 'parent';

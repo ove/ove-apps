@@ -164,7 +164,9 @@ base.operations.validateState = function (state) {
                 'state.position.bounds', 'state.position.bounds.x', 'state.position.bounds.y',
                 'state.position.bounds.w', 'state.position.bounds.h']
         }
-    ]) || Utils.validateState(state, [ { value: ['state.center', 'state.resolution', 'state.zoom'] } ]);
+    ]) ||
+    Utils.validateState(state, [ { value: ['state.center', 'state.resolution', 'state.zoom'] } ]) ||
+    Utils.validateState(state, [ { prefix: ['state.url'] } ]);
 };
 
 const port = process.env.PORT || 8080;

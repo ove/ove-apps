@@ -5,7 +5,12 @@ initControl = function (data) {
 
     const g = window.ove.geometry;
     OVE.Utils.resizeController('.map, .outer');
+    if (data.url) {
+        window.ove.state.current.url = data.url;
+    }
     initCommon().then(function () {
+        // We make sure both controller and viewer have received their layers
+        OVE.Utils.broadcastState();
         if (context.layers.length === 0) {
             log.fatal('Map layers not available. Cannot load application');
             return;
@@ -57,7 +62,6 @@ initControl = function (data) {
         };
 
         let url = OVE.Utils.getURLQueryParam();
-        // If a URL was passed, the sessionId of the loaded state would be overridden.
         if (!url) {
             // If not, the URL could also have been provided as a part of the state configuration.
             // We don't care to test if 'data.url' was set or not, since it will be tested below
@@ -128,6 +132,15 @@ beginInitialization = function () {
                 const p = window.ove.state.current.position;
                 log.debug('Successfully loaded state and found position');
                 const data = { center: p.center, resolution: p.resolution, zoom: p.zoom, scaled: true };
+                log.debug('Initializing controller with config:', data);
+                $(window).resize(function () {
+                    location.reload();
+                });
+                initControl(data);
+            } else if (window.ove.state.current.url) {
+                const url = window.ove.state.current.url;
+                log.debug('Attempting to load state from url:', url);
+                const data = { url: url };
                 log.debug('Initializing controller with config:', data);
                 $(window).resize(function () {
                     location.reload();
