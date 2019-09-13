@@ -9,7 +9,29 @@ updateImage = function () {
     if (!context.isInitialized) {
         // Fix for chrome unable to load large images (#54)
         const config = window.ove.state.current.config;
-        if (config.tileSources && config.tileSources.url) {
+        if (!config) {
+            // This happens if the controller was not opened and the state only contains
+            // a URL. In such a situation we assume that the image would fit the entire
+            // section. We will wait for sufficient time before attempting to load the
+            // image, as the same situation could occur if the controller was slower to
+            // load.
+            setTimeout(function () {
+                const url = window.ove.state.current.url;
+                if (!window.ove.state.current.config && url) {
+                    if (url.endsWith('.dzi') || url.endsWith('.xml') || url.endsWith('.json')) {
+                        window.ove.state.current.config = { tileSources: url };
+                    } else {
+                        window.ove.state.current.config = { tileSources: { type: 'image', url: url } };
+                    }
+                    const g = window.ove.geometry;
+                    window.ove.state.current.viewport = {
+                        bounds: { x: 0, y: 0, w: 1, h: g.section.h / g.section.w }, zoom: 1
+                    };
+                    updateImage();
+                }
+            }, Constants.OSD_POST_LOAD_WAIT_TIME);
+            return;
+        } else if (config.tileSources && config.tileSources.url) {
             config.tileSources.url += '?nonce=' + OVE.Utils.getViewId();
             log.info('Using tile-source URL:', config.tileSources.url);
         }
