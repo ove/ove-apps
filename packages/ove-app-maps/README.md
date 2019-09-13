@@ -4,9 +4,58 @@
 
 This app supports visualisation of dynamic maps using the OVE framework. It gives users the option of using either [OpenLayers](https://openlayers.org/) or [Leaflet](https://leafletjs.com/) as the underlying mapping library and supports tiled map layers (from Bing, OSM, etc), the [CARTO](https://carto.com) platform, vector data described in formats such as [GeoJSON](http://geojson.org/) and [TopoJSON](https://github.com/topojson) and custom overlays built using JavaScript libraries such as [D3.js](https://d3js.org/). The [OpenLayers](https://openlayers.org/) mapping library also supports the vector data formats specified by the [Open Geospatial Consortium](http://www.opengeospatial.org/), such as [GML](https://www.opengeospatial.org/standards/gml), [KML](https://www.opengeospatial.org/standards/kml) and [WKT CRS](https://www.opengeospatial.org/standards/wkt-crs) as well as proprietary formats such as [OSM](https://wiki.openstreetmap.org/wiki/OSM_XML), [IGC](http://istitutogeograficocentrale.it/en/) and [Esri](https://www.esri.com).
 
-The maps app depends on a [Map Layers configuration](../ove-app-maps/docs/MAP_LAYERS_JSON.md) that can be provided within the `config.json` file (either embedded or as a URL) or as an environment variable named `OVE_MAPS_LAYERS`, that points to a URL.
+The maps app depends on a [Map Layers configuration](../ove-app-maps/docs/MAP_LAYERS_JSON.md) that can be provided within the `config.json` file (either embedded or as a URL), as an environment variable named `OVE_MAPS_LAYERS` that points to a URL, or by embedding it within a `Map Configuration` file.
 
 Seen above is an image of the maps app displaying the [ArcGIS world topographic map](https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer) photographed at the [Imperial College](http://www.imperial.ac.uk) [Data Science Institute's](http://www.imperial.ac.uk/data-science/) [Data Observatory](http://www.imperial.ac.uk/data-science/data-observatory/).
+
+## Map Configuration file
+
+A Map Configuration file has a JSON format similar to:
+
+```json
+{
+    "layers": [
+        {
+            "type": "ol.layer.Tile",
+            "visible": false,
+            "wms": false,
+            "source": {
+                "type": "ol.source.OSM",
+                "config": {
+                    "crossOrigin": null,
+                    "url": "https://{a-c}.tile.thunderforest.com/transport/{z}/{x}/{y}.png"
+                }
+            }
+        },
+        {
+            "type": "ol.layer.Vector",
+            "visible": false,
+            "wms": true,
+            "source": {
+                "type": "ol.source.Vector",
+                "config": {
+                    "url": "data/sampleGeo.json"
+                }
+            },
+            "style": {
+                "fill": {
+                    "color": "#B29255"
+                },
+                "stroke": {
+                    "color": "#715E3A",
+                    "width": 4
+                }
+            },
+            "opacity": 0.7
+        }
+    ],
+    "center": ["-11137.70850550061", "6710544.04980525"],
+    "resolution": "77",
+    "zoom": "12"
+}
+```
+
+The `layers`, which is an optional property, must be defined according to [Map Layers configuration](../ove-app-maps/docs/MAP_LAYERS_JSON.md). If this is not provided, the default layers would be used. The `center`, `resolution` and `zoom` properties are mandatory.
 
 ## Application State
 
@@ -22,7 +71,7 @@ The state of this app has a format similar to:
 }
 ```
 
-The `center`, `resolution` and `zoom` properties are mandatory. It is also possible to store these properties in a file with a `.json` extension and provide its location using the optional `url` property. If the `url` property is provided, `center`, `resolution` and `zoom` can be omitted from the state configuration.
+The `center`, `resolution` and `zoom` properties are mandatory. It is also possible to store these properties in a file with a `.json` extension and provide its location using the optional `url` property. If the `url` property is provided, `center`, `resolution` and `zoom` can be omitted from the state configuration. The `url` property must refer to a `Map Configuration` file explained above.
 
 Optionally, there can be one or more enabled layers and one or more scripts to load custom overlays as seen above. The `enabledLayers` property accepts a list of integer values. These integer values correspond to the order (starting from 0) in which the layers were defined on the [Map Layers configuration](../ove-app-maps/docs/MAP_LAYERS_JSON.md).
 
