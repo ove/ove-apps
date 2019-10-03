@@ -3,6 +3,7 @@ const Constants = {
                               Controller
     **************************************************************/
     DEFAULT_STATE_NAME: 'Matrix',
+    CONTROLLER: '.operations',
 
     /**************************************************************
                                 Server
@@ -27,6 +28,10 @@ const Constants = {
 **************************************************************/
 Constants.Operation = {
     REFRESH: 'refresh'
+};
+
+Constants.Button = {
+    REFRESH: '#btnRefresh'
 };
 
 exports.Constants = Constants;

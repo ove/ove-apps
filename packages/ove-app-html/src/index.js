@@ -3,7 +3,7 @@ const HttpStatus = require('http-status-codes');
 const path = require('path');
 const fs = require('fs');
 const base = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
-const { express, app, log, Utils } = base;
+const { express, app, log, nodeModules, Utils } = base;
 const request = require('request');
 const server = require('http').createServer(app);
 
@@ -128,6 +128,9 @@ const getClock = function () {
     return __self;
 };
 const clock = getClock();
+
+log.debug('Using module:', 'fontawesome-free');
+app.use('/images', express.static(path.join(nodeModules, '@fortawesome', 'fontawesome-free', 'svgs', 'solid')));
 
 let ws;
 setTimeout(function () {
