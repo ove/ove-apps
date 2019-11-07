@@ -25,6 +25,7 @@ initControl = function (data) {
         }
         updateURL();
     });
+    loadControls();
 };
 
 getCSS = function () {
@@ -36,4 +37,21 @@ getCSS = function () {
 beginInitialization = function () {
     log.debug('Starting controller initialization');
     OVE.Utils.initControl(Constants.DEFAULT_STATE_NAME, initControl);
+};
+
+loadControls = function () {
+    log.debug('Displaying controller');
+    const scale = Math.min(Math.min(document.documentElement.clientWidth, window.innerWidth) / 1440,
+        Math.min(document.documentElement.clientHeight, window.innerHeight) / 720);
+    $(Constants.CONTROLLER).css({ display: 'block', transformOrigin: '50% 50%', transform: 'scale(' + scale + ')' });
+
+    $(Constants.Button.REFRESH).click(function () {
+        $.ajax({
+            url: './operation/refresh' +
+                '?oveSectionId' + OVE.Utils.getSectionId(),
+            type: 'POST',
+            data: {},
+            contentType: 'application/json'
+        }).catch(log.error);
+    });
 };
