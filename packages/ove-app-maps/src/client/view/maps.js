@@ -8,10 +8,8 @@ initView = function () {
 
 initThenUpdateMap = function () {
     if (!window.ove.context.isCommonInitialized) {
-        initCommon().then(function () {
-            window.ove.context.isCommonInitialized = true;
-            updateMap();
-        });
+        window.ove.context.isCommonInitialized = true;
+        initCommon().then(updateMap);
     } else {
         updateMap();
     }
@@ -67,6 +65,9 @@ updateMap = function () {
             enableRotation: false });
         context.isInitialized = true;
         log.debug('Application is initialized:', context.isInitialized && context.isCommonInitialized);
+        return;
+    } else if (!context.map) {
+        return;
     }
     log.debug('Updating map with zoom:', +(p.zoom), ', center:', center, ', and resolution:', +(p.resolution));
     context.library.setZoom(+(p.zoom));
