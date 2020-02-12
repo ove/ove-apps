@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@ove-lib/appbase": "0.4.1",
-    "d3-dsv": "1.1.1",
+    "d3-dsv": "1.2.0",
     "jquery": "3.4.1",
     "vega": "5.3.5",
     "vega-embed": "4.0.0",
