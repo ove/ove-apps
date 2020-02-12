@@ -1,4 +1,4 @@
-FROM node:10-alpine3.9
+FROM node:12-alpine3.9
 WORKDIR /usr/src/app
 
 RUN apk add --no-cache --virtual git
