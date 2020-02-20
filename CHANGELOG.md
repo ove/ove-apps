@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/ove/ove-apps/compare/v0.4.0...v0.5.0) (2019-02-20)
+
+### Features
+
+**feat:** Configurable overlap for graph objects.
+**feat:** Playback of tiled videos.
+**feat:** QR Code application.
+**feat:** Support for video synchronisation.
+**feat:** Support for vector map formats such as TopoJSON, OSM and KML.
+**feat:** Visibility and occlusion culling.
+
+### Docs
+
+**docs:** Documentation on map configuration and URL-based loading.
+**docs:** Tutorial on geovisualisation.
+
+### Fixes
+
+**fix:** Fixes to YouTube video player.
+**fix:** Version upgrades to all dependencies.
+
 <a name="0.4.0"></a>
 # [0.4.0](https://github.com/ove/ove-apps/compare/v0.3.3...v0.4.0) (2019-05-02)
 
