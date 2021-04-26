@@ -20,6 +20,6 @@
     "http-status-codes": "1.4.0",
     "jquery": "3.4.1",
     "openvidu-browser": "2.8.0",
-    "openvidu-node-client": "2.8.0"
+    "openvidu-node-client": "2.17.0"
   }
 }
