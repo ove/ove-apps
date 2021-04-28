@@ -21,6 +21,6 @@
     "jquery": "3.5.0",
     "vega": "5.17.3",
     "vega-embed": "6.17.0",
-    "vega-lite": "3.2.1"
+    "vega-lite": "3.4.0"
   }
 }
