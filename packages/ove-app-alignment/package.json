@@ -7,6 +7,7 @@
     "test": "echo \"No tests specified\" && exit 0",
     "clean": "npx rimraf dist",
     "build": "npx babel-cli src --out-dir dist --copy-files",
+    "build:new": "npx babel src --out-dir dist --copy-files",
     "start": "node dist/index.js --color",
     "start:dev": "babel-node src/index.js",
     "lint": "eslint src/. --ext .js"
