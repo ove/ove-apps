@@ -8,7 +8,6 @@
     "clean": "lerna run clean",
     "build": "lerna run build",
     "build:clean": "lerna run clean && lerna run build",
-    "build:new": "lerna run build:new",
     "lint": "lerna run lint",
     "test": "lerna run test",
     "start": "OVE_HOST='localhost:8080' TUORIS_HOST='localhost:7080' OPENVIDU_HOST='localhost:4443' pm2 start pm2.json",
