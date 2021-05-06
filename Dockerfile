@@ -1,7 +1,7 @@
 FROM node:14-alpine
 WORKDIR /usr/src/app
 
-RUN apk add --no-cache --virtual git
+RUN apk add --no-cache git
 RUN npm install -global pm2
 RUN npm install -global lerna
 
