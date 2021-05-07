@@ -11,20 +11,20 @@
     "lint": "lerna run lint",
     "test": "lerna run test",
     "start": "OVE_HOST='localhost:8080' TUORIS_HOST='localhost:7080' OPENVIDU_HOST='localhost:4443' pm2 start pm2.json",
-    "start:windows": "OVE_HOST='localhost:8080' TUORIS_HOST='localhost:7080' OPENVIDU_HOST='localhost:4443' pm2 start pm2-windows.json",
+    "start:windows": "pm2 start pm2-windows.json",
     "start:dev": "OVE_HOST='localhost:8080' TUORIS_HOST='localhost:7080' OPENVIDU_HOST='localhost:4443' lerna run start:dev"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
     "eslint": "6.8.0",
     "eslint-config-standard": "12.0.0",
-    "eslint-plugin-import": "2.20.1",
+    "eslint-plugin-import": "2.22.1",
     "eslint-plugin-node": "11.0.0",
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-standard": "4.0.1",
+    "lerna": "3.22.1",
     "remark": "11.0.2",
     "remark-preset-lint-recommended": "3.0.3",
-    "lerna": "3.20.2",
     "rimraf": "3.0.2"
   }
 }
