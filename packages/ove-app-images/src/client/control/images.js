@@ -6,6 +6,8 @@ initControl = function (data, viewport) {
     context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 
+    initCommon();
+
     OVE.Utils.resizeController(Constants.CONTENT_DIV);
     // Initially, the state may not be set under the config property, but it will be once
     // the controller sets its state. The difference is for it to be possible to set

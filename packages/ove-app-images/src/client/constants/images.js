@@ -15,7 +15,21 @@ const Constants = {
                                 Common
     **************************************************************/
     CONTENT_DIV: '#contentDiv',
-    APP_NAME: 'images'
+    APP_NAME: 'images',
+
+    /**************************************************************
+     Server
+     **************************************************************/
+    HTTP_HEADER_CONTENT_TYPE: 'Content-Type',
+    HTTP_CONTENT_TYPE_JSON: 'application/json'
+};
+
+/**************************************************************
+ Enums
+ **************************************************************/
+Constants.Operation = {
+    PAN: 'pan',
+    ZOOM: 'zoom'
 };
 
 exports.Constants = Constants;
