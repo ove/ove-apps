@@ -30,7 +30,7 @@ initCommon = function () {
                         const zoom = context.osd.viewport.getZoom();
 
                         viewport = {
-                            bounds: { x: op.x, y: op.y, w: bounds.width, h: bounds.height },
+                            bounds: { x: op.x, y: op.y, w: op.w, h: op.h },
                             zoom: zoom,
                             dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
                         };

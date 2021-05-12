@@ -124,9 +124,11 @@ const handleOperation = function (req, res) {
     // Pan and Zoom commands receive additional query parameters.
     let message = { operation: { name: name } };
     if (name === Constants.Operation.PAN) {
-        // We assume that the x and y properties are properly set instead of enforcing any strict type checks.
+        // We assume that the viewport's pan properties are properly set instead of enforcing any strict type checks.
         message.operation.x = req.query.x;
         message.operation.y = req.query.y;
+        message.operation.w = req.query.w;
+        message.operation.h = req.query.h;
     } else if (name === Constants.Operation.ZOOM) {
         // We assume that the zoom property is properly set instead of enforcing any strict type checks.
         message.operation.zoom = req.query.zoom;
