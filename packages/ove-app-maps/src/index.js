@@ -1,4 +1,5 @@
 const { Constants } = require('./client/constants/maps');
+const HttpStatus = require('http-status-codes');
 const path = require('path');
 const base = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const { express, app, Utils, log, nodeModules, config } = base;
@@ -168,6 +169,67 @@ base.operations.validateState = function (state) {
     Utils.validateState(state, [ { value: ['state.center', 'state.resolution', 'state.zoom'] } ]) ||
     Utils.validateState(state, [ { prefix: ['state.url'] } ]);
 };
+
+let ws;
+setTimeout(function () {
+    const getSocket = function () {
+        const socketURL = 'ws://' + Utils.getOVEHost();
+        log.debug('Establishing WebSocket connection with:', socketURL);
+        let socket = new (require('ws'))(socketURL);
+        ws = Utils.getSafeSocket(socket);
+        socket.on('open', function () {
+            log.debug('WebSocket connection made with:', socketURL);
+        });
+        socket.on('close', function (code) {
+            log.warn('Lost websocket connection: closed with code:', code);
+            log.warn('Attempting to reconnect in ' + Constants.SOCKET_REFRESH_DELAY + 'ms');
+            // If the socket is closed, we try to refresh it.
+            setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
+        });
+        socket.on('error', log.error);
+        socket.on('message', function (msg) {
+            let m = JSON.parse(msg);
+            log.info(m);
+        });
+    };
+    getSocket();
+}, Constants.SOCKET_READY_WAIT_TIME);
+
+const handleOperation = function (req, res) {
+    let name = req.params.name;
+    log.info('NAME: ', name);
+    let sectionId = req.query.oveSectionId;
+    if (sectionId) {
+        log.info('Performing operation:', name, ', on section:', sectionId);
+    } else {
+        log.info('Performing operation:', name, ', on all sections');
+    }
+
+    // Pan and Zoom commands receive additional query parameters.
+    let message = { operation: { name: name } };
+    if (name === Constants.Operation.PAN) {
+        // We assume that the viewport's pan properties are properly set instead of enforcing any strict type checks.
+        message.operation.x = req.query.x;
+        message.operation.y = req.query.y;
+    } else if (name === Constants.Operation.ZOOM) {
+        // We assume that the zoom property is properly set instead of enforcing any strict type checks.
+        message.operation.zoom = req.query.zoom;
+    }
+
+    // If the section id is not set the message will be available to all the sections.
+    if (sectionId) {
+        ws.safeSend(JSON.stringify({ appId: Constants.APP_NAME, sectionId: sectionId, message: message }));
+    } else {
+        ws.safeSend(JSON.stringify({ appId: Constants.APP_NAME, message: message }));
+    }
+
+    res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE,
+        Constants.HTTP_CONTENT_TYPE_JSON).send(JSON.stringify({}));
+};
+
+let operationsList = Object.values(Constants.Operation);
+app.post('/operation/:name(' + operationsList.join('|') + ')', handleOperation);
+app.post('/tester', () => { log.info('Successful test!!'); });
 
 const port = process.env.PORT || 8080;
 server.listen(port);

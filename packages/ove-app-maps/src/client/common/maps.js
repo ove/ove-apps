@@ -16,20 +16,51 @@ $(function () {
     });
 });
 
+const buildViewport = (op, context) => {
+    switch (op.name) {
+        case Constants.Operation.PAN:
+            log.info('Panning');
+            context.library.setCenter([op.x, op.y]);
+            sendDetails();
+            break;
+        case Constants.Operation.ZOOM:
+            log.info('Zooming');
+            context.library.setZoom(op.zoom);
+
+            sendDetails();
+            break;
+        default:
+            log.warn('Ignoring unknown operation:', op.name);
+    }
+};
+
 // Initialization that is common to viewers and controllers.
 /* jshint ignore:start */
 // current version of JSHint does not support async/await
 initCommon = async function () {
     const context = window.ove.context;
     const state = window.ove.state.current;
+
     const loadLayers = async function (layers) {
         if (layers.length === 0 || layers[0].type.indexOf('ol.') === 0) {
             context.library = new window.OVEOpenLayersMap();
         } else {
             context.library = new window.OVELeafletMap();
         }
+
         context.layers = await context.library.loadLayers(layers);
     };
+
+    window.ove.socket.on(function (message) {
+        if (message.operation && context.isInitialized) {
+            log.debug('Got invoke operation request: ', message.operation);
+            const op = message.operation;
+
+            setTimeout(function () {
+                buildViewport(op, context);
+            });
+        }
+    });
 
     log.debug('Starting to fetch map layer configurations');
     // The map layer configuration can be specified as a URL
@@ -46,10 +77,49 @@ initCommon = async function () {
                 });
             }
         });
-    };
+    }
     return fetch('layers.json').then(r => r.text()).then(async text => {
         log.debug('Parsing map layer configurations');
         loadLayers(JSON.parse(text));
     });
+};
+
+const sendDetails = () => {
+    const context = window.ove.context;
+    const size = context.library.getSize();
+    const topLeft = context.library.getTopLeft();
+    const bottomRight = context.library.getBottomRight();
+
+    // If the resolution is not available, the scaling factor will be applied to zoom, instead.
+    const scaleFactor = Math.sqrt(window.ove.geometry.section.w * window.ove.geometry.section.h / (size[0] * size[1]));
+    const zoom = context.library.getResolution() ? context.library.getZoom() : (context.library.getZoom() + Math.log2(scaleFactor));
+    const resolution = context.library.getResolution() ? context.library.getResolution() / scaleFactor : undefined;
+    if (topLeft === null || bottomRight === null) {
+        log.debug('Waiting to get coordinates from pixels');
+        // This method will loop until the top-left and bottom-right can be calculated.
+        setTimeout(sendDetails, 70);
+        return;
+    }
+    // We broadcast the coordinates of the center, the zoom level and the resolution.
+    // We also send the coordinates of the top-left and bottom-right, to ensure the
+    // map is focusing on the correct lat/long.
+    const position = {
+        bounds: {
+            x: topLeft[0],
+            y: topLeft[1],
+            w: bottomRight[0] - topLeft[0],
+            h: bottomRight[1] - topLeft[1]
+        },
+        center: context.library.getCenter(),
+        resolution: resolution,
+        zoom: zoom
+    };
+    // The broadcast happens only if the position has changed.
+    if (window.ove.state.current.position &&
+        OVE.Utils.JSON.equals(position, window.ove.state.current.position)) return;
+    window.ove.state.current.position = position;
+    log.debug('Broadcasting state with position:', position);
+    OVE.Utils.broadcastState();
+    window.location.reload(false);
 };
 /* jshint ignore:end */
