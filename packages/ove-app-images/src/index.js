@@ -145,7 +145,7 @@ const handleOperation = function (req, res) {
         Constants.HTTP_CONTENT_TYPE_JSON).send(JSON.stringify({}));
 };
 
-let operationsList = Object.values(Constants.Operation);
+const operationsList = Object.values(Constants.Operation);
 app.post('/operation/:name(' + operationsList.join('|') + ')', handleOperation);
 
 log.debug('Setting up state validation operation');

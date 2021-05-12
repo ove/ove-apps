@@ -41,8 +41,6 @@
             "globals": {
                 "changeEvent": true,
                 "initCommon": true,
-                "sendDetails": true,
-                "buildViewport": true,
                 "initMap": true,
                 "beginInitialization": true
             }

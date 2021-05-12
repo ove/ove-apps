@@ -227,9 +227,8 @@ const handleOperation = function (req, res) {
         Constants.HTTP_CONTENT_TYPE_JSON).send(JSON.stringify({}));
 };
 
-let operationsList = Object.values(Constants.Operation);
+const operationsList = Object.values(Constants.Operation);
 app.post('/operation/:name(' + operationsList.join('|') + ')', handleOperation);
-app.post('/tester', () => { log.info('Successful test!!'); });
 
 const port = process.env.PORT || 8080;
 server.listen(port);

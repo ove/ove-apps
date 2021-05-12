@@ -16,7 +16,7 @@ $(function () {
     });
 });
 
-const buildViewport = (op, context) => {
+const buildViewport = function (op, context) {
     switch (op.name) {
         case Constants.Operation.PAN:
             log.info('Panning');

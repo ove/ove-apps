@@ -32,7 +32,6 @@
             "globals": {
                 "beginInitialization": true,
                 "initCommon": true,
-                "sendDetails": true,
                 "loadOSD": true
             }
         }

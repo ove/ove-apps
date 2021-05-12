@@ -17,48 +17,49 @@ initCommon = function () {
     const context = window.ove.context;
 
     window.ove.socket.on(function (message) {
-        if (message.operation && context.isInitialized) {
-            log.debug('Got invoke operation request: ', message.operation);
-            const op = message.operation;
+        if (!message.operation || !context.isInitialized) return;
+        log.debug('Got invoke operation request: ', message.operation);
 
-            setTimeout(function () {
-                const bounds = context.osd.viewport.getBounds();
-                let viewport;
-                switch (op.name) {
-                    case Constants.Operation.PAN:
-                        log.info('Panning');
-                        const zoom = context.osd.viewport.getZoom();
-
-                        viewport = {
-                            bounds: { x: op.x, y: op.y, w: op.w, h: op.h },
-                            zoom: zoom,
-                            dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
-                        };
-
-                        log.info(JSON.stringify(viewport));
-
-                        sendDetails(viewport);
-                        break;
-                    case Constants.Operation.ZOOM:
-                        log.info('Zooming');
-                        // The viewport information sent across includes bounds and zoom level.
-                        viewport = {
-                            bounds: { x: bounds.x, y: bounds.y, w: bounds.width, h: bounds.height },
-                            zoom: op.zoom,
-                            dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
-                        };
-
-                        sendDetails(viewport);
-                        break;
-                    default:
-                        log.warn('Ignoring unknown operation:', op.name);
-                }
-            });
-        }
+        setTimeout(function () {
+            buildViewport(message.operation, context);
+        });
     });
 };
 
-sendDetails = function (viewport) {
+const buildViewport = function (op, context) {
+    const bounds = context.osd.viewport.getBounds();
+    let viewport;
+
+    switch (op.name) {
+        case Constants.Operation.PAN:
+            log.info('Panning');
+            const zoom = context.osd.viewport.getZoom();
+
+            viewport = {
+                bounds: { x: op.x, y: op.y, w: op.w, h: op.h },
+                zoom: zoom,
+                dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
+            };
+
+            sendViewportDetails(viewport);
+            break;
+        case Constants.Operation.ZOOM:
+            log.info('Zooming');
+            // The viewport information sent across includes bounds and zoom level.
+            viewport = {
+                bounds: { x: bounds.x, y: bounds.y, w: bounds.width, h: bounds.height },
+                zoom: op.zoom,
+                dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
+            };
+
+            sendViewportDetails(viewport);
+            break;
+        default:
+            log.warn('Ignoring unknown operation:', op.name);
+    }
+};
+
+const sendViewportDetails = function (viewport) {
     let context = window.ove.context;
     if (!context.isInitialized) return;
 
