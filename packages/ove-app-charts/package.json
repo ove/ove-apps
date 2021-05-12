@@ -19,7 +19,7 @@
     "d3-dsv": "1.2.0",
     "jquery": "3.5.0",
     "vega": "5.17.3",
-    "vega-embed": "6.17.0",
+    "vega-embed": "6.18.2",
     "vega-lite": "3.4.0"
   }
 }
