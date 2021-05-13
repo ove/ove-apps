@@ -42,38 +42,7 @@ initControl = function (data, viewport) {
 
     window.ove.state.current = { config: currentState };
     // Viewport details would be updated for specific events - check OSD_MONITORED_EVENTS.
-    const setupHandlers = function () {
-        for (const e of Constants.OSD_MONITORED_EVENTS) {
-            log.debug('Registering OpenSeadragon handler:', e);
-            context.osd.addHandler(e, sendViewportDetails);
-        }
-        context.isInitialized = true;
-        log.debug('Application is initialized:', context.isInitialized);
-        sendViewportDetails();
-    };
-    loadOSD(currentState).then(function () {
-        if (__private.viewport && __private.viewport.bounds) {
-            // Delaying visibility to support better loading experience.
-            log.debug('Making OpenSeadragon hidden');
-            context.osd.setVisible(false);
-            setTimeout(function () {
-                const bounds = __private.viewport.bounds;
-                context.osd.viewport.panTo(new OpenSeadragon.Point(bounds.x + bounds.w * 0.5,
-                    bounds.y + bounds.h * 0.5), true).zoomTo(__private.viewport.zoom);
-                if (!context.osd.isVisible()) {
-                    setTimeout(function () {
-                        // Wait further for OSD to re-center and zoom image.
-                        log.debug('Making OpenSeadragon visible');
-                        context.osd.setVisible(true);
-                    }, Constants.OSD_POST_LOAD_WAIT_TIME);
-                }
-                setupHandlers();
-            // Wait sufficiently for OSD to load the image for the first time.
-            }, Constants.OSD_POST_LOAD_WAIT_TIME);
-        } else {
-            setupHandlers();
-        }
-    }).catch(log.error);
+    loadOSD(currentState).then(updatePosition(currentState, __private, context)).catch(log.error);
 };
 
 sendViewportDetails = function () {
@@ -100,6 +69,42 @@ sendViewportDetails = function () {
             OVE.Utils.broadcastState();
         }
     }
+};
+
+updatePosition = function (state, wrapper, context) {
+    const setupHandlers = function () {
+        for (const e of Constants.OSD_MONITORED_EVENTS) {
+            log.debug('Registering OpenSeadragon handler:', e);
+            context.osd.addHandler(e, sendViewportDetails);
+        }
+        context.isInitialized = true;
+        log.debug('Application is initialized:', context.isInitialized);
+        sendViewportDetails();
+    };
+
+    return () => {
+        if (wrapper.viewport && wrapper.viewport.bounds) {
+            // Delaying visibility to support better loading experience.
+            log.debug('Making OpenSeadragon hidden');
+            context.osd.setVisible(false);
+            setTimeout(function () {
+                const bounds = wrapper.viewport.bounds;
+                context.osd.viewport.panTo(new OpenSeadragon.Point(bounds.x + bounds.w * 0.5,
+                    bounds.y + bounds.h * 0.5), true).zoomTo(wrapper.viewport.zoom);
+                if (!context.osd.isVisible()) {
+                    setTimeout(function () {
+                        // Wait further for OSD to re-center and zoom image.
+                        log.debug('Making OpenSeadragon visible');
+                        context.osd.setVisible(true);
+                    }, Constants.OSD_POST_LOAD_WAIT_TIME);
+                }
+                setupHandlers();
+                // Wait sufficiently for OSD to load the image for the first time.
+            }, Constants.OSD_POST_LOAD_WAIT_TIME);
+        } else {
+            setupHandlers();
+        }
+    };
 };
 
 beginInitialization = function () {

@@ -21,13 +21,10 @@ const buildViewport = function (op, context) {
         case Constants.Operation.PAN:
             log.info('Panning');
             context.library.setCenter([op.x, op.y]);
-            sendDetails();
             break;
         case Constants.Operation.ZOOM:
             log.info('Zooming');
             context.library.setZoom(op.zoom);
-
-            sendDetails();
             break;
         default:
             log.warn('Ignoring unknown operation:', op.name);
@@ -82,44 +79,5 @@ initCommon = async function () {
         log.debug('Parsing map layer configurations');
         loadLayers(JSON.parse(text));
     });
-};
-
-const sendDetails = () => {
-    const context = window.ove.context;
-    const size = context.library.getSize();
-    const topLeft = context.library.getTopLeft();
-    const bottomRight = context.library.getBottomRight();
-
-    // If the resolution is not available, the scaling factor will be applied to zoom, instead.
-    const scaleFactor = Math.sqrt(window.ove.geometry.section.w * window.ove.geometry.section.h / (size[0] * size[1]));
-    const zoom = context.library.getResolution() ? context.library.getZoom() : (context.library.getZoom() + Math.log2(scaleFactor));
-    const resolution = context.library.getResolution() ? context.library.getResolution() / scaleFactor : undefined;
-    if (topLeft === null || bottomRight === null) {
-        log.debug('Waiting to get coordinates from pixels');
-        // This method will loop until the top-left and bottom-right can be calculated.
-        setTimeout(sendDetails, 70);
-        return;
-    }
-    // We broadcast the coordinates of the center, the zoom level and the resolution.
-    // We also send the coordinates of the top-left and bottom-right, to ensure the
-    // map is focusing on the correct lat/long.
-    const position = {
-        bounds: {
-            x: topLeft[0],
-            y: topLeft[1],
-            w: bottomRight[0] - topLeft[0],
-            h: bottomRight[1] - topLeft[1]
-        },
-        center: context.library.getCenter(),
-        resolution: resolution,
-        zoom: zoom
-    };
-    // The broadcast happens only if the position has changed.
-    if (window.ove.state.current.position &&
-        OVE.Utils.JSON.equals(position, window.ove.state.current.position)) return;
-    window.ove.state.current.position = position;
-    log.debug('Broadcasting state with position:', position);
-    OVE.Utils.broadcastState();
-    window.location.reload(false);
 };
 /* jshint ignore:end */

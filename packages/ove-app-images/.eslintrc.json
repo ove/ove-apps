@@ -3,7 +3,8 @@
     "globals": {
         "$": true,
         "Constants": true,
-        "OVE": true
+        "OVE": true,
+        "updatePosition": true
     },
     "overrides": [
         {
