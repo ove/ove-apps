@@ -42,7 +42,7 @@ initControl = function (data, viewport) {
 
     window.ove.state.current = { config: currentState };
     // Viewport details would be updated for specific events - check OSD_MONITORED_EVENTS.
-    loadOSD(currentState).then(updatePosition(currentState, __private, context)).catch(log.error);
+    loadOSD(currentState).then(updatePosition(currentState, __private, context, false)).catch(log.error);
 };
 
 sendViewportDetails = function () {
@@ -55,6 +55,7 @@ sendViewportDetails = function () {
             zoom: context.osd.viewport.getZoom(),
             dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
         };
+
         // Viewport details are only sent across only if they have changed. This is
         // validated by checking the current state.
         if (!window.ove.state.current.viewport ||
@@ -71,7 +72,7 @@ sendViewportDetails = function () {
     }
 };
 
-updatePosition = function (state, wrapper, context) {
+updatePosition = function (state, wrapper, context, isAPI) {
     const setupHandlers = function () {
         for (const e of Constants.OSD_MONITORED_EVENTS) {
             log.debug('Registering OpenSeadragon handler:', e);
@@ -89,8 +90,11 @@ updatePosition = function (state, wrapper, context) {
             context.osd.setVisible(false);
             setTimeout(function () {
                 const bounds = wrapper.viewport.bounds;
-                context.osd.viewport.panTo(new OpenSeadragon.Point(bounds.x + bounds.w * 0.5,
-                    bounds.y + bounds.h * 0.5), true).zoomTo(wrapper.viewport.zoom);
+                const calcX = Number(bounds.x) + Number(bounds.w) * 0.5;
+                const calcY = Number(bounds.y) + Number(bounds.h) * 0.5;
+                context.osd.viewport.panTo(new OpenSeadragon.Point(calcX,
+                    calcY), true).zoomTo(wrapper.viewport.zoom);
+
                 if (!context.osd.isVisible()) {
                     setTimeout(function () {
                         // Wait further for OSD to re-center and zoom image.

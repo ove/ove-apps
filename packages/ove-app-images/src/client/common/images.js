@@ -28,20 +28,21 @@ initCommon = function () {
 
 const buildViewport = function (op, context) {
     const bounds = context.osd.viewport.getBounds();
+    const zoom = context.osd.viewport.getZoom();
+
     let viewport;
 
     switch (op.name) {
         case Constants.Operation.PAN:
             log.info('Panning');
-            const zoom = context.osd.viewport.getZoom();
 
             viewport = {
-                bounds: { x: op.x, y: op.y, w: op.w, h: op.h },
+                bounds: { x: op.x, y: op.y, w: bounds.width, h: bounds.height },
                 zoom: zoom,
                 dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
             };
 
-            updatePosition(window.ove.state.current, { viewport: viewport }, context)();
+            updatePosition(window.ove.state.current, { viewport: viewport }, context, true)();
             break;
         case Constants.Operation.ZOOM:
             log.info('Zooming');
@@ -52,7 +53,7 @@ const buildViewport = function (op, context) {
                 dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
             };
 
-            updatePosition(window.ove.state.current, { viewport: viewport }, context)();
+            updatePosition(window.ove.state.current, { viewport: viewport }, context, true)();
             break;
         default:
             log.warn('Ignoring unknown operation:', op.name);
