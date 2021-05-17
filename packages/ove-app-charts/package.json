@@ -17,7 +17,7 @@
   "dependencies": {
     "@ove-lib/appbase": "0.5.0",
     "d3-dsv": "2.0.0",
-    "jquery": "3.5.0",
+    "jquery": "3.6.0",
     "vega": "5.17.3",
     "vega-embed": "6.17.0",
     "vega-lite": "3.4.0"
