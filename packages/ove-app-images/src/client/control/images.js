@@ -6,6 +6,8 @@ initControl = function (data, viewport) {
     context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 
+    initCommon();
+
     OVE.Utils.resizeController(Constants.CONTENT_DIV);
     // Initially, the state may not be set under the config property, but it will be once
     // the controller sets its state. The difference is for it to be possible to set
@@ -40,38 +42,7 @@ initControl = function (data, viewport) {
 
     window.ove.state.current = { config: currentState };
     // Viewport details would be updated for specific events - check OSD_MONITORED_EVENTS.
-    const setupHandlers = function () {
-        for (const e of Constants.OSD_MONITORED_EVENTS) {
-            log.debug('Registering OpenSeadragon handler:', e);
-            context.osd.addHandler(e, sendViewportDetails);
-        }
-        context.isInitialized = true;
-        log.debug('Application is initialized:', context.isInitialized);
-        sendViewportDetails();
-    };
-    loadOSD(currentState).then(function () {
-        if (__private.viewport && __private.viewport.bounds) {
-            // Delaying visibility to support better loading experience.
-            log.debug('Making OpenSeadragon hidden');
-            context.osd.setVisible(false);
-            setTimeout(function () {
-                const bounds = __private.viewport.bounds;
-                context.osd.viewport.panTo(new OpenSeadragon.Point(bounds.x + bounds.w * 0.5,
-                    bounds.y + bounds.h * 0.5), true).zoomTo(__private.viewport.zoom);
-                if (!context.osd.isVisible()) {
-                    setTimeout(function () {
-                        // Wait further for OSD to re-center and zoom image.
-                        log.debug('Making OpenSeadragon visible');
-                        context.osd.setVisible(true);
-                    }, Constants.OSD_POST_LOAD_WAIT_TIME);
-                }
-                setupHandlers();
-            // Wait sufficiently for OSD to load the image for the first time.
-            }, Constants.OSD_POST_LOAD_WAIT_TIME);
-        } else {
-            setupHandlers();
-        }
-    }).catch(log.error);
+    loadOSD(currentState).then(updatePosition(currentState, __private, context, false)).catch(log.error);
 };
 
 sendViewportDetails = function () {
@@ -84,6 +55,7 @@ sendViewportDetails = function () {
             zoom: context.osd.viewport.getZoom(),
             dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
         };
+
         // Viewport details are only sent across only if they have changed. This is
         // validated by checking the current state.
         if (!window.ove.state.current.viewport ||
@@ -98,6 +70,45 @@ sendViewportDetails = function () {
             OVE.Utils.broadcastState();
         }
     }
+};
+
+updatePosition = function (state, wrapper, context, isAPI) {
+    const setupHandlers = function () {
+        for (const e of Constants.OSD_MONITORED_EVENTS) {
+            log.debug('Registering OpenSeadragon handler:', e);
+            context.osd.addHandler(e, sendViewportDetails);
+        }
+        context.isInitialized = true;
+        log.debug('Application is initialized:', context.isInitialized);
+        sendViewportDetails();
+    };
+
+    return () => {
+        if (wrapper.viewport && wrapper.viewport.bounds) {
+            // Delaying visibility to support better loading experience.
+            log.debug('Making OpenSeadragon hidden');
+            context.osd.setVisible(false);
+            setTimeout(function () {
+                const bounds = wrapper.viewport.bounds;
+                const calcX = Number(bounds.x) + Number(bounds.w) * 0.5;
+                const calcY = Number(bounds.y) + Number(bounds.h) * 0.5;
+                context.osd.viewport.panTo(new OpenSeadragon.Point(calcX,
+                    calcY), true).zoomTo(wrapper.viewport.zoom);
+
+                if (!context.osd.isVisible()) {
+                    setTimeout(function () {
+                        // Wait further for OSD to re-center and zoom image.
+                        log.debug('Making OpenSeadragon visible');
+                        context.osd.setVisible(true);
+                    }, Constants.OSD_POST_LOAD_WAIT_TIME);
+                }
+                setupHandlers();
+                // Wait sufficiently for OSD to load the image for the first time.
+            }, Constants.OSD_POST_LOAD_WAIT_TIME);
+        } else {
+            setupHandlers();
+        }
+    };
 };
 
 beginInitialization = function () {

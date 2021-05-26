@@ -1,6 +1,7 @@
 initView = function () {
     window.ove.context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
+    initCommon();
     OVE.Utils.setOnStateUpdate(updateImage);
 };
 

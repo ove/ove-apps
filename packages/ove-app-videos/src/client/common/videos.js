@@ -75,7 +75,7 @@ initCommon = function () {
     setTimeout(correctPosition, Constants.POSITION_CORRECTION_FREQUENCY);
 
     window.ove.socket.on(function (message) {
-        // We can receive a stat update before the application has been initialized.
+        // We can receive a state update before the application has been initialized.
         // this happens for controller-initiated flows.
         if (message.state) {
             log.debug('Got state change request: ', message.state);
