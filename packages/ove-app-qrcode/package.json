@@ -15,7 +15,7 @@
   "author": "James Scott-Brown <james.scott-brown@imperial.ac.uk>",
   "license": "MIT",
   "dependencies": {
-    "@ove-lib/appbase": "0.5.0",
+    "@ove-lib/appbase": "file:../ove/packages/ove-lib-appbase",
     "jquery": "3.6.0",
     "qrious": "4.0.2"
   }

@@ -29,7 +29,8 @@ const Constants = {
  **************************************************************/
 Constants.Operation = {
     PAN: 'pan',
-    ZOOM: 'zoom'
+    ZOOM: 'zoom',
+    UUID: 'uuid'
 };
 
 exports.Constants = Constants;

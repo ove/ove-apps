@@ -1,4 +1,6 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
+let currentUUID = -1;
+let clientId = -1;
 
 $(function () {
     // This is what happens first. After OVE is loaded, either the viewer or controller
@@ -6,6 +8,7 @@ $(function () {
     $(document).ready(function () {
         log.debug('Starting application');
         window.ove = new OVE(Constants.APP_NAME);
+        log.debug('UUID: ', window.ove.context.uuid);
         log.debug('Completed loading OVE');
         window.ove.context.isInitialized = false;
         window.ove.context.osd = undefined;
@@ -17,7 +20,27 @@ initCommon = function () {
     const context = window.ove.context;
 
     window.ove.socket.on(function (message) {
-        if (!message.operation || !context.isInitialized) return;
+        log.debug('message for client: ', message);
+        if (!message || !context.isInitialized) return;
+
+        if (message.update) {
+            log.debug('updating client: ', clientId);
+            log.debug('clientIds: ', clientId, ' ', message.clientId);
+            if (clientId === message.clientId) return;
+            log.debug('uuids: ', currentUUID, ' ', message.uuid);
+            if (message.uuid < currentUUID) return;
+            currentUUID = message.uuid;
+
+            for (const e of Constants.OSD_MONITORED_EVENTS) {
+                log.debug('Removing OpenSeadragon handler:', e);
+                context.osd.removeHandler(e, sendViewportDetails);
+            }
+
+            updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context, true)();
+            return;
+        }
+        if (!message.operation) return;
+
         log.debug('Got invoke operation request: ', message.operation);
 
         setTimeout(function () {
@@ -42,7 +65,7 @@ const buildViewport = function (op, context) {
                 dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
             };
 
-            updatePosition(window.ove.state.current, { viewport: viewport }, context, true)();
+            updatePosition(window.ove.state.current, { viewport: viewport }, context, false)();
             break;
         case Constants.Operation.ZOOM:
             log.info('Zooming');
@@ -53,7 +76,7 @@ const buildViewport = function (op, context) {
                 dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
             };
 
-            updatePosition(window.ove.state.current, { viewport: viewport }, context, true)();
+            updatePosition(window.ove.state.current, { viewport: viewport }, context, false)();
             break;
         default:
             log.warn('Ignoring unknown operation:', op.name);

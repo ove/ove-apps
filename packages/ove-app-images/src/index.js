@@ -4,9 +4,22 @@ const path = require('path');
 const base = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const { express, app, Utils, log, nodeModules } = base;
 const server = require('http').createServer(app);
-
 log.debug('Using module:', 'openseadragon');
 app.use('/', express.static(path.join(nodeModules, 'openseadragon', 'build', 'openseadragon')));
+
+const runner = (task) => {
+    log.debug(task);
+    task.message.event = undefined;
+    task.message.update = 'true';
+    ws.safeSend(JSON.stringify({ appId: task.appId, sectionId: task.sectionId, message: task.message }));
+    if (queue.size() !== 0) {
+        runner(queue.pop());
+    }
+};
+
+let uuid = 0;
+let noClients = 0;
+let queue = Utils.getPriorityQueue(runner);
 
 log.debug('Setting up state transformation operations');
 base.operations.canTransform = function (state, transformation) {
@@ -106,6 +119,12 @@ setTimeout(function () {
         socket.on('message', function (msg) {
             let m = JSON.parse(msg);
             log.info(m);
+
+            if (!m.message) return;
+
+            if (m.message.event) {
+                queue.push(m);
+            }
         });
     };
     getSocket();
@@ -127,8 +146,6 @@ const handleOperation = function (req, res) {
         // We assume that the viewport's pan properties are properly set instead of enforcing any strict type checks.
         message.operation.x = req.query.x;
         message.operation.y = req.query.y;
-        message.operation.w = req.query.w;
-        message.operation.h = req.query.h;
     } else if (name === Constants.Operation.ZOOM) {
         // We assume that the zoom property is properly set instead of enforcing any strict type checks.
         message.operation.zoom = req.query.zoom;
@@ -161,6 +178,14 @@ base.operations.validateState = function (state) {
         Utils.validateState(state, [{ prefix: ['state.url'] }]) ||
         Utils.validateState(state, [{ prefix: ['state.tileSources'] }]);
 };
+
+app.get('/private/id', (req, res) => {
+    res.status(200).set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JSON).send(JSON.stringify({ clientId: noClients++ }));
+});
+
+app.get('/private/uuid', (req, res) => {
+    res.status(200).set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JSON).send(JSON.stringify({ uuid: uuid++ }));
+});
 
 const port = process.env.PORT || 8080;
 server.listen(port);

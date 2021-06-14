@@ -15,7 +15,7 @@
   "author": "Senaka Fernando <senaka.fernando15@imperial.ac.uk>",
   "license": "MIT",
   "dependencies": {
-    "@ove-lib/appbase": "0.5.0",
+    "@ove-lib/appbase": "file:../ove/packages/ove-lib-appbase",
     "jquery": "3.6.0",
     "openseadragon": "2.4.2"
   }

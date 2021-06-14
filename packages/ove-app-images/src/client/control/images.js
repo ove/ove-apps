@@ -7,6 +7,11 @@ initControl = function (data, viewport) {
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 
     initCommon();
+    log.debug('URL: ', window.ove.context.appUrl);
+    $.ajax({
+        url: `/app/${Constants.APP_NAME}` + '/private/id',
+        success: success => { clientId = success.clientId }
+    })
 
     OVE.Utils.resizeController(Constants.CONTENT_DIV);
     // Initially, the state may not be set under the config property, but it will be once
@@ -41,6 +46,7 @@ initControl = function (data, viewport) {
     }
 
     window.ove.state.current = { config: currentState };
+    log.debug('Updating position!');
     // Viewport details would be updated for specific events - check OSD_MONITORED_EVENTS.
     loadOSD(currentState).then(updatePosition(currentState, __private, context, false)).catch(log.error);
 };
@@ -61,18 +67,28 @@ sendViewportDetails = function () {
         if (!window.ove.state.current.viewport ||
             !OVE.Utils.JSON.equals(viewport, window.ove.state.current.viewport)) {
             window.ove.state.current.viewport = viewport;
+
+            $.ajax({
+                url: `/app/${Constants.APP_NAME}` + '/private/uuid',
+                success: success => {
+                    currentUUID = success.uuid;
+                    log.debug('THIS IS IMPORTANT!!!: ', clientId);
+                    window.ove.socket.send({ event: 'true', clientId: clientId, viewport: viewport, uuid: success.uuid })
+                }
+            });
+
             if (window.ove.state.name) {
                 // Keep track of loaded state: this is used to check if the controller
                 // is attempting to load a different state.
                 window.ove.state.current.loadedState = window.ove.state.name;
             }
-            log.debug('Broadcasting state with viewport:', viewport);
+            log.debug('Broadcasting state with viewport:', window.ove.state.current.viewport);
             OVE.Utils.broadcastState();
         }
     }
 };
 
-updatePosition = function (state, wrapper, context, isAPI) {
+updatePosition = function (state, wrapper, context, isUpdate) {
     const setupHandlers = function () {
         for (const e of Constants.OSD_MONITORED_EVENTS) {
             log.debug('Registering OpenSeadragon handler:', e);
@@ -80,31 +96,40 @@ updatePosition = function (state, wrapper, context, isAPI) {
         }
         context.isInitialized = true;
         log.debug('Application is initialized:', context.isInitialized);
-        sendViewportDetails();
+        if (!isUpdate) {
+            sendViewportDetails();
+        }
     };
+
+    const update = function () {
+        const bounds = wrapper.viewport.bounds;
+        const calcX = Number(bounds.x) + Number(bounds.w) * 0.5;
+        const calcY = Number(bounds.y) + Number(bounds.h) * 0.5;
+        context.osd.viewport.panTo(new OpenSeadragon.Point(calcX,
+            calcY), true).zoomTo(wrapper.viewport.zoom);
+
+        if (!context.osd.isVisible()) {
+            setTimeout(function () {
+                // Wait further for OSD to re-center and zoom image.
+                log.debug('Making OpenSeadragon visible');
+                context.osd.setVisible(true);
+            }, Constants.OSD_POST_LOAD_WAIT_TIME);
+        }
+        setupHandlers();
+    }
 
     return () => {
         if (wrapper.viewport && wrapper.viewport.bounds) {
             // Delaying visibility to support better loading experience.
             log.debug('Making OpenSeadragon hidden');
             context.osd.setVisible(false);
-            setTimeout(function () {
-                const bounds = wrapper.viewport.bounds;
-                const calcX = Number(bounds.x) + Number(bounds.w) * 0.5;
-                const calcY = Number(bounds.y) + Number(bounds.h) * 0.5;
-                context.osd.viewport.panTo(new OpenSeadragon.Point(calcX,
-                    calcY), true).zoomTo(wrapper.viewport.zoom);
-
-                if (!context.osd.isVisible()) {
-                    setTimeout(function () {
-                        // Wait further for OSD to re-center and zoom image.
-                        log.debug('Making OpenSeadragon visible');
-                        context.osd.setVisible(true);
-                    }, Constants.OSD_POST_LOAD_WAIT_TIME);
-                }
-                setupHandlers();
-                // Wait sufficiently for OSD to load the image for the first time.
-            }, Constants.OSD_POST_LOAD_WAIT_TIME);
+            if (isUpdate) {
+                update();
+            } else {
+                setTimeout(function () {
+                    update(); // Wait sufficiently for OSD to load the image for the first time.
+                }, Constants.OSD_POST_LOAD_WAIT_TIME);
+            }
         } else {
             setupHandlers();
         }
