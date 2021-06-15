@@ -3,6 +3,11 @@ initControl = function (data) {
     context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 
+    $.ajax({
+        url: `/app/${Constants.APP_NAME}` + '/private/id',
+        success: success => { clientId = success.clientId }
+    })
+
     const g = window.ove.geometry;
     OVE.Utils.resizeController('.map, .outer');
     if (data.url) {
@@ -113,6 +118,15 @@ uploadMapPosition = function () {
         resolution: resolution,
         zoom: zoom
     };
+
+    $.ajax({
+        url: `/app/${Constants.APP_NAME}` + '/private/uuid',
+        success: success => {
+            currentUUID = success.uuid;
+            window.ove.socket.send({ event: 'true', clientId: clientId, position: position, uuid: success.uuid })
+        }
+    });
+
     // The broadcast happens only if the position has changed.
     if (!window.ove.state.current.position ||
         !OVE.Utils.JSON.equals(position, window.ove.state.current.position)) {

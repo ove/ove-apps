@@ -23,6 +23,8 @@ initCommon = function () {
         log.debug('message for client: ', message);
         if (!message || !context.isInitialized) return;
 
+        if (appId !== Constants.APP_NAME) return;
+
         if (message.update) {
             log.debug('updating client: ', clientId);
             log.debug('clientIds: ', clientId, ' ', message.clientId);

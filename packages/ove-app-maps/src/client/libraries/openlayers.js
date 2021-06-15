@@ -132,6 +132,13 @@ function OVEOpenLayersMap () {
         }
     };
 
+    this.unregisterHandlerForEvents = function () {
+        for (const e of Constants.OL_MONITORED_EVENTS) {
+            __private.map.getView().on(e, () => {});
+            log.debug('Removing OpenLayers handler:', e);
+        }
+    }
+
     this.loadLayers = function (config) {
         // The most complex operation in the initialization process is building
         // the layers of OpenLayers based on the JSON configuration model of the

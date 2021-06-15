@@ -1,4 +1,6 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
+let clientId = -1;
+let currentUUID = -1;
 
 $(function () {
     // This is what happens first. After OVE is loaded, either the viewer or controller
@@ -49,6 +51,20 @@ initCommon = async function () {
     };
 
     window.ove.socket.on(function (message) {
+        if (!message || !context.isInitialized) return;
+
+        if (message.update) {
+            if (clientId === message.clientId) return;
+            if (message.uuid < currentUUID) return;
+            currentUUID = message.UUID;
+
+            context.library.unregisterHandlerForEvents();
+
+            context.library.setZoom(message.position.zoom);
+            context.library.setCenter(message.position.center);
+            return;
+        }
+
         if (message.operation && context.isInitialized) {
             log.debug('Got invoke operation request: ', message.operation);
             const op = message.operation;

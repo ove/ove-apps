@@ -7,6 +7,19 @@ const request = require('request');
 const fs = require('fs');
 const server = require('http').createServer(app);
 
+const runner = (m) => {
+    m.message.event = undefined;
+    m.message.update = 'true';
+    ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: m.message }));
+    if (queue.size() !== 0) {
+        runner(queue.pop());
+    }
+}
+
+let uuid = 0;
+let noClients = 0;
+let queue = Utils.getPriorityQueue(runner);
+
 let layers = [];
 // The map layers can be provided as an embedded JSON data structure or as a URL pointing
 // to a location at which it is stored externally.
@@ -190,6 +203,13 @@ setTimeout(function () {
         socket.on('message', function (msg) {
             let m = JSON.parse(msg);
             log.info(m);
+
+            if (m.appId !== Constants.APP_NAME) return;
+            if (!m.message) return;
+
+            if (m.message.event) {
+                queue.push(m);
+            }
         });
     };
     getSocket();
@@ -229,6 +249,14 @@ const handleOperation = function (req, res) {
 
 const operationsList = Object.values(Constants.Operation);
 app.post('/operation/:name(' + operationsList.join('|') + ')', handleOperation);
+
+app.get('/private/id', (req, res) => {
+    res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JSON).send(JSON.stringify({ clientId: noClients++ }));
+});
+
+app.get('/private/uuid', (req, res) => {
+    res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JSON).send(JSON.stringify({ uuid: uuid++ }));
+});
 
 const port = process.env.PORT || 8080;
 server.listen(port);
