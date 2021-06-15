@@ -120,6 +120,8 @@ setTimeout(function () {
             let m = JSON.parse(msg);
             log.info(m);
 
+            if (m.appId !== Constants.APP_NAME) return;
+
             if (!m.message) return;
 
             if (m.message.event) {
