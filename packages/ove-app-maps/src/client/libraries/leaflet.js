@@ -59,6 +59,13 @@ function OVELeafletMap () {
         }
     };
 
+    this.unregisterHandlerForEvents = function (eventHandler) {
+        for (const e of Constants.LEAFLET_MONITORED_EVENTS) {
+            __private.map.removeEventListener(e, eventHandler);
+            log.debug('Removing Leaflet handler:', e);
+        }
+    }
+
     /* jshint ignore:start */
     // current version of JSHint does not support async/await
     this.loadLayers = async function (config) {
