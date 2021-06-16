@@ -33,6 +33,10 @@ const buildViewport = function (op, context) {
     }
 };
 
+const centerEquality = function (c1, c2) {
+    return c1[0] === c2[0] && c1[1] === c2[1];
+}
+
 // Initialization that is common to viewers and controllers.
 /* jshint ignore:start */
 // current version of JSHint does not support async/await
@@ -58,10 +62,12 @@ initCommon = async function () {
             if (message.uuid < currentUUID) return;
             currentUUID = message.UUID;
 
-            context.library.unregisterHandlerForEvents();
+            context.library.unregisterHandlerForEvents(uploadMapPosition);
 
             context.library.setZoom(message.position.zoom);
             context.library.setCenter(message.position.center);
+
+            context.library.registerHandlerForEvents(uploadMapPosition);
             return;
         }
 

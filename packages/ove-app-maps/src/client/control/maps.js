@@ -88,22 +88,20 @@ initControl = function (data) {
     });
 };
 
-uploadMapPosition = function () {
+uploadHelper = function (topLeft, bottomRight) {
     const context = window.ove.context;
     const size = context.library.getSize();
-    const topLeft = context.library.getTopLeft();
-    const bottomRight = context.library.getBottomRight();
 
     // If the resolution is not available, the scaling factor will be applied to zoom, instead.
     const scaleFactor = Math.sqrt(window.ove.geometry.section.w * window.ove.geometry.section.h / (size[0] * size[1]));
     const zoom = context.library.getResolution() ? context.library.getZoom() : (context.library.getZoom() + Math.log2(scaleFactor));
     const resolution = context.library.getResolution() ? context.library.getResolution() / scaleFactor : undefined;
-    if (topLeft === null || bottomRight === null) {
+    /*if (topLeft === null || bottomRight === null) {
         log.debug('Waiting to get coordinates from pixels');
         // This method will loop until the top-left and bottom-right can be calculated.
         setTimeout(uploadMapPosition, 70);
         return;
-    }
+    }*/
     // We broadcast the coordinates of the center, the zoom level and the resolution.
     // We also send the coordinates of the top-left and bottom-right, to ensure the
     // map is focusing on the correct lat/long.
@@ -134,6 +132,25 @@ uploadMapPosition = function () {
         log.debug('Broadcasting state with position:', position);
         OVE.Utils.broadcastState();
     }
+}
+
+waitLoad = async function () {
+    const topLeft = window.ove.context.library.getTopLeft();
+    const bottomRight = window.ove.context.library.getBottomRight();
+
+    if (topLeft === null || bottomRight === null || topLeft === undefined || bottomRight === undefined) {
+        return await new Promise((resolve, reject) => {
+            setTimeout(waitLoad, 70);
+        });
+    } else {
+        return [topLeft, bottomRight];
+    }
+}
+
+uploadMapPosition = async function () {
+    const corners = await waitLoad();
+    log.debug('Corners: [', corners[0], ', ', corners[1], ']');
+    uploadHelper(corners[0], corners[1]);
 };
 
 beginInitialization = function () {
