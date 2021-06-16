@@ -58,16 +58,7 @@ initCommon = async function () {
         if (!message || !context.isInitialized) return;
 
         if (message.update) {
-            if (clientId === message.clientId) return;
-            if (message.uuid < currentUUID) return;
-            currentUUID = message.UUID;
-
-            context.library.unregisterHandlerForEvents(uploadMapPosition);
-
-            context.library.setZoom(message.position.zoom);
-            context.library.setCenter(message.position.center);
-
-            context.library.registerHandlerForEvents(uploadMapPosition);
+            onUpdate(message);
             return;
         }
 
@@ -78,6 +69,11 @@ initCommon = async function () {
             setTimeout(function () {
                 buildViewport(op, context);
             });
+            return;
+        }
+
+        if (!message.event) {
+            updateState(message);
         }
     });
 

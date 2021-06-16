@@ -7,6 +7,7 @@ initView = function () {
 };
 
 initThenUpdateMap = function () {
+    log.debug('other update');
     if (!window.ove.context.isCommonInitialized) {
         window.ove.context.isCommonInitialized = true;
         initCommon().then(updateMap);
@@ -14,6 +15,13 @@ initThenUpdateMap = function () {
         updateMap();
     }
 };
+
+onUpdate = _ => {};
+
+updateState = message => {
+    window.ove.state.current = message;
+    initThenUpdateMap();
+}
 
 updateMap = function () {
     const context = window.ove.context;

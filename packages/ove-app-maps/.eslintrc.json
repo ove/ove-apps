@@ -4,7 +4,7 @@
         "$": true,
         "Constants": true,
         "fetch": true,
-        "OVE": true
+        "OVE": true,
     },
     "overrides": [
         {
@@ -13,7 +13,9 @@
                 "initThenUpdateMap": true,
                 "initView": true,
                 "log": true,
-                "updateMap": true
+                "updateMap": true,
+                "onUpdate": true,
+                "updateState": true
             }
         },
         {
@@ -22,7 +24,9 @@
                 "initControl": true,
                 "location": true,
                 "log": true,
-                "uploadMapPosition": true
+                "uploadMapPosition": true,
+                "onUpdate": true,
+                "updateState": true
             }
         },
         {

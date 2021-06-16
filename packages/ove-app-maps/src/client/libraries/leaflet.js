@@ -59,7 +59,7 @@ function OVELeafletMap () {
         }
     };
 
-    this.unregisterHandlerForEvents = function (eventHandler) {
+    this.unregisterHandlerForEvents = function (eventHandler, onChange) {
         for (const e of Constants.LEAFLET_MONITORED_EVENTS) {
             __private.map.removeEventListener(e, eventHandler);
             log.debug('Removing Leaflet handler:', e);
