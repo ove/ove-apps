@@ -9,7 +9,7 @@ initControl = function (data, viewport) {
     initCommon();
     log.debug('URL: ', window.ove.context.appUrl);
     $.ajax({
-        url: `/app/${Constants.APP_NAME}` + '/private/id',
+        url: `/app/${Constants.APP_NAME}/private/id`,
         success: success => { clientId = success.clientId }
     })
 
@@ -69,10 +69,9 @@ sendViewportDetails = function () {
             window.ove.state.current.viewport = viewport;
 
             $.ajax({
-                url: `/app/${Constants.APP_NAME}` + '/private/uuid',
+                url: `/app/${Constants.APP_NAME}/private/uuid`,
                 success: success => {
                     currentUUID = success.uuid;
-                    log.debug('THIS IS IMPORTANT!!!: ', clientId);
                     window.ove.socket.send({ event: 'true', clientId: clientId, viewport: viewport, uuid: success.uuid })
                 }
             });

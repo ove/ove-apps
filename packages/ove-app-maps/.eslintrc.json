@@ -4,7 +4,7 @@
         "$": true,
         "Constants": true,
         "fetch": true,
-        "OVE": true,
+        "OVE": true
     },
     "overrides": [
         {
