@@ -48,7 +48,6 @@ initControl = function (data) {
         if (!OVE.Utils.JSON.equals(context.state, state)) {
             // We only trigger updates if the state has really changed.
             context.state = JSON.parse(JSON.stringify(state));
-            window.ove.socket.send({ event: 'true', clientId: window.ove.context.uuid, state: context.state });
             triggerUpdate();
         }
     }));

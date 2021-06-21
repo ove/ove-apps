@@ -1,6 +1,4 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
-let currentUUID = -1;
-let updateFlag = false;
 
 $(function () {
     // This is what happens first. After OVE is loaded, either the viewer or controller
@@ -14,25 +12,7 @@ $(function () {
     });
 });
 
-initCommon = function () {
-    window.ove.socket.on(function (message) {
-        if (!message || !window.ove.context.isInitialized) return;
-        if (message.fetch_uuid && message.uuid > currentUUID) {
-            currentUUID = message.uuid;
-        } else if (message.update) {
-            if (window.ove.context.uuid === message.clientId) return;
-            if (currentUUID >= message.uuid) return;
-            currentUUID = message.uuid;
-            updateFlag = true;
-            window.ove.state.current = message.state;
-            updatePDF();
-            updateFlag = false;
-        }
-    });
-};
-
 updatePDF = function () {
-    if (updateFlag) return;
     const context = window.ove.context;
     const state = window.ove.state.current;
 

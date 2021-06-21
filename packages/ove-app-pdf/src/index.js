@@ -9,18 +9,6 @@ app.use('/', express.static(path.join(nodeModules, 'pdfjs-dist', 'build')));
 log.debug('Using module:', 'd3');
 app.use('/', express.static(path.join(nodeModules, 'd3', 'dist')));
 
-const runner = function (m) {
-    m.message.event = undefined;
-    m.message.update = 'true';
-    ws.safeSend(JSON.stringify(m));
-    if (queue.size() !== 0) {
-        runner(queue.pop());
-    }
-};
-
-let uuid = 0;
-const queue = Utils.getPriorityQueue(runner);
-
 log.debug('Setting up state transformation operations');
 base.operations.canTransform = function (state, transformation) {
     const combinations = [
@@ -96,38 +84,6 @@ base.operations.validateState = function (state) {
         { prefix: ['state.scale'] }
     ]);
 };
-
-let ws;
-setTimeout(function () {
-    const getSocket = function () {
-        const socketURL = 'ws://' + Utils.getOVEHost();
-        log.debug('Establishing WebSocket connection with:', socketURL);
-        let socket = new (require('ws'))(socketURL);
-        ws = Utils.getSafeSocket(socket);
-        socket.on('open', function () {
-            log.debug('WebSocket connection made with:', socketURL);
-        });
-        socket.on('close', function (code) {
-            log.warn('Lost websocket connection: closed with code:', code);
-            log.warn('Attempting to reconnect in ' + Constants.SOCKET_REFRESH_DELAY + 'ms');
-            // If the socket is closed, we try to refresh it.
-            setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
-        });
-        socket.on('error', log.error);
-        socket.on('message', function (msg) {
-            let m = JSON.parse(msg);
-            if (m.appId !== Constants.APP_NAME || !m.message) return;
-
-            if (m.message.event) {
-                m.message.uuid = uuid++;
-                const message = { fetch_uuid: 'true', uuid: m.message.uuid }
-                ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: message }));
-                queue.push(m);
-            }
-        });
-    };
-    getSocket();
-}, Constants.SOCKET_READY_WAIT_TIME);
 
 const port = process.env.PORT || 8080;
 server.listen(port);
