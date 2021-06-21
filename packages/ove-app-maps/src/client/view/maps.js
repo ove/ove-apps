@@ -16,9 +16,9 @@ initThenUpdateMap = function () {
     }
 };
 
-onUpdate = _ => {};
+onUpdate = function () {};
 
-updateState = message => {
+updateState = function (message) {
     window.ove.state.current = message;
     initThenUpdateMap();
 }

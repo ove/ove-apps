@@ -1,5 +1,5 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
-let clientId = -1;
+let updateFlag = false;
 let currentUUID = -1;
 
 $(function () {
@@ -21,15 +21,14 @@ $(function () {
 const buildViewport = function (op, context) {
     switch (op.name) {
         case Constants.Operation.PAN:
-            log.info('Panning');
             context.library.setCenter([op.x, op.y]);
             break;
         case Constants.Operation.ZOOM:
-            log.info('Zooming');
             context.library.setZoom(op.zoom);
             break;
         default:
             log.warn('Ignoring unknown operation:', op.name);
+            break;
     }
 };
 
@@ -57,22 +56,18 @@ initCommon = async function () {
     window.ove.socket.on(function (message) {
         if (!message || !context.isInitialized) return;
 
-        if (message.update) {
+        if (message.fetch_uuid && currentUUID < message.uuid) {
+            currentUUID = message.uuid;
+        } else if (message.update) {
             onUpdate(message);
-            return;
-        }
-
-        if (message.operation && context.isInitialized) {
+        } else if (message.operation && context.isInitialized) {
             log.debug('Got invoke operation request: ', message.operation);
             const op = message.operation;
 
             setTimeout(function () {
                 buildViewport(op, context);
             });
-            return;
-        }
-
-        if (!message.event) {
+        } else if (!message.event) {
             updateState(message);
         }
     });

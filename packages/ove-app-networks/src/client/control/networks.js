@@ -33,7 +33,17 @@ initControl = function (data) {
     log.debug('Broadcasting state');
     OVE.Utils.broadcastState();
     window.ove.socket.on(function (message) {
-        if (message.operation) {
+        if (!message || !window.ove.context.isInitialized) return;
+
+        if (message.update) {
+            if (window.ove.context.uuid === message.clientId) return;
+            if (message.uuid <= currentUUID) return;
+            currentUUID = message.uuid;
+            updateFlag = true;
+            window.ove.context.sigma.camera.goTo(message.coordinates);
+            updateFlag = false;
+            refreshSigma(window.ove.context.sigma);
+        } else if (message.operation) {
             // We first of all need to know if the operation was known
             if (!Object.values(Constants.Operation).includes(message.operation)) {
                 // This can only happen due to a user error
@@ -60,6 +70,7 @@ getClientSpecificURL = function (url) {
 };
 
 setupCoordinatesUpdateEventListener = function (sigma) {
+    if (updateFlag) return;
     const horizontalScalingFactor = window.ove.geometry.section.w /
         Math.min(document.documentElement.clientWidth, window.innerWidth);
     const verticalScalingFactor = window.ove.geometry.section.h /
@@ -68,8 +79,11 @@ setupCoordinatesUpdateEventListener = function (sigma) {
     log.debug('Calculated scaling factor:', factor);
 
     // Camera position changes trigger COORDINATES_UPDATED_EVENT
-    let camera = sigma.camera;
+    const camera = sigma.camera;
     camera.bind(Constants.COORDINATES_UPDATED_EVENT, function () {
+        if (updateFlag) return;
+        const coordinates = {x: camera.x, y: camera.y, ratio: camera.ratio, angle: camera.angle }
+        window.ove.socket.send({ event: 'true', clientId: window.ove.context.uuid, coordinates: coordinates, factor: factor });
         window.ove.context.coordinates = {
             x: camera.x * factor,
             y: camera.y * factor,

@@ -7,17 +7,16 @@ const request = require('request');
 const fs = require('fs');
 const server = require('http').createServer(app);
 
-const runner = (m) => {
+const runner = function (m) {
     m.message.event = undefined;
     m.message.update = 'true';
-    ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: m.message }));
+    ws.safeSend(JSON.stringify(m));
     if (queue.size() !== 0) {
         runner(queue.pop());
     }
-}
+};
 
 let uuid = 0;
-let noClients = 0;
 let queue = Utils.getPriorityQueue(runner);
 
 let layers = [];
@@ -202,13 +201,13 @@ setTimeout(function () {
         socket.on('error', log.error);
         socket.on('message', function (msg) {
             let m = JSON.parse(msg);
-            log.info(m);
-
-            if (m.appId !== Constants.APP_NAME) return;
-            if (!m.message) return;
+            if (m.appId !== Constants.APP_NAME || !m.message) return;
 
             if (m.message.event) {
+                m.message.uuid = uuid++;
                 queue.push(m);
+                const message = { fetch_uuid: 'true', uuid: m.message.uuid };
+                ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: message }));
             }
         });
     };
@@ -249,14 +248,6 @@ const handleOperation = function (req, res) {
 
 const operationsList = Object.values(Constants.Operation);
 app.post('/operation/:name(' + operationsList.join('|') + ')', handleOperation);
-
-app.get('/private/id', (req, res) => {
-    res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JSON).send(JSON.stringify({ clientId: noClients++ }));
-});
-
-app.get('/private/uuid', (req, res) => {
-    res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JSON).send(JSON.stringify({ uuid: uuid++ }));
-});
 
 const port = process.env.PORT || 8080;
 server.listen(port);

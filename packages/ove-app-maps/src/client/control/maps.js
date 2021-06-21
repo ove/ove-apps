@@ -3,11 +3,6 @@ initControl = function (data) {
     context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 
-    $.ajax({
-        url: `/app/${Constants.APP_NAME}/private/id`,
-        success: success => { clientId = success.clientId }
-    })
-
     const g = window.ove.geometry;
     OVE.Utils.resizeController('.map, .outer');
     if (data.url) {
@@ -49,8 +44,9 @@ initControl = function (data) {
             // The resolution can be scaled to match the section's dimensions, or it could be
             // the original resolution intended for the controller. The data.scaled property
             // is used to determine the option.
+            const outer = $('.outer');
             const scaleFactor = (data.scaled ? Math.sqrt(g.section.w * g.section.h /
-                (parseInt($('.outer').css('width'), 10) * parseInt($('.outer').css('height'), 10))) : 1.0);
+                (parseInt(outer.css('width'), 10) * parseInt(outer.css('height'), 10))) : 1.0);
             const resolution = config.resolution ? +(config.resolution) * scaleFactor : undefined;
             const zoom = config.resolution ? +(config.zoom) : (+(config.zoom) - Math.log2(scaleFactor));
             context.map = context.library.initialize({
@@ -88,27 +84,21 @@ initControl = function (data) {
     });
 };
 
-updateState = _ => {};
+updateState = function () {};
 
 onUpdate = function (message) {
     const context = window.ove.context;
-    if (clientId === message.clientId) return;
-    if (message.uuid < currentUUID) return;
+    if (window.ove.context.uuid === message.clientId) return;
+    if (message.uuid <= currentUUID) return;
     currentUUID = message.UUID;
-
-    context.library.unregisterHandlerForEvents(uploadMapPosition, changeEvent);
-
+    updateFlag = true;
     context.library.setZoom(message.position.zoom);
     context.library.setCenter(message.position.center);
-
-    context.library.registerHandlerForEvents(uploadMapPosition, changeEvent);
-}
-
-changeEvent = function () {
-    setTimeout(uploadMapPosition, Constants.OL_CHANGE_CENTER_AFTER_UPDATE_WAIT_TIME);
+    updateFlag = false;
 }
 
 uploadMapPosition = function () {
+    if (updateFlag) return;
     const context = window.ove.context;
     const size = context.library.getSize();
     const topLeft = context.library.getTopLeft();
@@ -142,13 +132,7 @@ uploadMapPosition = function () {
     // The broadcast happens only if the position has changed.
     if (!window.ove.state.current.position ||
         !OVE.Utils.JSON.equals(position, window.ove.state.current.position)) {
-        $.ajax({
-            url: `/app/${Constants.APP_NAME}/private/uuid`,
-            success: success => {
-                currentUUID = success.uuid;
-                window.ove.socket.send({ event: 'true', clientId: clientId, position: position, uuid: success.uuid })
-            }
-        });
+        window.ove.socket.send({ event: 'true', clientId: window.ove.context.uuid, position: position });
 
         window.ove.state.current.position = position;
         log.debug('Broadcasting state with position:', position);

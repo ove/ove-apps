@@ -1,6 +1,6 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
 let currentUUID = -1;
-let clientId = -1;
+let updateFlag = false;
 
 $(function () {
     // This is what happens first. After OVE is loaded, either the viewer or controller
@@ -20,32 +20,23 @@ initCommon = function () {
     const context = window.ove.context;
 
     window.ove.socket.on(function (message) {
-        log.debug('message for client: ', message);
         if (!message || !context.isInitialized) return;
 
-        if (message.update) {
-            log.debug('updating client: ', clientId);
-            log.debug('clientIds: ', clientId, ' ', message.clientId);
-            if (clientId === message.clientId) return;
-            log.debug('uuids: ', currentUUID, ' ', message.uuid);
-            if (message.uuid < currentUUID) return;
+        if (message.fetch_uuid && currentUUID < message.uuid) {
+            currentUUID = message.uuid;
+        } else if (message.update) {
+            if (window.ove.context.uuid === message.clientId) return;
+            if (message.uuid <= currentUUID) return;
             currentUUID = message.uuid;
 
-            for (const e of Constants.OSD_MONITORED_EVENTS) {
-                log.debug('Removing OpenSeadragon handler:', e);
-                context.osd.removeHandler(e, sendViewportDetails);
-            }
+            updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context)();
+        } else if (message.operation) {
+            log.debug('Got invoke operation request: ', message.operation);
 
-            updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context, true)();
-            return;
+            setTimeout(function () {
+                buildViewport(message.operation, context);
+            });
         }
-        if (!message.operation) return;
-
-        log.debug('Got invoke operation request: ', message.operation);
-
-        setTimeout(function () {
-            buildViewport(message.operation, context);
-        });
     });
 };
 
@@ -57,18 +48,16 @@ const buildViewport = function (op, context) {
 
     switch (op.name) {
         case Constants.Operation.PAN:
-            log.info('Panning');
-
+            // The viewport information sent across includes bounds and zoom level.
             viewport = {
                 bounds: { x: op.x, y: op.y, w: bounds.width, h: bounds.height },
                 zoom: zoom,
                 dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
             };
 
-            updatePosition(window.ove.state.current, { viewport: viewport }, context, false)();
+            updatePosition(window.ove.state.current, { viewport: viewport }, context)();
             break;
         case Constants.Operation.ZOOM:
-            log.info('Zooming');
             // The viewport information sent across includes bounds and zoom level.
             viewport = {
                 bounds: { x: bounds.x, y: bounds.y, w: bounds.width, h: bounds.height },
@@ -76,10 +65,11 @@ const buildViewport = function (op, context) {
                 dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
             };
 
-            updatePosition(window.ove.state.current, { viewport: viewport }, context, false)();
+            updatePosition(window.ove.state.current, { viewport: viewport }, context)();
             break;
         default:
             log.warn('Ignoring unknown operation:', op.name);
+            break;
     }
 };
 

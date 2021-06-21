@@ -7,18 +7,16 @@ const server = require('http').createServer(app);
 log.debug('Using module:', 'openseadragon');
 app.use('/', express.static(path.join(nodeModules, 'openseadragon', 'build', 'openseadragon')));
 
-const runner = (task) => {
-    log.debug(task);
-    task.message.event = undefined;
-    task.message.update = 'true';
-    ws.safeSend(JSON.stringify({ appId: task.appId, sectionId: task.sectionId, message: task.message }));
+const runner = function (m) {
+    m.message.event = undefined;
+    m.message.update = 'true';
+    ws.safeSend(JSON.stringify(m));
     if (queue.size() !== 0) {
         runner(queue.pop());
     }
 };
 
 let uuid = 0;
-let noClients = 0;
 let queue = Utils.getPriorityQueue(runner);
 
 log.debug('Setting up state transformation operations');
@@ -118,13 +116,12 @@ setTimeout(function () {
         socket.on('error', log.error);
         socket.on('message', function (msg) {
             let m = JSON.parse(msg);
-            log.info(m);
-
-            if (m.appId !== Constants.APP_NAME) return;
-
-            if (!m.message) return;
+            if (m.appId !== Constants.APP_NAME || !m.message) return;
 
             if (m.message.event) {
+                m.message.uuid = uuid++;
+                const message = { fetch_uuid: 'true', uuid: m.message.uuid }
+                ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: message }));
                 queue.push(m);
             }
         });
@@ -180,14 +177,6 @@ base.operations.validateState = function (state) {
         Utils.validateState(state, [{ prefix: ['state.url'] }]) ||
         Utils.validateState(state, [{ prefix: ['state.tileSources'] }]);
 };
-
-app.get('/private/id', (req, res) => {
-    res.status(200).set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JSON).send(JSON.stringify({ clientId: noClients++ }));
-});
-
-app.get('/private/uuid', (req, res) => {
-    res.status(200).set(Constants.HTTP_HEADER_CONTENT_TYPE, Constants.HTTP_CONTENT_TYPE_JSON).send(JSON.stringify({ uuid: uuid++ }));
-});
 
 const port = process.env.PORT || 8080;
 server.listen(port);

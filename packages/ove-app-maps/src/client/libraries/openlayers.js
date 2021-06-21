@@ -115,30 +115,22 @@ function OVEOpenLayersMap () {
         return __private.map;
     };
 
-    this.registerHandlerForEvents = function (eventHandler, changeEvent) {
-        log.debug('eventHandler', eventHandler);
-        log.debug('changeEvent', changeEvent);
+    this.registerHandlerForEvents = function (eventHandler) {
+        const changeEvent = function () {
+            // it takes a while for the all attributes of the map to be updated, especially after
+            // a resolution/zoom-level change.
+            setTimeout(eventHandler, Constants.OL_CHANGE_CENTER_AFTER_UPDATE_WAIT_TIME);
+        };
         // Handlers for OpenLayers events.
         for (const e of Constants.OL_MONITORED_EVENTS) {
             if (e === 'change:center') {
-                __private.map.getView().addEventListener(e, eventHandler);
+                __private.map.getView().on(e, eventHandler);
             } else {
-                __private.map.getView().addEventListener(e, changeEvent);
+                __private.map.getView().on(e, changeEvent);
             }
             log.debug('Registering OpenLayers handler:', e);
         }
     };
-
-    this.unregisterHandlerForEvents = function (eventHandler, changeEvent) {
-        for (const e of Constants.OL_MONITORED_EVENTS) {
-            if (e === 'change:center') {
-                __private.map.getView().removeEventListener(e, eventHandler);
-            } else {
-                __private.map.getView().removeEventListener(e, changeEvent);
-            }
-            log.debug('Removing OpenLayers handler:', e);
-        }
-    }
 
     this.loadLayers = function (config) {
         // The most complex operation in the initialization process is building
