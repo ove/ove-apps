@@ -39,9 +39,7 @@ initControl = function (data) {
     // D3 is used for pan and zoom operations.
     log.debug('Registering pan/zoom listeners');
     d3.select(Constants.CONTROL_CANVAS).call(d3.zoom().scaleExtent([1, Constants.MAX_ZOOM_LEVEL]).on('zoom', function () {
-        if (context.renderingInProgress) {
-            return;
-        }
+        if (context.renderingInProgress) return;
         state.offset.x = d3.event.transform.x * getScalingFactor();
         state.offset.y = d3.event.transform.y * getScalingFactor();
         state.scale = d3.event.transform.k * (state.settings.scale || Constants.DEFAULT_SCALE);
@@ -50,6 +48,7 @@ initControl = function (data) {
         if (!OVE.Utils.JSON.equals(context.state, state)) {
             // We only trigger updates if the state has really changed.
             context.state = JSON.parse(JSON.stringify(state));
+            window.ove.socket.send({ event: 'true', clientId: window.ove.context.uuid, state: context.state });
             triggerUpdate();
         }
     }));
