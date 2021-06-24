@@ -13,9 +13,6 @@ const runner = function (m) {
     m.message.event = undefined;
     m.message.update = 'true';
     ws.safeSend(JSON.stringify(m));
-    if (queue.size() !== 0) {
-        runner(queue.pop());
-    }
 };
 
 let uuid = 0;

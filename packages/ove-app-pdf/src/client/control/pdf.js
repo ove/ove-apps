@@ -1,6 +1,7 @@
 initControl = function (data) {
     let context = window.ove.context;
     context.isInitialized = false;
+    initCommon();
     log.debug('Application is initialized:', context.isInitialized);
     log.debug('Restoring state:', data);
     const state = window.ove.state.current = data;
@@ -30,19 +31,14 @@ initControl = function (data) {
     canvas.height = window.ove.geometry.section.h;
     canvas.width = window.ove.geometry.section.w;
 
-    const triggerUpdate = function () {
-        log.debug('Broadcasting state');
-        OVE.Utils.broadcastState();
-        updatePDF();
-    };
-
     // D3 is used for pan and zoom operations.
     log.debug('Registering pan/zoom listeners');
-    d3.select(Constants.CONTROL_CANVAS).call(d3.zoom().scaleExtent([1, Constants.MAX_ZOOM_LEVEL]).on('zoom', function () {
+    d3.select(Constants.CONTROL_CANVAS).call(d3.zoom().scaleExtent([1, Constants.MAX_ZOOM_LEVEL]).on('zoom', function ({transform}) {
+        if (updateFlag) return;
         if (context.renderingInProgress) return;
-        state.offset.x = d3.event.transform.x * getScalingFactor();
-        state.offset.y = d3.event.transform.y * getScalingFactor();
-        state.scale = d3.event.transform.k * (state.settings.scale || Constants.DEFAULT_SCALE);
+        state.offset.x = transform.x * getScalingFactor();
+        state.offset.y = transform.y * getScalingFactor();
+        state.scale = transform.k * (state.settings.scale || Constants.DEFAULT_SCALE);
 
         log.debug('Updating scale:', state.scale, 'and offset:', state.offset);
         if (!OVE.Utils.JSON.equals(context.state, state)) {
@@ -51,6 +47,8 @@ initControl = function (data) {
             triggerUpdate();
         }
     }));
+
+    window.ove.state.cache();
 
     triggerUpdate();
 };
@@ -65,5 +63,28 @@ getScalingFactor = function () {
 
 beginInitialization = function () {
     log.debug('Starting controller initialization');
-    OVE.Utils.initControl(Constants.DEFAULT_STATE_NAME, initControl);
+    $(document).on(OVE.Event.LOADED, function () {
+        log.debug('Invoking OVE.Event.Loaded handler');
+        // The pdf controller can pre-load an existing state and continue navigation
+        // from that point onwards and does not reset what's already loaded.
+        window.ove.state.load().then(function () {
+            const currentState = window.ove.state.current;
+            const loadingNewState = currentState.loadedState !== undefined && currentState.loadedState !== window.ove.state.name;
+            if (currentState.url) {
+                log.debug('url: ', currentState.url);
+                initControl({ url: currentState.url });
+            } else if (!loadingNewState && currentState) {
+                // This happens when the pdf has been pre-loaded by a controller.
+                log.debug('Initializing controller with state:', currentState, 'and viewport:', currentState.viewport);
+                $(window.resize(function () {
+                    location.reload();
+                }));
+                initControl(currentState);
+            } else {
+                OVE.Utils.initControlOnDemand(Constants.DEFAULT_STATE_NAME, initControl);
+            }
+        }).catch(function () {
+            OVE.Utils.initControlOnDemand(Constants.DEFAULT_STATE_NAME, initControl);
+        });
+    });
 };
