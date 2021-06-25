@@ -20,16 +20,19 @@ initCommon = function () {
     const context = window.ove.context;
 
     window.ove.socket.on(function (message) {
+        const uuid = window.ove.context.uuid;
         if (!message || !context.isInitialized) return;
 
-        if (message.fetch_uuid && currentUUID < message.uuid) {
-            currentUUID = message.uuid;
-        } else if (message.update) {
-            if (window.ove.context.uuid === message.clientId) return;
-            if (message.uuid <= currentUUID) return;
-            currentUUID = message.uuid;
+        if (message.name) {
+            if (message.name === Constants.Events.UUID && currentUUID < message.uuid && message.clientId === uuid) {
+                currentUUID = message.uuid;
+            } else if (message.name === Constants.Events.UPDATE) {
+                if (window.ove.context.uuid === message.clientId) return;
+                if (message.uuid <= currentUUID) return;
+                currentUUID = message.uuid;
 
-            updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context)();
+                updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context)();
+            }
         } else if (message.operation) {
             log.debug('Got invoke operation request: ', message.operation);
 

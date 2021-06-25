@@ -63,7 +63,7 @@ sendViewportDetails = function () {
         if (!window.ove.state.current.viewport ||
             !OVE.Utils.JSON.equals(viewport, window.ove.state.current.viewport)) {
             window.ove.state.current.viewport = viewport;
-            window.ove.socket.send({ event: 'true', clientId: window.ove.context.uuid, viewport: viewport });
+            window.ove.socket.send({ name: Constants.Events.EVENT, clientId: window.ove.context.uuid, viewport: viewport });
 
             if (window.ove.state.name) {
                 // Keep track of loaded state: this is used to check if the controller
