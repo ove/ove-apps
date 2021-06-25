@@ -34,15 +34,20 @@ initControl = function (data) {
     OVE.Utils.broadcastState();
     window.ove.socket.on(function (message) {
         if (!message || !window.ove.context.isInitialized) return;
+        const uuid = window.ove.context.uuid;
 
-        if (message.update) {
-            if (window.ove.context.uuid === message.clientId) return;
-            if (message.uuid <= currentUUID) return;
-            currentUUID = message.uuid;
-            updateFlag = true;
-            window.ove.context.sigma.camera.goTo(message.coordinates);
-            updateFlag = false;
-            refreshSigma(window.ove.context.sigma);
+        if (message.name) {
+            if (message.name === Constants.Events.UPDATE) {
+                if (uuid === message.clientId) return;
+                if (message.uuid <= currentUUID) return;
+                currentUUID = message.uuid;
+                updateFlag = true;
+                window.ove.context.sigma.camera.goTo(message.coordinates);
+                updateFlag = false;
+                refreshSigma(window.ove.context.sigma);
+            } else if (message.name === Constants.Events.UUID && message.uuid > currentUUID && message.clientId === uuid) {
+                currentUUID = message.uuid;
+            }
         } else if (message.operation) {
             // We first of all need to know if the operation was known
             if (!Object.values(Constants.Operation).includes(message.operation)) {
@@ -83,7 +88,7 @@ setupCoordinatesUpdateEventListener = function (sigma) {
     camera.bind(Constants.COORDINATES_UPDATED_EVENT, function () {
         if (updateFlag) return;
         const coordinates = {x: camera.x, y: camera.y, ratio: camera.ratio, angle: camera.angle }
-        window.ove.socket.send({ event: 'true', clientId: window.ove.context.uuid, coordinates: coordinates, factor: factor });
+        window.ove.socket.send({ name: Constants.Events.EVENT, clientId: window.ove.context.uuid, coordinates: coordinates });
         window.ove.context.coordinates = {
             x: camera.x * factor,
             y: camera.y * factor,

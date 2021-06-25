@@ -62,7 +62,7 @@ const panPage = function (x, y) {
 const triggerUpdate = function () {
     log.debug('Broadcasting state');
     OVE.Utils.broadcastState();
-    window.ove.socket.send({ event: 'true', clientId: window.ove.context.uuid, state: window.ove.state.current });
+    window.ove.socket.send({ name: Constants.Events.EVENT, clientId: window.ove.context.uuid, state: window.ove.state.current });
     updatePDF();
 };
 
@@ -95,25 +95,28 @@ const updatePage = function (newState) {
 }
 
 const initCommon = function () {
-    window.ove.socket.on(function (msg) {
-        if (!msg || !window.ove.context.isInitialized) return;
-        if (msg.fetch_uuid && currentUUID < msg.uuid && msg.clientId === window.ove.context.uuid) {
-            currentUUID = msg.uuid;
-        } else if (msg.update) {
-            if (window.ove.context.uuid === msg.clientId) return;
-            if (msg.uuid <= currentUUID) return;
-            currentUUID = msg.uuid;
+    window.ove.socket.on(function (message) {
+        if (!message || !window.ove.context.isInitialized) return;
+        const uuid = window.ove.context.uuid;
 
-            updateFlag = true;
-            updatePage(msg.state);
-            updateFlag = false;
-        }
+        if (message.name) {
+            if (message.name === Constants.Events.UUID && currentUUID < message.uuid && message.clientId === uuid) {
+                currentUUID = message.uuid;
+            } else if (message.name === Constants.Events.UPDATE) {
+                if (uuid === message.clientId) return;
+                if (message.uuid <= currentUUID) return;
+                currentUUID = message.uuid;
 
-        if (!msg.operation) return;
-        if (msg.operation.zoom) {
-            zoomPage(msg.operation.zoom);
-        } else if (msg.operation.x && msg.operation.y) {
-            panPage(msg.operation.x, msg.operation.y);
+                updateFlag = true;
+                updatePage(message.state);
+                updateFlag = false;
+            }
+        }else if (message.operation) {
+            if (message.operation.zoom) {
+                zoomPage(message.operation.zoom);
+            } else if (message.operation.x && message.operation.y) {
+                panPage(message.operation.x, message.operation.y);
+            }
         }
     });
 };

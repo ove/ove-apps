@@ -37,5 +37,10 @@ Constants.Operation = {
     PAN: 'pan',
     ZOOM: 'zoom'
 };
+Constants.Events = {
+    EVENT: 'event',
+    UPDATE: 'update',
+    UUID: 'uuid'
+}
 
 exports.Constants = Constants;

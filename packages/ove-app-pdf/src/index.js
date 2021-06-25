@@ -11,8 +11,7 @@ log.debug('Using module:', 'd3');
 app.use('/', express.static(path.join(nodeModules, 'd3', 'dist')));
 
 const runner = function (m) {
-    m.message.event = undefined;
-    m.message.update = 'true';
+    m.message.name = Constants.Events.UPDATE;
     ws.safeSend(JSON.stringify(m));
 };
 
@@ -116,9 +115,9 @@ setTimeout(function () {
             let m = JSON.parse(msg);
             if (m.appId !== Constants.APP_NAME || !m.message) return;
 
-            if (m.message.event) {
+            if (m.message.name && m.message.name === Constants.Events.EVENT) {
                 m.message.uuid = uuid++;
-                const message = { fetch_uuid: 'true', uuid: m.message.uuid, clientId: m.message.clientId };
+                const message = { name: Constants.Events.UUID, uuid: m.message.uuid, clientId: m.message.clientId };
                 ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: message }));
                 queue.push(m);
             }

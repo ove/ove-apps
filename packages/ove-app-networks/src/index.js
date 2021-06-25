@@ -10,8 +10,7 @@ log.debug('Using module:', 'sigma');
 app.use('/', express.static(path.join(nodeModules, 'sigma', 'build')));
 
 const runner = function (m) {
-    m.message.event = undefined;
-    m.message.update = 'true';
+    m.message.name = Constants.Events.UPDATE;
     ws.safeSend(JSON.stringify(m));
 };
 
@@ -35,9 +34,9 @@ setTimeout(function () {
         socket.on('message', msg => {
             const m = JSON.parse(msg);
             if (m.appId !== Constants.APP_NAME || !m.message) return;
-            if (m.message.event) {
+            if (m.message.name && m.message.name === Constants.Events.EVENT) {
                 m.message.uuid = uuid++;
-                const message = { uuid: m.message.uuid };
+                const message = { name: Constants.Events.UUID, uuid: m.message.uuid, clientId: m.message.clientId };
                 ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: message }));
                 queue.push(m);
             }
