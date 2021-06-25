@@ -20,14 +20,14 @@ initCommon = function () {
     const context = window.ove.context;
 
     window.ove.socket.on(function (message) {
-        const uuid = window.ove.context.uuid;
         if (!message || !context.isInitialized) return;
+        const uuid = window.ove.context.uuid;
 
         if (message.name) {
             if (message.name === Constants.Events.UUID && currentUUID < message.uuid && message.clientId === uuid) {
                 currentUUID = message.uuid;
             } else if (message.name === Constants.Events.UPDATE) {
-                if (window.ove.context.uuid === message.clientId) return;
+                if (uuid === message.clientId) return;
                 if (message.uuid <= currentUUID) return;
                 currentUUID = message.uuid;
 

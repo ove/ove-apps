@@ -55,19 +55,22 @@ initCommon = async function () {
 
     window.ove.socket.on(function (message) {
         if (!message || !context.isInitialized) return;
+        const uuid = window.ove.context.uuid;
 
-        if (message.fetch_uuid && currentUUID < message.uuid) {
-            currentUUID = message.uuid;
-        } else if (message.update) {
-            onUpdate(message);
-        } else if (message.operation && context.isInitialized) {
+         if (message.name) {
+             if (message.name === Constants.Events.UUID && currentUUID < message.uuid && message.clientId === uuid) {
+                 currentUUID = message.uuid;
+             } else if (message.name === Constants.Events.UPDATE) {
+                 onUpdate(message);
+             }
+         } else if (message.operation) {
             log.debug('Got invoke operation request: ', message.operation);
             const op = message.operation;
 
             setTimeout(function () {
                 buildViewport(op, context);
             });
-        } else if (!message.event) {
+        } else {
             updateState(message);
         }
     });

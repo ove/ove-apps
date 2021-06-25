@@ -8,8 +8,7 @@ const fs = require('fs');
 const server = require('http').createServer(app);
 
 const runner = function (m) {
-    m.message.event = undefined;
-    m.message.update = 'true';
+    m.message.name = Constants.Events.UPDATE;
     ws.safeSend(JSON.stringify(m));
 };
 
@@ -200,11 +199,11 @@ setTimeout(function () {
             let m = JSON.parse(msg);
             if (m.appId !== Constants.APP_NAME || !m.message) return;
 
-            if (m.message.event) {
+            if (m.message.name && m.message.name === Constants.Events.EVENT) {
                 m.message.uuid = uuid++;
-                queue.push(m);
-                const message = { fetch_uuid: 'true', uuid: m.message.uuid };
+                const message = { name: Constants.Events.UUID, uuid: m.message.uuid, clientId: m.message.clientId };
                 ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: message }));
+                queue.push(m);
             }
         });
     };

@@ -132,7 +132,7 @@ uploadMapPosition = function () {
     // The broadcast happens only if the position has changed.
     if (!window.ove.state.current.position ||
         !OVE.Utils.JSON.equals(position, window.ove.state.current.position)) {
-        window.ove.socket.send({ event: 'true', clientId: window.ove.context.uuid, position: position });
+        window.ove.socket.send({ name: Constants.Events.EVENT, clientId: window.ove.context.uuid, position: position });
 
         window.ove.state.current.position = position;
         log.debug('Broadcasting state with position:', position);
