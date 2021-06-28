@@ -15,7 +15,7 @@ const runner = function (m) {
 };
 
 let uuid = 0;
-let queue = Utils.getPriorityQueue(runner);
+let queue = Utils.getPriorityQueue((a, b) => a.message.uuid > b.message.uuid, runner);
 
 let ws;
 setTimeout(function () {

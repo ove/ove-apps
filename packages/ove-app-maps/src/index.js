@@ -13,7 +13,7 @@ const runner = function (m) {
 };
 
 let uuid = 0;
-let queue = Utils.getPriorityQueue(runner);
+let queue = Utils.getPriorityQueue((a, b) => a.message.uuid > b.message.uuid, runner);
 
 let layers = [];
 // The map layers can be provided as an embedded JSON data structure or as a URL pointing
