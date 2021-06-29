@@ -1,3 +1,5 @@
+let updateFlag = false;
+
 initControl = function (data, viewport) {
     const context = window.ove.context;
     const __private = {
@@ -106,7 +108,7 @@ updatePosition = function (state, wrapper, context) {
         }
         setupHandlers();
         updateFlag = false;
-    }
+    };
 
     return function () {
         if (wrapper.viewport && wrapper.viewport.bounds) {
