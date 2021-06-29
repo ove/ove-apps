@@ -14,6 +14,7 @@ const runner = function (m) {
 
 let uuid = 0;
 let queue = Utils.getPriorityQueue((a, b) => a.message.uuid > b.message.uuid, runner);
+const connectedFlags = {};
 
 let layers = [];
 // The map layers can be provided as an embedded JSON data structure or as a URL pointing
@@ -197,6 +198,10 @@ setTimeout(function () {
         socket.on('error', log.error);
         socket.on('message', function (msg) {
             let m = JSON.parse(msg);
+            log.info(msg);
+            if (m.appId === Constants.CORE && m.message && m.message.sections) {
+                log.debug('Sections: ', m.message.sections);
+            }
             if (m.appId !== Constants.APP_NAME || !m.message) return;
 
             if (m.message.name && m.message.name === Constants.Events.EVENT) {
