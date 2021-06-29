@@ -10,7 +10,7 @@ initThenUpdateMap = function () {
     log.debug('other update');
     if (!window.ove.context.isCommonInitialized) {
         window.ove.context.isCommonInitialized = true;
-        initCommon().then(updateMap);
+        initCommon(onUpdate, updateState).then(updateMap);
     } else {
         updateMap();
     }
@@ -21,7 +21,7 @@ onUpdate = function () {};
 updateState = function (message) {
     window.ove.state.current = message;
     initThenUpdateMap();
-}
+};
 
 updateMap = function () {
     const context = window.ove.context;

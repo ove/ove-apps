@@ -1,5 +1,4 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
-let updateFlag = false;
 let currentUUID = -1;
 
 $(function () {
@@ -32,14 +31,10 @@ const buildViewport = function (op, context) {
     }
 };
 
-const centerEquality = function (c1, c2) {
-    return c1[0] === c2[0] && c1[1] === c2[1];
-}
-
 // Initialization that is common to viewers and controllers.
 /* jshint ignore:start */
 // current version of JSHint does not support async/await
-initCommon = async function () {
+initCommon = async function (onUpdate, updateState) {
     const context = window.ove.context;
     const state = window.ove.state.current;
 
@@ -61,18 +56,21 @@ initCommon = async function () {
              if (message.name === Constants.Events.UUID && currentUUID < message.uuid && message.clientId === uuid) {
                  currentUUID = message.uuid;
              } else if (message.name === Constants.Events.UPDATE) {
+                 if (window.ove.context.uuid === message.clientId) return;
+                 if (message.uuid <= currentUUID) return;
+                 currentUUID = message.UUID;
                  onUpdate(message);
              }
          } else if (message.operation) {
-            log.debug('Got invoke operation request: ', message.operation);
-            const op = message.operation;
+             log.debug('Got invoke operation request: ', message.operation);
+             const op = message.operation;
 
-            setTimeout(function () {
-                buildViewport(op, context);
-            });
-        } else {
-            updateState(message);
-        }
+             setTimeout(function () {
+                 buildViewport(op, context);
+             });
+         } else {
+             updateState(message);
+         }
     });
 
     log.debug('Starting to fetch map layer configurations');
