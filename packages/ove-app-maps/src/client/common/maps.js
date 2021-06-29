@@ -52,25 +52,25 @@ initCommon = async function (onUpdate, updateState) {
         if (!message || !context.isInitialized) return;
         const uuid = window.ove.context.uuid;
 
-         if (message.name) {
-             if (message.name === Constants.Events.UUID && currentUUID < message.uuid && message.clientId === uuid) {
-                 currentUUID = message.uuid;
-             } else if (message.name === Constants.Events.UPDATE) {
-                 if (window.ove.context.uuid === message.clientId) return;
-                 if (message.uuid <= currentUUID) return;
-                 currentUUID = message.UUID;
-                 onUpdate(message);
-             }
-         } else if (message.operation) {
-             log.debug('Got invoke operation request: ', message.operation);
-             const op = message.operation;
+        if (message.name) {
+            if (message.name === Constants.Events.UUID && currentUUID < message.uuid && message.clientId === uuid) {
+                currentUUID = message.uuid;
+            } else if (message.name === Constants.Events.UPDATE) {
+                if (window.ove.context.uuid === message.clientId) return;
+                if (message.uuid <= currentUUID) return;
+                currentUUID = message.UUID;
+                onUpdate(message);
+            }
+        } else if (message.operation) {
+            log.debug('Got invoke operation request: ', message.operation);
+            const op = message.operation;
 
-             setTimeout(function () {
-                 buildViewport(op, context);
-             });
-         } else {
-             updateState(message);
-         }
+            setTimeout(function () {
+                buildViewport(op, context);
+            });
+        } else {
+            updateState(message);
+        }
     });
 
     log.debug('Starting to fetch map layer configurations');
