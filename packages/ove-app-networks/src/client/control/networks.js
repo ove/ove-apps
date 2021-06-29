@@ -89,7 +89,7 @@ setupCoordinatesUpdateEventListener = function (sigma) {
     const camera = sigma.camera;
     camera.bind(Constants.COORDINATES_UPDATED_EVENT, function () {
         if (window.ove.context.updateFlag) return;
-        const coordinates = {x: camera.x, y: camera.y, ratio: camera.ratio, angle: camera.angle }
+        const coordinates = { x: camera.x, y: camera.y, ratio: camera.ratio, angle: camera.angle };
         window.ove.socket.send({ name: Constants.Events.EVENT, clientId: window.ove.context.uuid, coordinates: coordinates });
         window.ove.context.coordinates = {
             x: camera.x * factor,

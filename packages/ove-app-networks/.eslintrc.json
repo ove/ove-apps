@@ -23,11 +23,10 @@
         {
             "files": [ "**/common/*.js" ],
             "globals": {
-                "refreshSigma": true,
                 "sigma": true
             },
             "rules": {
-                "new-cap": ["error", { "newIsCap": true, "capIsNew": false, "newIsCapExceptions": ["sigma", "filter"] }]                
+                "new-cap": ["error", { "newIsCap": true, "capIsNew": false, "newIsCapExceptions": ["sigma", "filter"] }]
             }
         },
         {
@@ -35,6 +34,7 @@
             "globals": {
                 "beginInitialization": true,
                 "getClientSpecificURL": true,
+                "refreshSigma": true,
                 "loadSigma": true,
                 "runOperation": true,
                 "setupCoordinatesUpdateEventListener": true
