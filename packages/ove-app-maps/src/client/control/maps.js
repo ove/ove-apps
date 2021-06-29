@@ -1,5 +1,3 @@
-let updateFlag = false;
-
 initControl = function (data) {
     const context = window.ove.context;
     context.isInitialized = false;
@@ -90,14 +88,14 @@ updateState = function () {};
 
 onUpdate = function (message) {
     const context = window.ove.context;
-    updateFlag = true;
+    window.ove.context.updateFlag = true;
     context.library.setZoom(message.position.zoom);
     context.library.setCenter(message.position.center);
-    updateFlag = false;
+    window.ove.context.updateFlag = false;
 };
 
 uploadMapPosition = function () {
-    if (updateFlag) return;
+    if (window.ove.context.updateFlag) return;
     const context = window.ove.context;
     const size = context.library.getSize();
     const topLeft = context.library.getTopLeft();

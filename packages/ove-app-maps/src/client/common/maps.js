@@ -11,6 +11,8 @@ $(function () {
         log.debug('Completed loading OVE');
         const context = window.ove.context;
         context.isInitialized = false;
+        context.currentUUID = -1;
+        context.updateFlag = false;
         context.layers = [];
         context.map = undefined;
         beginInitialization();
@@ -53,12 +55,12 @@ initCommon = async function (onUpdate, updateState) {
         const uuid = window.ove.context.uuid;
 
         if (message.name) {
-            if (message.name === Constants.Events.UUID && currentUUID < message.uuid && message.clientId === uuid) {
-                currentUUID = message.uuid;
+            if (message.name === Constants.Events.UUID && window.ove.context.currentUUID < message.uuid && message.clientId === uuid) {
+                window.ove.context.currentUUID = message.uuid;
             } else if (message.name === Constants.Events.UPDATE) {
                 if (window.ove.context.uuid === message.clientId) return;
-                if (message.uuid <= currentUUID) return;
-                currentUUID = message.UUID;
+                if (message.uuid <= window.ove.context.currentUUID) return;
+                window.ove.context.currentUUID = message.UUID;
                 onUpdate(message);
             }
         } else if (message.operation) {

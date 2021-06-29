@@ -1,6 +1,4 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
-let currentUUID = -1;
-let updateFlag = false;
 
 $(function () {
     // This is what happens first. After OVE is loaded, either the viewer or controller
@@ -10,6 +8,8 @@ $(function () {
         window.ove = new OVE(Constants.APP_NAME);
         log.debug('Completed loading OVE');
         window.ove.context.isInitialized = false;
+        window.ove.context.updateFlag = false;
+        window.ove.context.currentUUID = -1;
         beginInitialization();
     });
 });
@@ -100,16 +100,16 @@ const initCommon = function () {
         const uuid = window.ove.context.uuid;
 
         if (message.name) {
-            if (message.name === Constants.Events.UUID && currentUUID < message.uuid && message.clientId === uuid) {
-                currentUUID = message.uuid;
+            if (message.name === Constants.Events.UUID && window.ove.context.currentUUID < message.uuid && message.clientId === uuid) {
+                window.ove.context.currentUUID = message.uuid;
             } else if (message.name === Constants.Events.UPDATE) {
                 if (uuid === message.clientId) return;
-                if (message.uuid <= currentUUID) return;
-                currentUUID = message.uuid;
+                if (message.uuid <= window.ove.context.currentUUID) return;
+                window.ove.context.currentUUID = message.uuid;
 
-                updateFlag = true;
+                window.ove.context.updateFlag = true;
                 updatePage(message.state);
-                updateFlag = false;
+                window.ove.context.updateFlag = false;
             }
         }else if (message.operation) {
             if (message.operation.zoom) {

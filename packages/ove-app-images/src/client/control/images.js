@@ -1,5 +1,3 @@
-let updateFlag = false;
-
 initControl = function (data, viewport) {
     const context = window.ove.context;
     const __private = {
@@ -49,7 +47,7 @@ initControl = function (data, viewport) {
 };
 
 sendViewportDetails = function () {
-    if (updateFlag) return;
+    if (window.ove.context.updateFlag) return;
     const context = window.ove.context;
     if (context.isInitialized) {
         const bounds = context.osd.viewport.getBounds();
@@ -86,7 +84,7 @@ updatePosition = function (state, wrapper, context) {
         }
         context.isInitialized = true;
         log.debug('Application is initialized:', context.isInitialized);
-        if (!updateFlag) {
+        if (!window.ove.context.updateFlag) {
             sendViewportDetails();
         }
     };
@@ -95,7 +93,7 @@ updatePosition = function (state, wrapper, context) {
         const bounds = wrapper.viewport.bounds;
         const calcX = Number(bounds.x) + Number(bounds.w) * 0.5;
         const calcY = Number(bounds.y) + Number(bounds.h) * 0.5;
-        updateFlag = true;
+        window.ove.context.updateFlag = true;
         context.osd.viewport.panTo(new OpenSeadragon.Point(calcX,
             calcY), true).zoomTo(wrapper.viewport.zoom);
 
@@ -107,7 +105,7 @@ updatePosition = function (state, wrapper, context) {
             }, Constants.OSD_POST_LOAD_WAIT_TIME);
         }
         setupHandlers();
-        updateFlag = false;
+        window.ove.context.updateFlag = false;
     };
 
     return function () {

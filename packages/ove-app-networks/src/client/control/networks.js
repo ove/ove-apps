@@ -1,5 +1,7 @@
 initControl = function (data) {
     window.ove.context.isInitialized = false;
+    window.ove.context.updateFlag = false;
+    window.ove.context.currentUUID = -1;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 
     OVE.Utils.resizeController(Constants.CONTENT_DIV);
@@ -39,14 +41,14 @@ initControl = function (data) {
         if (message.name) {
             if (message.name === Constants.Events.UPDATE) {
                 if (uuid === message.clientId) return;
-                if (message.uuid <= currentUUID) return;
-                currentUUID = message.uuid;
-                updateFlag = true;
+                if (message.uuid <= window.ove.context.currentUUID) return;
+                window.ove.context.currentUUID = message.uuid;
+                window.ove.context.updateFlag = true;
                 window.ove.context.sigma.camera.goTo(message.coordinates);
-                updateFlag = false;
+                window.ove.context.updateFlag = false;
                 refreshSigma(window.ove.context.sigma);
-            } else if (message.name === Constants.Events.UUID && message.uuid > currentUUID && message.clientId === uuid) {
-                currentUUID = message.uuid;
+            } else if (message.name === Constants.Events.UUID && message.uuid > window.ove.context.currentUUID && message.clientId === uuid) {
+                window.ove.context.currentUUID = message.uuid;
             }
         } else if (message.operation) {
             // We first of all need to know if the operation was known
@@ -75,7 +77,7 @@ getClientSpecificURL = function (url) {
 };
 
 setupCoordinatesUpdateEventListener = function (sigma) {
-    if (updateFlag) return;
+    if (window.ove.context.updateFlag) return;
     const horizontalScalingFactor = window.ove.geometry.section.w /
         Math.min(document.documentElement.clientWidth, window.innerWidth);
     const verticalScalingFactor = window.ove.geometry.section.h /
@@ -86,7 +88,7 @@ setupCoordinatesUpdateEventListener = function (sigma) {
     // Camera position changes trigger COORDINATES_UPDATED_EVENT
     const camera = sigma.camera;
     camera.bind(Constants.COORDINATES_UPDATED_EVENT, function () {
-        if (updateFlag) return;
+        if (window.ove.context.updateFlag) return;
         const coordinates = {x: camera.x, y: camera.y, ratio: camera.ratio, angle: camera.angle }
         window.ove.socket.send({ name: Constants.Events.EVENT, clientId: window.ove.context.uuid, coordinates: coordinates });
         window.ove.context.coordinates = {
