@@ -57,7 +57,7 @@ const panPage = function (x, y) {
         context.state = JSON.parse(JSON.stringify(state));
         triggerUpdate();
     }
-}
+};
 
 const triggerUpdate = function () {
     log.debug('Broadcasting state');
@@ -78,7 +78,7 @@ const zoomPage = function (zoom) {
         context.state = JSON.parse(JSON.stringify(state));
         triggerUpdate();
     }
-}
+};
 
 const updatePage = function (newState) {
     const state = window.ove.state.current;
@@ -92,7 +92,7 @@ const updatePage = function (newState) {
         window.ove.state.current = JSON.parse(JSON.stringify(newState));
         updatePDF();
     }
-}
+};
 
 const initCommon = function () {
     window.ove.socket.on(function (message) {
@@ -111,7 +111,7 @@ const initCommon = function () {
                 updatePage(message.state);
                 window.ove.context.updateFlag = false;
             }
-        }else if (message.operation) {
+        } else if (message.operation) {
             if (message.operation.zoom) {
                 zoomPage(message.operation.zoom);
             } else if (message.operation.x && message.operation.y) {
@@ -132,7 +132,7 @@ const onGetPage = function (pdf, firstPage) {
     const scale = state.scale || state.settings.scale || Constants.DEFAULT_SCALE;
     log.trace('Using scale:', scale);
 
-    let viewport = firstPage.getViewport({scale: scale});
+    let viewport = firstPage.getViewport({ scale: scale });
     let dim = {
         c: Math.floor(g.section.w / (viewport.width + pageGap)),
         r: Math.floor(g.section.h / (viewport.height + pageGap)),
@@ -149,16 +149,16 @@ const onGetPage = function (pdf, firstPage) {
     let i = firstPage.pageNumber - 1;
     while (i < (state.settings.endPage || pdf.numPages)) {
         i++;
-        pdf.getPage(i).then(page => { renderPage(pdf, page, scale, dim, firstPage, pageGap) });
+        pdf.getPage(i).then(page => { renderPage(pdf, page, scale, dim, firstPage, pageGap); });
     }
-}
+};
 
 const renderPage = function (pdf, page, scale, dim, firstPage, pageGap) {
     const i = page.pageNumber;
     const state = window.ove.state.current;
     const context = window.ove.context;
 
-    let viewport = page.getViewport({scale: scale});
+    let viewport = page.getViewport({ scale: scale });
     let pageDim = { border: { x: 0, y: 0 } };
     if (viewport.width !== dim.w || viewport.height !== dim.h) {
         log.trace('The size or aspect ratio is different on page:', i);
@@ -278,5 +278,5 @@ renderPDF = function (pdf) {
     }
 
     const pageNo = Number(state.settings.startPage || 1);
-    pdf.getPage(pageNo).then(firstPage => { onGetPage(pdf, firstPage); })
+    pdf.getPage(pageNo).then(firstPage => { onGetPage(pdf, firstPage); });
 };

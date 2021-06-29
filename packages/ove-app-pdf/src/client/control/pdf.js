@@ -33,8 +33,8 @@ initControl = function (data) {
 
     // D3 is used for pan and zoom operations.
     log.debug('Registering pan/zoom listeners');
-    d3.select(Constants.CONTROL_CANVAS).call(d3.zoom().scaleExtent([1, Constants.MAX_ZOOM_LEVEL]).on('zoom', function ({transform}) {
-        if (updateFlag) return;
+    d3.select(Constants.CONTROL_CANVAS).call(d3.zoom().scaleExtent([1, Constants.MAX_ZOOM_LEVEL]).on('zoom', function ({ transform }) {
+        if (window.ove.context.updateFlag) return;
         if (context.renderingInProgress) return;
         state.offset.x = transform.x * getScalingFactor();
         state.offset.y = transform.y * getScalingFactor();
@@ -77,7 +77,7 @@ beginInitialization = function () {
                 // This happens when the pdf has been pre-loaded by a controller.
                 log.debug('Initializing controller with state:', currentState, 'and viewport:', currentState.viewport);
                 $(window.resize(function () {
-                    location.reload();
+                    window.location.reload();
                 }));
                 initControl(currentState);
             } else {
