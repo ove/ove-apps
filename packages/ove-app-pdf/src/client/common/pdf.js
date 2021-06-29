@@ -94,7 +94,7 @@ const updatePage = function (newState) {
     }
 };
 
-const initCommon = function () {
+initCommon = function () {
     window.ove.socket.on(function (message) {
         if (!message || !window.ove.context.isInitialized) return;
         const uuid = window.ove.context.uuid;
