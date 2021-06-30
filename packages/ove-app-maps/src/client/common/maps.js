@@ -1,6 +1,4 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
-let updateFlag = false;
-let currentUUID = -1;
 
 $(function () {
     // This is what happens first. After OVE is loaded, either the viewer or controller
@@ -12,6 +10,8 @@ $(function () {
         log.debug('Completed loading OVE');
         const context = window.ove.context;
         context.isInitialized = false;
+        context.currentUUID = -1;
+        context.updateFlag = false;
         context.layers = [];
         context.map = undefined;
         beginInitialization();
@@ -32,14 +32,10 @@ const buildViewport = function (op, context) {
     }
 };
 
-const centerEquality = function (c1, c2) {
-    return c1[0] === c2[0] && c1[1] === c2[1];
-}
-
 // Initialization that is common to viewers and controllers.
 /* jshint ignore:start */
 // current version of JSHint does not support async/await
-initCommon = async function () {
+initCommon = async function (onUpdate, updateState) {
     const context = window.ove.context;
     const state = window.ove.state.current;
 
@@ -57,13 +53,16 @@ initCommon = async function () {
         if (!message || !context.isInitialized) return;
         const uuid = window.ove.context.uuid;
 
-         if (message.name) {
-             if (message.name === Constants.Events.UUID && currentUUID < message.uuid && message.clientId === uuid) {
-                 currentUUID = message.uuid;
-             } else if (message.name === Constants.Events.UPDATE) {
-                 onUpdate(message);
-             }
-         } else if (message.operation) {
+        if (message.name) {
+            if (message.name === Constants.Events.UUID && window.ove.context.currentUUID < message.uuid && message.clientId === uuid) {
+                window.ove.context.currentUUID = message.uuid;
+            } else if (message.name === Constants.Events.UPDATE) {
+                if (window.ove.context.uuid === message.clientId) return;
+                if (message.uuid <= window.ove.context.currentUUID) return;
+                window.ove.context.currentUUID = message.UUID;
+                onUpdate(message);
+            }
+        } else if (message.operation) {
             log.debug('Got invoke operation request: ', message.operation);
             const op = message.operation;
 

@@ -1,6 +1,4 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
-let currentUUID = -1;
-let updateFlag = false;
 
 $(function () {
     // This is what happens first. After OVE is loaded, either the viewer or controller
@@ -10,6 +8,8 @@ $(function () {
         window.ove = new OVE(Constants.APP_NAME);
         log.debug('Completed loading OVE');
         window.ove.context.isInitialized = false;
+        window.ove.context.updateFlag = false;
+        window.ove.context.currentUUID = -1;
         beginInitialization();
     });
 });
@@ -57,7 +57,7 @@ const panPage = function (x, y) {
         context.state = JSON.parse(JSON.stringify(state));
         triggerUpdate();
     }
-}
+};
 
 const triggerUpdate = function () {
     log.debug('Broadcasting state');
@@ -78,7 +78,7 @@ const zoomPage = function (zoom) {
         context.state = JSON.parse(JSON.stringify(state));
         triggerUpdate();
     }
-}
+};
 
 const updatePage = function (newState) {
     const state = window.ove.state.current;
@@ -92,26 +92,26 @@ const updatePage = function (newState) {
         window.ove.state.current = JSON.parse(JSON.stringify(newState));
         updatePDF();
     }
-}
+};
 
-const initCommon = function () {
+initCommon = function () {
     window.ove.socket.on(function (message) {
         if (!message || !window.ove.context.isInitialized) return;
         const uuid = window.ove.context.uuid;
 
         if (message.name) {
-            if (message.name === Constants.Events.UUID && currentUUID < message.uuid && message.clientId === uuid) {
-                currentUUID = message.uuid;
+            if (message.name === Constants.Events.UUID && window.ove.context.currentUUID < message.uuid && message.clientId === uuid) {
+                window.ove.context.currentUUID = message.uuid;
             } else if (message.name === Constants.Events.UPDATE) {
                 if (uuid === message.clientId) return;
-                if (message.uuid <= currentUUID) return;
-                currentUUID = message.uuid;
+                if (message.uuid <= window.ove.context.currentUUID) return;
+                window.ove.context.currentUUID = message.uuid;
 
-                updateFlag = true;
+                window.ove.context.updateFlag = true;
                 updatePage(message.state);
-                updateFlag = false;
+                window.ove.context.updateFlag = false;
             }
-        }else if (message.operation) {
+        } else if (message.operation) {
             if (message.operation.zoom) {
                 zoomPage(message.operation.zoom);
             } else if (message.operation.x && message.operation.y) {
@@ -132,7 +132,7 @@ const onGetPage = function (pdf, firstPage) {
     const scale = state.scale || state.settings.scale || Constants.DEFAULT_SCALE;
     log.trace('Using scale:', scale);
 
-    let viewport = firstPage.getViewport({scale: scale});
+    let viewport = firstPage.getViewport({ scale: scale });
     let dim = {
         c: Math.floor(g.section.w / (viewport.width + pageGap)),
         r: Math.floor(g.section.h / (viewport.height + pageGap)),
@@ -149,16 +149,16 @@ const onGetPage = function (pdf, firstPage) {
     let i = firstPage.pageNumber - 1;
     while (i < (state.settings.endPage || pdf.numPages)) {
         i++;
-        pdf.getPage(i).then(page => { renderPage(pdf, page, scale, dim, firstPage, pageGap) });
+        pdf.getPage(i).then(page => { renderPage(pdf, page, scale, dim, firstPage, pageGap); });
     }
-}
+};
 
 const renderPage = function (pdf, page, scale, dim, firstPage, pageGap) {
     const i = page.pageNumber;
     const state = window.ove.state.current;
     const context = window.ove.context;
 
-    let viewport = page.getViewport({scale: scale});
+    let viewport = page.getViewport({ scale: scale });
     let pageDim = { border: { x: 0, y: 0 } };
     if (viewport.width !== dim.w || viewport.height !== dim.h) {
         log.trace('The size or aspect ratio is different on page:', i);
@@ -278,5 +278,5 @@ renderPDF = function (pdf) {
     }
 
     const pageNo = Number(state.settings.startPage || 1);
-    pdf.getPage(pageNo).then(firstPage => { onGetPage(pdf, firstPage); })
+    pdf.getPage(pageNo).then(firstPage => { onGetPage(pdf, firstPage); });
 };

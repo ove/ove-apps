@@ -8,7 +8,7 @@ initControl = function (data) {
     if (data.url) {
         window.ove.state.current.url = data.url;
     }
-    initCommon().then(function () {
+    initCommon(onUpdate, updateState).then(function () {
         // We make sure both controller and viewer have received their layers
         OVE.Utils.broadcastState();
         if (context.layers.length === 0) {
@@ -88,17 +88,14 @@ updateState = function () {};
 
 onUpdate = function (message) {
     const context = window.ove.context;
-    if (window.ove.context.uuid === message.clientId) return;
-    if (message.uuid <= currentUUID) return;
-    currentUUID = message.UUID;
-    updateFlag = true;
+    window.ove.context.updateFlag = true;
     context.library.setZoom(message.position.zoom);
     context.library.setCenter(message.position.center);
-    updateFlag = false;
-}
+    window.ove.context.updateFlag = false;
+};
 
 uploadMapPosition = function () {
-    if (updateFlag) return;
+    if (window.ove.context.updateFlag) return;
     const context = window.ove.context;
     const size = context.library.getSize();
     const topLeft = context.library.getTopLeft();

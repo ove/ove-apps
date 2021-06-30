@@ -1,7 +1,4 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
-let currentUUID = -1;
-let updateFlag = false;
-
 $(function () {
     // This is what happens first. After OVE is loaded, either the viewer or controller
     // will be initialized. Application specific context variables are also initialized at this point.
@@ -12,6 +9,8 @@ $(function () {
         log.debug('Completed loading OVE');
         window.ove.context.isInitialized = false;
         window.ove.context.osd = undefined;
+        window.ove.context.currentUUID = -1;
+        window.ove.context.updateFlag = false;
         beginInitialization();
     });
 });
@@ -24,12 +23,12 @@ initCommon = function () {
         const uuid = window.ove.context.uuid;
 
         if (message.name) {
-            if (message.name === Constants.Events.UUID && currentUUID < message.uuid && message.clientId === uuid) {
-                currentUUID = message.uuid;
+            if (message.name === Constants.Events.UUID && window.ove.context.currentUUID < message.uuid && message.clientId === uuid) {
+                window.ove.context.currentUUID = message.uuid;
             } else if (message.name === Constants.Events.UPDATE) {
                 if (uuid === message.clientId) return;
-                if (message.uuid <= currentUUID) return;
-                currentUUID = message.uuid;
+                if (message.uuid <= window.ove.context.currentUUID) return;
+                window.ove.context.currentUUID = message.uuid;
 
                 updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context)();
             }

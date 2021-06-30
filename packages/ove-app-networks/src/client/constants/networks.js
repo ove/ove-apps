@@ -36,7 +36,7 @@ Constants.Events = {
     EVENT: 'event',
     UPDATE: 'update',
     UUID: 'uuid'
-}
+};
 
 Constants.Evaluation = {
     PROPERTY: 'property',
