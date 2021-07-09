@@ -115,10 +115,11 @@ function OVEOpenLayersMap () {
         return __private.map;
     };
 
-    this.registerHandlerForEvents = function (eventHandler) {
+    this.registerHandlerForEvents = function (eventHandler, isUpdate) {
         const changeEvent = function () {
             // it takes a while for the all attributes of the map to be updated, especially after
             // a resolution/zoom-level change.
+            if (isUpdate()) return;
             setTimeout(eventHandler, Constants.OL_CHANGE_CENTER_AFTER_UPDATE_WAIT_TIME);
         };
         // Handlers for OpenLayers events.

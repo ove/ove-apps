@@ -47,9 +47,13 @@ Constants.Action = {
 }
 
 Constants.Events = {
-    EVENT: 'event',
-    UPDATE: 'update',
-    UUID: 'uuid'
+    EVENT: 'event_mc',
+    UPDATE: 'update_mc',
+    UUID: 'uuid_mc',
+    REQUEST_DETAILS: 'request_details',
+    RESPOND_DETAILS: 'respond_details',
+    REQUEST: 'request',
+    RESPOND: 'respond'
 };
 
 exports.Constants = Constants;

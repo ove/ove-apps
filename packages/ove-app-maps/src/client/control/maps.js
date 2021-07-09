@@ -34,6 +34,7 @@ initControl = function (data) {
             window.ove.state.current.scripts = data.scripts;
         }
 
+        window.ove.socket.send({ name: Constants.Events.REQUEST_DETAILS });
         const config = {
             center: data.center,
             resolution: data.resolution,
@@ -59,7 +60,7 @@ initControl = function (data) {
             context.library.setZoom(zoom);
             uploadMapPosition();
             context.isInitialized = true;
-            context.library.registerHandlerForEvents(uploadMapPosition);
+            context.library.registerHandlerForEvents(uploadMapPosition, () => { return window.ove.context.updateFlag; });
         };
 
         let url = OVE.Utils.getURLQueryParam();
@@ -86,9 +87,9 @@ initControl = function (data) {
 
 updateState = function () {};
 
-onUpdate = function (message) {
+onUpdate = function (message, special) {
     const context = window.ove.context;
-    window.ove.context.updateFlag = true;
+    window.ove.context.updateFlag = !special;
     context.library.setZoom(message.position.zoom);
     context.library.setCenter(message.position.center);
     window.ove.context.updateFlag = false;
@@ -129,6 +130,7 @@ uploadMapPosition = function () {
     // The broadcast happens only if the position has changed.
     if (!window.ove.state.current.position ||
         !OVE.Utils.JSON.equals(position, window.ove.state.current.position)) {
+        log.debug('Sending event message from client!');
         window.ove.socket.send({ name: Constants.Events.EVENT, clientId: window.ove.context.uuid, position: position });
 
         window.ove.state.current.position = position;

@@ -56,11 +56,18 @@ initCommon = async function (onUpdate, updateState) {
         if (message.name) {
             if (message.name === Constants.Events.UUID && window.ove.context.currentUUID < message.uuid && message.clientId === uuid) {
                 window.ove.context.currentUUID = message.uuid;
-            } else if (message.name === Constants.Events.UPDATE) {
+            } else if (message.name === Constants.Events.UPDATE && !message.secondary) {
                 if (window.ove.context.uuid === message.clientId) return;
                 if (message.uuid <= window.ove.context.currentUUID) return;
                 window.ove.context.currentUUID = message.UUID;
-                onUpdate(message);
+                onUpdate(message, false);
+            } else if (message.name === Constants.Events.UPDATE && message.secondary) {
+                onUpdate(message, false);
+            } else if (message.name === Constants.Events.REQUEST) {
+                const m = { name: Constants.Events.RESPOND_DETAILS, position: window.ove.state.current.position, secondaryId: message.secondaryId };
+                window.ove.socket.send(m);
+            } else if (message.name === Constants.Events.RESPOND) {
+                onUpdate(message, true);
             }
         } else if (message.operation) {
             log.debug('Got invoke operation request: ', message.operation);

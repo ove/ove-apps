@@ -198,17 +198,34 @@ setTimeout(function () {
         socket.on('error', log.error);
         socket.on('message', function (msg) {
             let m = JSON.parse(msg);
-            log.info(msg);
-            if (m.appId === Constants.CORE && m.message && m.message.sections) {
-                log.debug('Sections: ', m.message.sections);
-            }
-            if (m.appId !== Constants.APP_NAME || !m.message) return;
+            if (m.appId !== Constants.APP_NAME || !m.message || !m.message.name) return;
 
-            if (m.message.name && m.message.name === Constants.Events.EVENT) {
+            if (m.message.name === Constants.Events.EVENT && !m.message.secondary) {
                 m.message.uuid = uuid++;
                 const message = { name: Constants.Events.UUID, uuid: m.message.uuid, clientId: m.message.clientId };
                 ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: message }));
                 queue.push(m);
+            } else if (m.message.name === Constants.Events.REQUEST_DETAILS) {
+                request({
+                    headers: { 'Content-Type': 'application/json'},
+                    url: `http://${Utils.getOVEHost()}/sections/connected/${m.sectionId}`,
+                    method: 'GET',
+                    json: true
+                }, (error, res, body) => {
+                    if (!error && res.statusCode === 200) {
+                        if (!body || !body.section) return;
+                        m.message.name = Constants.Events.REQUEST;
+                        m.message.secondaryId = m.sectionId;
+                        const message = { appId: m.appId, sectionId: body.section.primary, message: m.message };
+                        ws.safeSend(JSON.stringify(message));
+                    } else {
+                        log.error('an error occurred while requesting details:', error);
+                    }
+                });
+            } else if (m.message.name === Constants.Events.RESPOND_DETAILS) {
+                m.message.name = Constants.Events.RESPOND;
+                const message = { appId: m.appId, sectionId: m.message.secondaryId, message: m.message };
+                ws.safeSend(JSON.stringify(message));
             }
         });
     };

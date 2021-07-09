@@ -51,7 +51,7 @@ function OVELeafletMap () {
         return __private.map;
     };
 
-    this.registerHandlerForEvents = function (eventHandler) {
+    this.registerHandlerForEvents = function (eventHandler, _) {
         // Handlers for Leaflet events.
         for (const e of Constants.LEAFLET_MONITORED_EVENTS) {
             __private.map.on(e, eventHandler);
