@@ -87,9 +87,9 @@ initControl = function (data) {
 
 updateState = function () {};
 
-onUpdate = function (message, special) {
+onUpdate = function (message) {
     const context = window.ove.context;
-    window.ove.context.updateFlag = !special;
+    window.ove.context.updateFlag = true;
     context.library.setZoom(message.position.zoom);
     context.library.setCenter(message.position.center);
     window.ove.context.updateFlag = false;

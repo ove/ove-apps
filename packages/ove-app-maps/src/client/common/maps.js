@@ -62,7 +62,7 @@ initCommon = async function (onUpdate, updateState) {
                 window.ove.context.currentUUID = message.UUID;
                 onUpdate(message, false);
             } else if (message.name === Constants.Events.UPDATE && message.secondary) {
-                onUpdate(message, false);
+                onUpdate(message, true);
             } else if (message.name === Constants.Events.REQUEST) {
                 const m = { name: Constants.Events.RESPOND_DETAILS, position: window.ove.state.current.position, secondaryId: message.secondaryId };
                 window.ove.socket.send(m);

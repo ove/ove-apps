@@ -14,7 +14,6 @@ const runner = function (m) {
 
 let uuid = 0;
 let queue = Utils.getPriorityQueue((a, b) => a.message.uuid > b.message.uuid, runner);
-const connectedFlags = {};
 
 let layers = [];
 // The map layers can be provided as an embedded JSON data structure or as a URL pointing
@@ -208,7 +207,7 @@ setTimeout(function () {
             } else if (m.message.name === Constants.Events.REQUEST_DETAILS) {
                 request({
                     headers: { 'Content-Type': 'application/json'},
-                    url: `http://${Utils.getOVEHost()}/sections/connected/${m.sectionId}`,
+                    url: `http://${Utils.getOVEHost()}/connections/section/${m.sectionId}`,
                     method: 'GET',
                     json: true
                 }, (error, res, body) => {
@@ -216,13 +215,14 @@ setTimeout(function () {
                         if (!body || !body.section) return;
                         m.message.name = Constants.Events.REQUEST;
                         m.message.secondaryId = m.sectionId;
-                        const message = { appId: m.appId, sectionId: body.section.primary, message: m.message };
+                        const message = { appId: m.appId, sectionId: body.section.primary.toString(), message: m.message };
                         ws.safeSend(JSON.stringify(message));
                     } else {
                         log.error('an error occurred while requesting details:', error);
                     }
                 });
             } else if (m.message.name === Constants.Events.RESPOND_DETAILS) {
+                if (!m.message.secondaryId) return;
                 m.message.name = Constants.Events.RESPOND;
                 const message = { appId: m.appId, sectionId: m.message.secondaryId, message: m.message };
                 ws.safeSend(JSON.stringify(message));
