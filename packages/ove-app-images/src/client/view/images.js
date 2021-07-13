@@ -56,6 +56,24 @@ updateImage = function () {
     }
 };
 
+updatePosition = (state, wrapper, context, special) => {
+    const update = function () {
+        if (!special) return;
+        window.ove.state.current.viewport = wrapper.viewport;
+        setPosition();
+    };
+
+    return function () {
+        // Delaying visibility to support better loading experience.
+        log.debug('Making OpenSeadragon hidden');
+        context.osd.setVisible(false);
+
+        setTimeout(function () {
+            update(); // Wait sufficiently for OSD to load the image for the first time.
+        }, Constants.OSD_POST_LOAD_WAIT_TIME);
+    };
+}
+
 setPosition = function () {
     const context = window.ove.context;
     const g = window.ove.geometry;

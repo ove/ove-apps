@@ -50,10 +50,10 @@ Constants.Events = {
     EVENT: 'event_mc',
     UPDATE: 'update_mc',
     UUID: 'uuid_mc',
-    REQUEST_DETAILS: 'request_details',
-    RESPOND_DETAILS: 'respond_details',
-    REQUEST: 'request',
-    RESPOND: 'respond'
+    REQUEST_SERVER: 'request_server',
+    RESPOND_SERVER: 'respond_server',
+    REQUEST_CLIENT: 'request_client',
+    RESPOND_CLIENT: 'respond_client'
 };
 
 exports.Constants = Constants;

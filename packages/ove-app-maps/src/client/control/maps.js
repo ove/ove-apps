@@ -34,7 +34,7 @@ initControl = function (data) {
             window.ove.state.current.scripts = data.scripts;
         }
 
-        window.ove.socket.send({ name: Constants.Events.REQUEST_DETAILS });
+        window.ove.socket.send({ name: Constants.Events.REQUEST_SERVER });
         const config = {
             center: data.center,
             resolution: data.resolution,

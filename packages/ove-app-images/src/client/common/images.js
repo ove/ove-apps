@@ -25,12 +25,18 @@ initCommon = function () {
         if (message.name) {
             if (message.name === Constants.Events.UUID && window.ove.context.currentUUID < message.uuid && message.clientId === uuid) {
                 window.ove.context.currentUUID = message.uuid;
-            } else if (message.name === Constants.Events.UPDATE) {
-                if (uuid === message.clientId) return;
+            }  else if (message.name === Constants.Events.UPDATE && !message.secondary) {
+                if (window.ove.context.uuid === message.clientId) return;
                 if (message.uuid <= window.ove.context.currentUUID) return;
-                window.ove.context.currentUUID = message.uuid;
-
-                updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context)();
+                window.ove.context.currentUUID = message.UUID;
+                updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context, false)();
+            } else if (message.name === Constants.Events.UPDATE && message.secondary) {
+                updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context, true)();
+            } else if (message.name === Constants.Events.REQUEST_CLIENT) {
+                const m = { name: Constants.Events.RESPOND_SERVER, viewport: window.ove.state.current.viewport, secondaryId: message.secondaryId };
+                window.ove.socket.send(m);
+            } else if (message.name === Constants.Events.RESPOND_CLIENT) {
+                updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context, true)();
             }
         } else if (message.operation) {
             log.debug('Got invoke operation request: ', message.operation);

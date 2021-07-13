@@ -204,7 +204,7 @@ setTimeout(function () {
                 const message = { name: Constants.Events.UUID, uuid: m.message.uuid, clientId: m.message.clientId };
                 ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: message }));
                 queue.push(m);
-            } else if (m.message.name === Constants.Events.REQUEST_DETAILS) {
+            } else if (m.message.name === Constants.Events.REQUEST_SERVER) {
                 request({
                     headers: { 'Content-Type': 'application/json'},
                     url: `http://${Utils.getOVEHost()}/connections/section/${m.sectionId}`,
@@ -213,7 +213,7 @@ setTimeout(function () {
                 }, (error, res, body) => {
                     if (!error && res.statusCode === 200) {
                         if (!body || !body.section) return;
-                        m.message.name = Constants.Events.REQUEST;
+                        m.message.name = Constants.Events.REQUEST_CLIENT;
                         m.message.secondaryId = m.sectionId;
                         const message = { appId: m.appId, sectionId: body.section.primary.toString(), message: m.message };
                         ws.safeSend(JSON.stringify(message));
@@ -221,9 +221,9 @@ setTimeout(function () {
                         log.error('an error occurred while requesting details:', error);
                     }
                 });
-            } else if (m.message.name === Constants.Events.RESPOND_DETAILS) {
+            } else if (m.message.name === Constants.Events.RESPOND_SERVER) {
                 if (!m.message.secondaryId) return;
-                m.message.name = Constants.Events.RESPOND;
+                m.message.name = Constants.Events.RESPOND_CLIENT;
                 const message = { appId: m.appId, sectionId: m.message.secondaryId, message: m.message };
                 ws.safeSend(JSON.stringify(message));
             }

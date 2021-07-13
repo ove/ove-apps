@@ -63,10 +63,10 @@ initCommon = async function (onUpdate, updateState) {
                 onUpdate(message, false);
             } else if (message.name === Constants.Events.UPDATE && message.secondary) {
                 onUpdate(message, true);
-            } else if (message.name === Constants.Events.REQUEST) {
-                const m = { name: Constants.Events.RESPOND_DETAILS, position: window.ove.state.current.position, secondaryId: message.secondaryId };
+            } else if (message.name === Constants.Events.REQUEST_CLIENT) {
+                const m = { name: Constants.Events.RESPOND_SERVER, position: window.ove.state.current.position, secondaryId: message.secondaryId };
                 window.ove.socket.send(m);
-            } else if (message.name === Constants.Events.RESPOND) {
+            } else if (message.name === Constants.Events.RESPOND_CLIENT) {
                 onUpdate(message, true);
             }
         } else if (message.operation) {
