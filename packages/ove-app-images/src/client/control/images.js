@@ -8,7 +8,6 @@ initControl = function (data, viewport) {
 
     initCommon();
 
-    window.ove.socket.send({ name: Constants.Events.REQUEST_SERVER });
     log.debug('URL: ', window.ove.context.appUrl);
 
     OVE.Utils.resizeController(Constants.CONTENT_DIV);

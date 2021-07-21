@@ -16,9 +16,9 @@ initThenUpdateMap = function () {
     }
 };
 
-onUpdate = function (message, special) {
+onUpdate = function (position, special) {
     if (!special) return;
-    window.ove.state.current.position = message.position;
+    window.ove.state.current.position = position;
     updateMap();
 };
 

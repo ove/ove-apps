@@ -34,7 +34,7 @@ initControl = function (data) {
             window.ove.state.current.scripts = data.scripts;
         }
 
-        window.ove.socket.send({ name: Constants.Events.REQUEST_SERVER });
+        //window.ove.socket.send({ name: Constants.Events.REQUEST_SERVER });
         const config = {
             center: data.center,
             resolution: data.resolution,
@@ -87,11 +87,11 @@ initControl = function (data) {
 
 updateState = function () {};
 
-onUpdate = function (message) {
+onUpdate = function (position) {
     const context = window.ove.context;
     window.ove.context.updateFlag = true;
-    context.library.setZoom(message.position.zoom);
-    context.library.setCenter(message.position.center);
+    context.library.setZoom(position.zoom);
+    context.library.setCenter(position.center);
     window.ove.context.updateFlag = false;
 };
 

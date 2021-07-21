@@ -32,11 +32,6 @@ initCommon = function () {
                 updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context, false)();
             } else if (message.name === Constants.Events.UPDATE && message.secondary) {
                 updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context, true)();
-            } else if (message.name === Constants.Events.REQUEST_CLIENT) {
-                const m = { name: Constants.Events.RESPOND_SERVER, viewport: window.ove.state.current.viewport, secondaryId: message.secondaryId };
-                window.ove.socket.send(m);
-            } else if (message.name === Constants.Events.RESPOND_CLIENT) {
-                updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context, true)();
             }
         } else if (message.operation) {
             log.debug('Got invoke operation request: ', message.operation);
