@@ -7,24 +7,12 @@ initView = function () {
 };
 
 initThenUpdateMap = function () {
-    log.debug('other update');
     if (!window.ove.context.isCommonInitialized) {
         window.ove.context.isCommonInitialized = true;
-        initCommon(onUpdate, updateState).then(updateMap);
+        initCommon().then(updateMap);
     } else {
         updateMap();
     }
-};
-
-onUpdate = function (position, special) {
-    if (!special) return;
-    window.ove.state.current.position = position;
-    updateMap();
-};
-
-updateState = function (message) {
-    window.ove.state.current = message;
-    initThenUpdateMap();
 };
 
 updateMap = function () {

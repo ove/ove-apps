@@ -6,14 +6,7 @@ const { express, app, Utils, log, nodeModules, config } = base;
 const request = require('request');
 const fs = require('fs');
 const server = require('http').createServer(app);
-
-const runner = function (m) {
-    m.message.name = Constants.Events.UPDATE;
-    ws.safeSend(JSON.stringify(m));
-};
-
-let uuid = 0;
-let queue = Utils.getPriorityQueue((a, b) => a.message.uuid > b.message.uuid, runner);
+const WebSocket = require('ws');
 
 let layers = [];
 // The map layers can be provided as an embedded JSON data structure or as a URL pointing
@@ -183,7 +176,7 @@ setTimeout(function () {
     const getSocket = function () {
         const socketURL = 'ws://' + Utils.getOVEHost();
         log.debug('Establishing WebSocket connection with:', socketURL);
-        let socket = new (require('ws'))(socketURL);
+        let socket = new WebSocket(socketURL);
         ws = Utils.getSafeSocket(socket);
         socket.on('open', function () {
             log.debug('WebSocket connection made with:', socketURL);
@@ -195,39 +188,6 @@ setTimeout(function () {
             setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
         });
         socket.on('error', log.error);
-        socket.on('message', function (msg) {
-            let m = JSON.parse(msg);
-            if (m.appId !== Constants.APP_NAME || !m.message || !m.message.name) return;
-
-            if (m.message.name === Constants.Events.EVENT && !m.message.secondary) {
-                m.message.uuid = uuid++;
-                const message = { name: Constants.Events.UUID, uuid: m.message.uuid, clientId: m.message.clientId };
-                ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: message }));
-                queue.push(m);
-            } else if (m.message.name === Constants.Events.REQUEST_SERVER) {
-                request({
-                    headers: { 'Content-Type': 'application/json'},
-                    url: `http://${Utils.getOVEHost()}/connections/section/${m.sectionId}`,
-                    method: 'GET',
-                    json: true
-                }, (error, res, body) => {
-                    if (!error && res.statusCode === 200) {
-                        if (!body || !body.section) return;
-                        m.message.name = Constants.Events.REQUEST_CLIENT;
-                        m.message.secondaryId = m.sectionId;
-                        const message = { appId: m.appId, sectionId: body.section.primary.toString(), message: m.message };
-                        ws.safeSend(JSON.stringify(message));
-                    } else {
-                        log.error('an error occurred while requesting details:', error);
-                    }
-                });
-            } else if (m.message.name === Constants.Events.RESPOND_SERVER) {
-                if (!m.message.secondaryId) return;
-                m.message.name = Constants.Events.RESPOND_CLIENT;
-                const message = { appId: m.appId, sectionId: m.message.secondaryId, message: m.message };
-                ws.safeSend(JSON.stringify(message));
-            }
-        });
     };
     getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);

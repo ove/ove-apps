@@ -10,7 +10,6 @@ $(function () {
         log.debug('Completed loading OVE');
         const context = window.ove.context;
         context.isInitialized = false;
-        context.currentUUID = -1;
         context.updateFlag = false;
         context.layers = [];
         context.map = undefined;
@@ -35,7 +34,7 @@ const buildViewport = function (op, context) {
 // Initialization that is common to viewers and controllers.
 /* jshint ignore:start */
 // current version of JSHint does not support async/await
-initCommon = async function (onUpdate, updateState) {
+initCommon = async function () {
     const context = window.ove.context;
     const state = window.ove.state.current;
 
@@ -49,31 +48,16 @@ initCommon = async function (onUpdate, updateState) {
         context.layers = await context.library.loadLayers(layers);
     };
 
-    window.ove.socket.on(function (message) {
-        if (!message || !context.isInitialized) return;
-        const uuid = window.ove.context.uuid;
+    window.ove.socket.addEventListener('message', message => {
+        if (!message || !context.isInitialized || !message.data) return;
+        const data = JSON.parse(message.data);
+        if (!data.message || !data.message.operation) return;
+        log.debug('Got invoke operation request: ', data.message.operation);
+        const op = data.message.operation;
 
-        if (message.name) {
-            if (message.name === Constants.Events.UUID && window.ove.context.currentUUID < message.uuid && message.clientId === uuid) {
-                window.ove.context.currentUUID = message.uuid;
-            } else if (message.name === Constants.Events.UPDATE && !message.secondary) {
-                if (window.ove.context.uuid === message.clientId) return;
-                if (message.uuid <= window.ove.context.currentUUID) return;
-                window.ove.context.currentUUID = message.UUID;
-                onUpdate(message.position, false);
-            } else if (message.name === Constants.Events.UPDATE && message.secondary) {
-                onUpdate(message.position, true);
-            }
-        } else if (message.operation) {
-            log.debug('Got invoke operation request: ', message.operation);
-            const op = message.operation;
-
-            setTimeout(function () {
-                buildViewport(op, context);
-            });
-        } else {
-            updateState(message);
-        }
+        setTimeout(function () {
+            buildViewport(op, context);
+        });
     });
 
     log.debug('Starting to fetch map layer configurations');

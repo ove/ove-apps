@@ -8,7 +8,17 @@ initControl = function (data) {
     if (data.url) {
         window.ove.state.current.url = data.url;
     }
-    initCommon(onUpdate, updateState).then(function () {
+
+    OVE.Utils.setOnStateUpdate(() => {
+        context.updateFlag = true;
+        const p = window.ove.state.current.position;
+        log.debug('Updating map with zoom:', p.zoom, ', center:', p.center, ', and resolution:', p.resolution);
+        context.library.setZoom(p.zoom);
+        context.library.setCenter(p.center);
+        context.updateFlag = false;
+    });
+
+    initCommon().then(function () {
         // We make sure both controller and viewer have received their layers
         OVE.Utils.broadcastState();
         if (context.layers.length === 0) {
@@ -34,7 +44,6 @@ initControl = function (data) {
             window.ove.state.current.scripts = data.scripts;
         }
 
-        //window.ove.socket.send({ name: Constants.Events.REQUEST_SERVER });
         const config = {
             center: data.center,
             resolution: data.resolution,
@@ -85,18 +94,7 @@ initControl = function (data) {
     });
 };
 
-updateState = function () {};
-
-onUpdate = function (position) {
-    const context = window.ove.context;
-    window.ove.context.updateFlag = true;
-    context.library.setZoom(position.zoom);
-    context.library.setCenter(position.center);
-    window.ove.context.updateFlag = false;
-};
-
 uploadMapPosition = function () {
-    if (window.ove.context.updateFlag) return;
     const context = window.ove.context;
     const size = context.library.getSize();
     const topLeft = context.library.getTopLeft();
@@ -130,12 +128,11 @@ uploadMapPosition = function () {
     // The broadcast happens only if the position has changed.
     if (!window.ove.state.current.position ||
         !OVE.Utils.JSON.equals(position, window.ove.state.current.position)) {
-        log.debug('Sending event message from client!');
-        window.ove.socket.send({ name: Constants.Events.EVENT, clientId: window.ove.context.uuid, position: position });
-
         window.ove.state.current.position = position;
         log.debug('Broadcasting state with position:', position);
-        OVE.Utils.broadcastState();
+        if (!context.updateFlag) {
+            OVE.Utils.broadcastState();
+        }
     }
 };
 
