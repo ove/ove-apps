@@ -9,13 +9,11 @@ initControl = function (data) {
         window.ove.state.current.url = data.url;
     }
 
-    OVE.Utils.setOnStateUpdate(() => {
-        context.updateFlag = true;
+    OVE.Utils.setOnStateUpdateController(() => {
         const p = window.ove.state.current.position;
         log.debug('Updating map with zoom:', p.zoom, ', center:', p.center, ', and resolution:', p.resolution);
         context.library.setZoom(p.zoom);
         context.library.setCenter(p.center);
-        context.updateFlag = false;
     });
 
     initCommon().then(function () {
@@ -130,9 +128,7 @@ uploadMapPosition = function () {
         !OVE.Utils.JSON.equals(position, window.ove.state.current.position)) {
         window.ove.state.current.position = position;
         log.debug('Broadcasting state with position:', position);
-        if (!context.updateFlag) {
-            OVE.Utils.broadcastState();
-        }
+        OVE.Utils.broadcastState();
     }
 };
 

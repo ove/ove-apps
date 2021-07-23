@@ -46,10 +46,4 @@ Constants.Action = {
     CONNECT: 'connect'
 }
 
-Constants.Events = {
-    EVENT: 'event_mc',
-    UPDATE: 'update_mc',
-    UUID: 'uuid_mc',
-};
-
 exports.Constants = Constants;
