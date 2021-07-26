@@ -32,10 +32,4 @@ Constants.Operation = {
     ZOOM: 'zoom'
 };
 
-Constants.Events = {
-    EVENT: 'event_mc',
-    UPDATE: 'update_mc',
-    UUID: 'uuid_mc',
-};
-
 exports.Constants = Constants;

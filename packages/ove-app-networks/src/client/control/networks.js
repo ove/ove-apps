@@ -1,12 +1,16 @@
 initControl = function (data) {
     window.ove.context.isInitialized = false;
-    window.ove.context.updateFlag = false;
-    window.ove.context.currentUUID = -1;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 
     OVE.Utils.resizeController(Constants.CONTENT_DIV);
     log.debug('Restoring state:', data);
     window.ove.state.current = data;
+
+    OVE.Utils.setOnStateUpdateController(() => {
+        window.ove.context.updateFlag = true;
+        window.ove.context.sigma.camera.goTo(window.ove.state.current.coordinates);
+        refreshSigma(window.ove.context.sigma);
+    });
 
     let url = OVE.Utils.getURLQueryParam();
     // If a URL was passed, the URLs of the loaded state would be overridden.
@@ -34,41 +38,28 @@ initControl = function (data) {
     loadSigma();
     log.debug('Broadcasting state');
     OVE.Utils.broadcastState();
-    window.ove.socket.on(function (message) {
-        if (!message || !window.ove.context.isInitialized) return;
-        const uuid = window.ove.context.uuid;
-
-        if (message.name) {
-            if (message.name === Constants.Events.UPDATE) {
-                if (uuid === message.clientId) return;
-                if (message.uuid <= window.ove.context.currentUUID) return;
-                window.ove.context.currentUUID = message.uuid;
-                window.ove.context.updateFlag = true;
-                window.ove.context.sigma.camera.goTo(message.coordinates);
-                window.ove.context.updateFlag = false;
-                refreshSigma(window.ove.context.sigma);
-            } else if (message.name === Constants.Events.UUID && message.uuid > window.ove.context.currentUUID && message.clientId === uuid) {
-                window.ove.context.currentUUID = message.uuid;
-            }
-        } else if (message.operation) {
-            // We first of all need to know if the operation was known
-            if (!Object.values(Constants.Operation).includes(message.operation)) {
-                // This can only happen due to a user error
-                log.warn('Ignoring unknown operation:', message.operation);
-                return;
-            }
-
-            runOperation(message);
-            if (message.operation === Constants.Operation.RESET) {
-                if (window.ove.state.current.operation) {
-                    delete window.ove.state.current.operation;
-                }
-            } else {
-                window.ove.state.current.operation = message;
-            }
-            // Cache state for later use.
-            window.ove.state.cache();
+    window.ove.socket.addEventListener('message', function (message) {
+        if (!message || !window.ove.context.isInitialized || !message.data) return;
+        const data = JSON.parse(message.data);
+        if (!data.message || !data.message.operation) return;
+        const operation = data.message.operation;
+        // We first of all need to know if the operation was known
+        if (!Object.values(Constants.Operation).includes(operation)) {
+            // This can only happen due to a user error
+            log.warn('Ignoring unknown operation:', operation);
+            return;
         }
+
+        runOperation(data.message);
+        if (operation === Constants.Operation.RESET) {
+            if (window.ove.state.current.operation) {
+                delete window.ove.state.current.operation;
+            }
+        } else {
+            window.ove.state.current.operation = data.message;
+        }
+        // Cache state for later use.
+        window.ove.state.cache();
     });
 };
 
@@ -77,7 +68,6 @@ getClientSpecificURL = function (url) {
 };
 
 setupCoordinatesUpdateEventListener = function (sigma) {
-    if (window.ove.context.updateFlag) return;
     const horizontalScalingFactor = window.ove.geometry.section.w /
         Math.min(document.documentElement.clientWidth, window.innerWidth);
     const verticalScalingFactor = window.ove.geometry.section.h /
@@ -88,9 +78,6 @@ setupCoordinatesUpdateEventListener = function (sigma) {
     // Camera position changes trigger COORDINATES_UPDATED_EVENT
     const camera = sigma.camera;
     camera.bind(Constants.COORDINATES_UPDATED_EVENT, function () {
-        if (window.ove.context.updateFlag) return;
-        const coordinates = { x: camera.x, y: camera.y, ratio: camera.ratio, angle: camera.angle };
-        window.ove.socket.send({ name: Constants.Events.EVENT, clientId: window.ove.context.uuid, coordinates: coordinates });
         window.ove.context.coordinates = {
             x: camera.x * factor,
             y: camera.y * factor,
@@ -104,6 +91,7 @@ setupCoordinatesUpdateEventListener = function (sigma) {
             !OVE.Utils.JSON.equals(window.ove.context.coordinates, window.ove.state.current.coordinates)) {
             window.ove.state.current.coordinates = window.ove.context.coordinates;
             OVE.Utils.broadcastState();
+            window.ove.context.updateFlag = false;
         }
     }, Constants.COORDINATES_UPDATE_TIMEOUT);
     log.debug('Registered coordinates update event listener');

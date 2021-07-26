@@ -9,14 +9,6 @@ const server = require('http').createServer(app);
 log.debug('Using module:', 'sigma');
 app.use('/', express.static(path.join(nodeModules, 'sigma', 'build')));
 
-const runner = function (m) {
-    m.message.name = Constants.Events.UPDATE;
-    ws.safeSend(JSON.stringify(m));
-};
-
-let uuid = 0;
-let queue = Utils.getPriorityQueue((a, b) => a.message.uuid > b.message.uuid, runner);
-
 let ws;
 setTimeout(function () {
     const getSocket = function () {
@@ -31,16 +23,6 @@ setTimeout(function () {
         });
         socket.on('error', log.error);
         ws = Utils.getSafeSocket(socket);
-        socket.on('message', msg => {
-            const m = JSON.parse(msg);
-            if (m.appId !== Constants.APP_NAME || !m.message) return;
-            if (m.message.name && m.message.name === Constants.Events.EVENT) {
-                m.message.uuid = uuid++;
-                const message = { name: Constants.Events.UUID, uuid: m.message.uuid, clientId: m.message.clientId };
-                ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: message }));
-                queue.push(m);
-            }
-        });
     };
     getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);
@@ -162,6 +144,6 @@ base.operations.validateState = function (state) {
     ]);
 };
 
-const port = process.env.PORT || 8080;
+const port = Number(process.env.PORT) || 8080;
 server.listen(port);
 log.info(Constants.APP_NAME, 'application started, port:', port);

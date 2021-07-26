@@ -7,14 +7,6 @@ const server = require('http').createServer(app);
 log.debug('Using module:', 'openseadragon');
 app.use('/', express.static(path.join(nodeModules, 'openseadragon', 'build', 'openseadragon')));
 
-const runner = function (m) {
-    m.message.name = Constants.Events.UPDATE;
-    ws.safeSend(JSON.stringify(m));
-};
-
-let uuid = 0;
-let queue = Utils.getPriorityQueue((a, b) => a.message.uuid > b.message.uuid, runner);
-
 log.debug('Setting up state transformation operations');
 base.operations.canTransform = function (state, transformation) {
     const combinations = [
@@ -110,39 +102,6 @@ setTimeout(function () {
             setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
         });
         socket.on('error', log.error);
-        socket.on('message', function (msg) {
-            let m = JSON.parse(msg);
-            if (m.appId !== Constants.APP_NAME || !m.message || !m.message.name) return;
-
-            if (m.message.name === Constants.Events.EVENT && !m.message.secondary) {
-                m.message.uuid = uuid++;
-                const message = { name: Constants.Events.UUID, uuid: m.message.uuid, clientId: m.message.clientId };
-                ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: message }));
-                queue.push(m);
-            } else if (m.message.name === Constants.Events.REQUEST_SERVER) {
-                require('request')({
-                    headers: { 'Content-Type': 'application/json'},
-                    url: `http://${Utils.getOVEHost()}/connections/section/${m.sectionId}`,
-                    method: 'GET',
-                    json: true
-                }, (error, res, body) => {
-                    if (!error && res.statusCode === 200) {
-                        if (!body || !body.section) return;
-                        m.message.name = Constants.Events.REQUEST_CLIENT;
-                        m.message.secondaryId = m.sectionId;
-                        const message = { appId: m.appId, sectionId: body.section.primary.toString(), message: m.message };
-                        ws.safeSend(JSON.stringify(message));
-                    } else {
-                        log.error('an error occurred while requesting details:', error);
-                    }
-                });
-            } else if (m.message.name === Constants.Events.RESPOND_SERVER) {
-                if (!m.message.secondaryId) return;
-                m.message.name = Constants.Events.RESPOND_CLIENT;
-                const message = { appId: m.appId, sectionId: m.message.secondaryId, message: m.message };
-                ws.safeSend(JSON.stringify(message));
-            }
-        });
     };
     getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);

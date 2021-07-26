@@ -9,8 +9,6 @@ $(function () {
         log.debug('Completed loading OVE');
         window.ove.context.isInitialized = false;
         window.ove.context.osd = undefined;
-        window.ove.context.currentUUID = -1;
-        window.ove.context.updateFlag = false;
         beginInitialization();
     });
 });
@@ -18,28 +16,15 @@ $(function () {
 initCommon = function () {
     const context = window.ove.context;
 
-    window.ove.socket.on(function (message) {
-        if (!message || !context.isInitialized) return;
-        const uuid = window.ove.context.uuid;
+    window.ove.socket.addEventListener('message', message => {
+        if (!message || !context.isInitialized || !message.data) return;
+        const data = JSON.parse(message.data);
+        if (!data.message || !data.message.operation) return;
+        log.debug('Got invoke operation request: ', data.message.operation);
 
-        if (message.name) {
-            if (message.name === Constants.Events.UUID && window.ove.context.currentUUID < message.uuid && message.clientId === uuid) {
-                window.ove.context.currentUUID = message.uuid;
-            }  else if (message.name === Constants.Events.UPDATE && !message.secondary) {
-                if (window.ove.context.uuid === message.clientId) return;
-                if (message.uuid <= window.ove.context.currentUUID) return;
-                window.ove.context.currentUUID = message.UUID;
-                updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context, false)();
-            } else if (message.name === Constants.Events.UPDATE && message.secondary) {
-                updatePosition(window.ove.state.current, { viewport: message.viewport }, window.ove.context, true)();
-            }
-        } else if (message.operation) {
-            log.debug('Got invoke operation request: ', message.operation);
-
-            setTimeout(function () {
-                buildViewport(message.operation, context);
-            });
-        }
+        setTimeout(function () {
+            buildViewport(data.message.operation, context);
+        });
     });
 };
 

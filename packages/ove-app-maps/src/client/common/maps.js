@@ -53,10 +53,9 @@ initCommon = async function () {
         const data = JSON.parse(message.data);
         if (!data.message || !data.message.operation) return;
         log.debug('Got invoke operation request: ', data.message.operation);
-        const op = data.message.operation;
 
         setTimeout(function () {
-            buildViewport(op, context);
+            buildViewport(data.message.operation, context);
         });
     });
 

@@ -6,6 +6,8 @@ initControl = function (data, viewport) {
     context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 
+    OVE.Utils.setOnStateUpdateController(() => updatePosition(window.ove.state.current, { viewport: window.ove.state.current.viewport }, window.ove.context)());
+
     initCommon();
 
     log.debug('URL: ', window.ove.context.appUrl);
@@ -64,7 +66,6 @@ sendViewportDetails = function () {
         if (!window.ove.state.current.viewport ||
             !OVE.Utils.JSON.equals(viewport, window.ove.state.current.viewport)) {
             window.ove.state.current.viewport = viewport;
-            window.ove.socket.send({ name: Constants.Events.EVENT, clientId: window.ove.context.uuid, viewport: viewport });
 
             if (window.ove.state.name) {
                 // Keep track of loaded state: this is used to check if the controller
@@ -85,16 +86,13 @@ updatePosition = function (state, wrapper, context) {
         }
         context.isInitialized = true;
         log.debug('Application is initialized:', context.isInitialized);
-        if (!window.ove.context.updateFlag) {
-            sendViewportDetails();
-        }
+        sendViewportDetails();
     };
 
     const update = function () {
         const bounds = wrapper.viewport.bounds;
         const calcX = Number(bounds.x) + Number(bounds.w) * 0.5;
         const calcY = Number(bounds.y) + Number(bounds.h) * 0.5;
-        window.ove.context.updateFlag = true;
         context.osd.viewport.panTo(new OpenSeadragon.Point(calcX,
             calcY), true).zoomTo(wrapper.viewport.zoom);
 
@@ -106,7 +104,6 @@ updatePosition = function (state, wrapper, context) {
             }, Constants.OSD_POST_LOAD_WAIT_TIME);
         }
         setupHandlers();
-        window.ove.context.updateFlag = false;
     };
 
     return function () {
@@ -116,7 +113,9 @@ updatePosition = function (state, wrapper, context) {
             context.osd.setVisible(false);
 
             setTimeout(function () {
+                window.ove.context.updateFlag = true;
                 update(); // Wait sufficiently for OSD to load the image for the first time.
+                window.ove.context.updateFlag = false;
             }, Constants.OSD_POST_LOAD_WAIT_TIME);
         } else {
             setupHandlers();

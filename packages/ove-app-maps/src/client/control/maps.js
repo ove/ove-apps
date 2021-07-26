@@ -12,8 +12,10 @@ initControl = function (data) {
     OVE.Utils.setOnStateUpdateController(() => {
         const p = window.ove.state.current.position;
         log.debug('Updating map with zoom:', p.zoom, ', center:', p.center, ', and resolution:', p.resolution);
+        context.updateFlag = true;
         context.library.setZoom(p.zoom);
         context.library.setCenter(p.center);
+        context.updateFlag = false;
     });
 
     initCommon().then(function () {
