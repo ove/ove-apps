@@ -16,15 +16,11 @@ $(function () {
 initCommon = function () {
     const context = window.ove.context;
 
-    window.ove.socket.addEventListener('message', message => {
-        if (!message || !context.isInitialized || !message.data) return;
-        const data = JSON.parse(message.data);
-        if (!data.message || !data.message.operation) return;
-        log.debug('Got invoke operation request: ', data.message.operation);
+    window.ove.socket.addEventListener(message => {
+        if (!context.isInitialized || !message.operation) return;
+        log.debug('Got invoke operation request: ', message.operation);
 
-        setTimeout(function () {
-            buildViewport(data.message.operation, context);
-        });
+        buildViewport(message.operation, context);
     });
 };
 

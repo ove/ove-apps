@@ -39,24 +39,21 @@ initControl = function (data) {
     log.debug('Broadcasting state');
     OVE.Utils.broadcastState();
     window.ove.socket.addEventListener('message', function (message) {
-        if (!message || !window.ove.context.isInitialized || !message.data) return;
-        const data = JSON.parse(message.data);
-        if (!data.message || !data.message.operation) return;
-        const operation = data.message.operation;
+        if (!window.ove.context.isInitialized || !message) return;
         // We first of all need to know if the operation was known
-        if (!Object.values(Constants.Operation).includes(operation)) {
+        if (!Object.values(Constants.Operation).includes(message.operation)) {
             // This can only happen due to a user error
-            log.warn('Ignoring unknown operation:', operation);
+            log.warn('Ignoring unknown operation:', message.operation);
             return;
         }
 
-        runOperation(data.message);
-        if (operation === Constants.Operation.RESET) {
+        runOperation(message);
+        if (message.operation === Constants.Operation.RESET) {
             if (window.ove.state.current.operation) {
                 delete window.ove.state.current.operation;
             }
         } else {
-            window.ove.state.current.operation = data.message;
+            window.ove.state.current.operation = message;
         }
         // Cache state for later use.
         window.ove.state.cache();

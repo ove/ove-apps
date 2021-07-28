@@ -10,14 +10,6 @@ app.use('/', express.static(path.join(nodeModules, 'pdfjs-dist', 'build')));
 log.debug('Using module:', 'd3');
 app.use('/', express.static(path.join(nodeModules, 'd3', 'dist')));
 
-const runner = function (m) {
-    m.message.name = Constants.Events.UPDATE;
-    ws.safeSend(JSON.stringify(m));
-};
-
-let uuid = 0;
-let queue = Utils.getPriorityQueue((a, b) => a.message.uuid > b.message.uuid, runner);
-
 log.debug('Setting up state transformation operations');
 base.operations.canTransform = function (state, transformation) {
     const combinations = [
@@ -111,17 +103,6 @@ setTimeout(function () {
             setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
         });
         socket.on('error', log.error);
-        socket.on('message', function (msg) {
-            let m = JSON.parse(msg);
-            if (m.appId !== Constants.APP_NAME || !m.message) return;
-
-            if (m.message.name && m.message.name === Constants.Events.EVENT) {
-                m.message.uuid = uuid++;
-                const message = { name: Constants.Events.UUID, uuid: m.message.uuid, clientId: m.message.clientId };
-                ws.safeSend(JSON.stringify({ appId: m.appId, sectionId: m.sectionId, message: message }));
-                queue.push(m);
-            }
-        });
     };
     getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);
@@ -161,6 +142,6 @@ const handleOperation = function (req, res) {
 const operationsList = Object.values(Constants.Operation);
 app.post('/operation/:name(' + operationsList.join('|') + ')', handleOperation);
 
-const port = process.env.PORT || 8080;
+const port = Number(process.env.PORT) || 8080;
 server.listen(port);
 log.info(Constants.APP_NAME, 'application started, port:', port);

@@ -8,8 +8,6 @@ $(function () {
         window.ove = new OVE(Constants.APP_NAME);
         log.debug('Completed loading OVE');
         window.ove.context.isInitialized = false;
-        window.ove.context.updateFlag = false;
-        window.ove.context.currentUUID = -1;
         beginInitialization();
     });
 });
@@ -44,83 +42,6 @@ updatePDF = function () {
     }
 };
 
-const panPage = function (x, y) {
-    const state = window.ove.state.current;
-    const context = window.ove.context;
-    if (context.renderingInProgress) return;
-
-    state.offset.x = x * getScalingFactor();
-    state.offset.y = y * getScalingFactor();
-
-    log.debug('Updating offset:', state.offset);
-    if (!OVE.Utils.JSON.equals(context.state, state)) {
-        context.state = JSON.parse(JSON.stringify(state));
-        triggerUpdate();
-    }
-};
-
-const triggerUpdate = function () {
-    log.debug('Broadcasting state');
-    OVE.Utils.broadcastState();
-    window.ove.socket.send({ name: Constants.Events.EVENT, clientId: window.ove.context.uuid, state: window.ove.state.current });
-    updatePDF();
-};
-
-const zoomPage = function (zoom) {
-    const state = window.ove.state.current;
-    const context = window.ove.context;
-    if (context.renderingInProgress) return;
-    state.scale = zoom * (state.settings.scale || Constants.DEFAULT_SCALE);
-
-    log.debug('Updating scale:', state.scale);
-    if (!OVE.Utils.JSON.equals(context.state, state)) {
-        // We only trigger updates if the state has really changed.
-        context.state = JSON.parse(JSON.stringify(state));
-        triggerUpdate();
-    }
-};
-
-const updatePage = function (newState) {
-    const state = window.ove.state.current;
-    const context = window.ove.context;
-
-    if (context.renderingInProgress) return;
-
-    log.debug('Updating scale:', state.scale, 'and offset:', state.offset);
-    if (!OVE.Utils.JSON.equals(state, newState)) {
-        // We only trigger updates if the state has really changed.
-        window.ove.state.current = JSON.parse(JSON.stringify(newState));
-        updatePDF();
-    }
-};
-
-initCommon = function () {
-    window.ove.socket.on(function (message) {
-        if (!message || !window.ove.context.isInitialized) return;
-        const uuid = window.ove.context.uuid;
-
-        if (message.name) {
-            if (message.name === Constants.Events.UUID && window.ove.context.currentUUID < message.uuid && message.clientId === uuid) {
-                window.ove.context.currentUUID = message.uuid;
-            } else if (message.name === Constants.Events.UPDATE) {
-                if (uuid === message.clientId) return;
-                if (message.uuid <= window.ove.context.currentUUID) return;
-                window.ove.context.currentUUID = message.uuid;
-
-                window.ove.context.updateFlag = true;
-                updatePage(message.state);
-                window.ove.context.updateFlag = false;
-            }
-        } else if (message.operation) {
-            if (message.operation.zoom) {
-                zoomPage(message.operation.zoom);
-            } else if (message.operation.x && message.operation.y) {
-                panPage(message.operation.x, message.operation.y);
-            }
-        }
-    });
-};
-
 const onGetPage = function (pdf, firstPage) {
     const state = window.ove.state.current;
     const g = window.ove.geometry;
@@ -149,8 +70,56 @@ const onGetPage = function (pdf, firstPage) {
     let i = firstPage.pageNumber - 1;
     while (i < (state.settings.endPage || pdf.numPages)) {
         i++;
-        pdf.getPage(i).then(page => { renderPage(pdf, page, scale, dim, firstPage, pageGap); });
+        pdf.getPage(i).then(page => {
+            renderPage(pdf, page, scale, dim, firstPage, pageGap);
+        });
     }
+};
+
+const panPage = function (x, y) {
+    const state = window.ove.state.current;
+    const context = window.ove.context;
+    if (context.renderingInProgress) return;
+
+    state.offset.x = x * getScalingFactor();
+    state.offset.y = y * getScalingFactor();
+
+    log.debug('Updating offset:', state.offset);
+    if (!OVE.Utils.JSON.equals(context.state, state)) {
+        context.state = JSON.parse(JSON.stringify(state));
+        triggerUpdate();
+    }
+};
+
+triggerUpdate = function () {
+    log.debug('Broadcasting state');
+    OVE.Utils.broadcastState();
+    updatePDF();
+};
+
+const zoomPage = function (zoom) {
+    const state = window.ove.state.current;
+    const context = window.ove.context;
+    if (context.renderingInProgress) return;
+    state.scale = zoom * (state.settings.scale || Constants.DEFAULT_SCALE);
+
+    log.debug('Updating scale:', state.scale);
+    if (!OVE.Utils.JSON.equals(context.state, state)) {
+        // We only trigger updates if the state has really changed.
+        context.state = JSON.parse(JSON.stringify(state));
+        triggerUpdate();
+    }
+};
+
+initCommon = function () {
+    window.ove.socket.addEventListener(function (message) {
+        if (!message || !window.ove.context.isInitialized || !message.operation) return;
+        if (message.operation.zoom) {
+            zoomPage(message.operation.zoom);
+        } else if (message.operation.x && message.operation.y) {
+            panPage(message.operation.x, message.operation.y);
+        }
+    });
 };
 
 const renderPage = function (pdf, page, scale, dim, firstPage, pageGap) {

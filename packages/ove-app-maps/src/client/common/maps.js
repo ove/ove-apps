@@ -48,15 +48,10 @@ initCommon = async function () {
         context.layers = await context.library.loadLayers(layers);
     };
 
-    window.ove.socket.addEventListener('message', message => {
-        if (!message || !context.isInitialized || !message.data) return;
-        const data = JSON.parse(message.data);
-        if (!data.message || !data.message.operation) return;
-        log.debug('Got invoke operation request: ', data.message.operation);
-
-        setTimeout(function () {
-            buildViewport(data.message.operation, context);
-        });
+    window.ove.socket.addEventListener(message => {
+        if (!context.isInitialized || !message.operation) return;
+        log.debug('Got invoke operation request: ', message.operation);
+        buildViewport(message.operation, context);
     });
 
     log.debug('Starting to fetch map layer configurations');

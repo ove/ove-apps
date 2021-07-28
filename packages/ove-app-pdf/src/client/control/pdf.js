@@ -1,7 +1,14 @@
 initControl = function (data) {
     let context = window.ove.context;
     context.isInitialized = false;
-    initCommon();
+
+    OVE.Utils.setOnStateUpdateController(() => {
+        log.debug('On update');
+        window.ove.context.updateFlag = true;
+        updatePDF();
+        window.ove.context.updateFlag = false;
+    });
+
     log.debug('Application is initialized:', context.isInitialized);
     log.debug('Restoring state:', data);
     const state = window.ove.state.current = data;
