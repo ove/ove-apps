@@ -61,18 +61,18 @@ initCommon = async function () {
             const config = JSON.parse(text);
             if (config.layers) {
                 log.debug('Loading map configuration from URL:', state.url);
-                loadLayers(config.layers);
+                await loadLayers(config.layers);
             } else {
                 return fetch('layers.json').then(r => r.text()).then(async text => {
                     log.debug('Parsing map layer configurations');
-                    loadLayers(JSON.parse(text));
+                    await loadLayers(JSON.parse(text));
                 });
             }
         });
     }
     return fetch('layers.json').then(r => r.text()).then(async text => {
         log.debug('Parsing map layer configurations');
-        loadLayers(JSON.parse(text));
+        await loadLayers(JSON.parse(text));
     });
 };
 /* jshint ignore:end */

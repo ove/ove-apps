@@ -2,13 +2,6 @@ initControl = function (data) {
     let context = window.ove.context;
     context.isInitialized = false;
 
-    OVE.Utils.setOnStateUpdateController(() => {
-        log.debug('On update');
-        window.ove.context.updateFlag = true;
-        updatePDF();
-        window.ove.context.updateFlag = false;
-    });
-
     log.debug('Application is initialized:', context.isInitialized);
     log.debug('Restoring state:', data);
     const state = window.ove.state.current = data;
@@ -30,6 +23,33 @@ initControl = function (data) {
     state.scale = state.settings.scale || Constants.DEFAULT_SCALE;
     OVE.Utils.resizeController(Constants.CONTENT_DIV);
 
+    createCanvas();
+    initCommon();
+
+    window.ove.state.cache();
+
+    triggerUpdate();
+};
+
+const onZoom = function ({ transform }) {
+    const context = window.ove.context;
+    if (context.renderingInProgress) return;
+    let s = window.ove.state.current;
+
+    s.offset.x = transform.x * getScalingFactor();
+    s.offset.y = transform.y * getScalingFactor();
+    s.scale = transform.k * (s.settings.scale || Constants.DEFAULT_SCALE);
+    s = JSON.parse(JSON.stringify(s));
+
+    log.debug('Updating scale:', s.scale, 'and offset:', s.offset);
+    if (!OVE.Utils.JSON.equals(context.state, s)) {
+        // We only trigger updates if the state has really changed.
+        context.state = s;
+        triggerUpdate();
+    }
+};
+
+const createCanvas = () => {
     log.debug('Creating control canvas');
     $('<canvas>', {
         class: Constants.CONTROL_CANVAS.substring(1)
@@ -40,24 +60,7 @@ initControl = function (data) {
 
     // D3 is used for pan and zoom operations.
     log.debug('Registering pan/zoom listeners');
-    d3.select(Constants.CONTROL_CANVAS).call(d3.zoom().scaleExtent([1, Constants.MAX_ZOOM_LEVEL]).on('zoom', function ({ transform }) {
-        if (window.ove.context.updateFlag) return;
-        if (context.renderingInProgress) return;
-        state.offset.x = transform.x * getScalingFactor();
-        state.offset.y = transform.y * getScalingFactor();
-        state.scale = transform.k * (state.settings.scale || Constants.DEFAULT_SCALE);
-
-        log.debug('Updating scale:', state.scale, 'and offset:', state.offset);
-        if (!OVE.Utils.JSON.equals(context.state, state)) {
-            // We only trigger updates if the state has really changed.
-            context.state = JSON.parse(JSON.stringify(state));
-            triggerUpdate();
-        }
-    }));
-
-    window.ove.state.cache();
-
-    triggerUpdate();
+    d3.select(Constants.CONTROL_CANVAS).call(d3.zoom().scaleExtent([1, Constants.MAX_ZOOM_LEVEL]).on('zoom', onZoom));
 };
 
 getScalingFactor = function () {

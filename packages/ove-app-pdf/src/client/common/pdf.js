@@ -12,7 +12,8 @@ $(function () {
     });
 });
 
-updatePDF = function () {
+updatePDF = async function () {
+    window.ove.context.renderingInProgress = true;
     const context = window.ove.context;
     const state = window.ove.state.current;
 
@@ -31,18 +32,20 @@ updatePDF = function () {
 
     if (context.url !== state.url || !context.pdf) {
         log.debug('Fetching document from url:', state.url);
-        pdfjsLib.getDocument(state.url).promise.then(function (pdf) {
-            context.url = state.url;
-            context.pdf = pdf;
-            renderPDF(context.pdf);
-        }).catch(log.error);
+        let pdf = await pdfjsLib.getDocument(state.url).promise;
+        context.url = state.url;
+        context.pdf = pdf;
+        await renderPDF(context.pdf);
     } else {
         // The document was already fetched, it can be reused. This will enhance performance.
-        renderPDF(context.pdf);
+        await renderPDF(context.pdf);
     }
+
+    log.debug('Finished updating PDF');
+    context.renderingInProgress = false;
 };
 
-const onGetPage = function (pdf, firstPage) {
+const onGetPage = async function (pdf, firstPage) {
     const state = window.ove.state.current;
     const g = window.ove.geometry;
     const pageGap = parseInt(state.settings.pageGap || Constants.DEFAULT_PAGE_GAP, 10);
@@ -65,18 +68,11 @@ const onGetPage = function (pdf, firstPage) {
         y: (g.section.h - (viewport.height + pageGap) * dim.r - pageGap) / 2
     };
     log.trace('Computed page dimensions:', dim);
-
-    // Apply the render function on all pages;
-    let i = firstPage.pageNumber - 1;
-    while (i < (state.settings.endPage || pdf.numPages)) {
-        i++;
-        pdf.getPage(i).then(page => {
-            renderPage(pdf, page, scale, dim, firstPage, pageGap);
-        });
-    }
+    const page = await pdf.getPage(firstPage.pageNumber);
+    await renderPage(pdf, page, scale, dim, firstPage, pageGap);
 };
 
-const panPage = function (x, y) {
+const panPage = async function (x, y) {
     const state = window.ove.state.current;
     const context = window.ove.context;
     if (context.renderingInProgress) return;
@@ -87,17 +83,17 @@ const panPage = function (x, y) {
     log.debug('Updating offset:', state.offset);
     if (!OVE.Utils.JSON.equals(context.state, state)) {
         context.state = JSON.parse(JSON.stringify(state));
-        triggerUpdate();
+        await triggerUpdate();
     }
 };
 
-triggerUpdate = function () {
+triggerUpdate = async function () {
     log.debug('Broadcasting state');
     OVE.Utils.broadcastState();
-    updatePDF();
+    await updatePDF();
 };
 
-const zoomPage = function (zoom) {
+const zoomPage = async function (zoom) {
     const state = window.ove.state.current;
     const context = window.ove.context;
     if (context.renderingInProgress) return;
@@ -107,22 +103,22 @@ const zoomPage = function (zoom) {
     if (!OVE.Utils.JSON.equals(context.state, state)) {
         // We only trigger updates if the state has really changed.
         context.state = JSON.parse(JSON.stringify(state));
-        triggerUpdate();
+        await triggerUpdate();
     }
 };
 
 initCommon = function () {
-    window.ove.socket.addEventListener(function (message) {
+    window.ove.socket.addEventListener(async function (message) {
         if (!message || !window.ove.context.isInitialized || !message.operation) return;
         if (message.operation.zoom) {
-            zoomPage(message.operation.zoom);
+            await zoomPage(message.operation.zoom);
         } else if (message.operation.x && message.operation.y) {
-            panPage(message.operation.x, message.operation.y);
+            await panPage(message.operation.x, message.operation.y);
         }
     });
 };
 
-const renderPage = function (pdf, page, scale, dim, firstPage, pageGap) {
+const renderPage = async function (pdf, page, scale, dim, firstPage, pageGap) {
     const i = page.pageNumber;
     const state = window.ove.state.current;
     const context = window.ove.context;
@@ -162,8 +158,8 @@ const renderPage = function (pdf, page, scale, dim, firstPage, pageGap) {
     }
     log.trace('Using scroll direction:', scrollDir);
 
-    let pageRow = 0;
-    let pageColumn = 0;
+    let pageRow;
+    let pageColumn;
     if (scrollDir === Constants.Scrolling.VERTICAL) {
         pageColumn = (i - firstPage.pageNumber) % dim.c;
         pageRow = Math.floor((i - firstPage.pageNumber) / dim.c);
@@ -210,32 +206,19 @@ const renderPage = function (pdf, page, scale, dim, firstPage, pageGap) {
         pageCanvas[0].height = pageDim.h;
         pageCanvas[0].width = pageDim.w;
 
-        page.render({
+        await page.render({
             canvasContext: pageCanvas[0].getContext('2d'),
             viewport: viewport
-        }).promise.catch(log.warn).then(function () {
-            if (i === (state.settings.endPage || pdf.numPages)) {
-                // Sets the scale to the context after the last page has rendered.
-                // We wait for sometime for all pages to complete rendering.
-                setTimeout(function () {
-                    context.scale = scale;
-                    context.renderingInProgress = false;
-                }, Constants.RENDERING_TIMEOUT);
-            }
-            log.trace('Finished rendering page:', i);
-        });
+        }).promise;
+        context.scale = scale;
     } else {
         context.renderingInProgress = false;
     }
 };
 
-renderPDF = function (pdf) {
+renderPDF = async function (pdf) {
     log.debug('Starting PDF rendering');
-    const context = window.ove.context;
     const state = window.ove.state.current;
-
-    if (context.renderingInProgress) return;
-    context.renderingInProgress = true;
 
     // Offsets may not be set
     if (!state.offset) {
@@ -247,5 +230,6 @@ renderPDF = function (pdf) {
     }
 
     const pageNo = Number(state.settings.startPage || 1);
-    pdf.getPage(pageNo).then(firstPage => { onGetPage(pdf, firstPage); });
+    const firstPage = await pdf.getPage(pageNo);
+    await onGetPage(pdf, firstPage);
 };
