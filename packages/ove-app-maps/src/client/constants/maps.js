@@ -44,6 +44,6 @@ Constants.Operation = {
 
 Constants.Action = {
     CONNECT: 'connect'
-}
+};
 
 exports.Constants = Constants;
