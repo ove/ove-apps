@@ -1,6 +1,7 @@
-initControl = function (data) {
+initControl = async function (data) {
     let context = window.ove.context;
     context.isInitialized = false;
+    context.zoom = d3.zoom().scaleExtent([1, Constants.MAX_ZOOM_LEVEL]).on('zoom', onZoom);
 
     log.debug('Application is initialized:', context.isInitialized);
     log.debug('Restoring state:', data);
@@ -26,12 +27,20 @@ initControl = function (data) {
     createCanvas();
     initCommon();
 
+    OVE.Utils.setOnStateUpdateController(async () => {
+        const s = window.ove.state.current;
+        if (!s.isTransform) return;
+        window.ove.context.updateFlag = true;
+        d3.select(Constants.CONTROL_CANVAS).call(context.zoom.transform, d3.zoomIdentity.translate(s.offset.x, s.offset.y).scale(s.scale));
+    });
+
     window.ove.state.cache();
 
-    triggerUpdate();
+    await triggerUpdate();
 };
 
 const onZoom = function ({ transform }) {
+    log.debug('transform: ', transform);
     const context = window.ove.context;
     if (context.renderingInProgress) return;
     let s = window.ove.state.current;
@@ -45,22 +54,34 @@ const onZoom = function ({ transform }) {
     if (!OVE.Utils.JSON.equals(context.state, s)) {
         // We only trigger updates if the state has really changed.
         context.state = s;
+        if (context.updateFlag) {
+            updatePDF();
+            context.updateFlag = false;
+            return;
+        }
         triggerUpdate();
+        s.offset.x = transform.x;
+        s.offset.y = transform.y;
+        s.scale = transform.k;
+        s.isTransform = true;
+        OVE.Utils.broadcastState(s);
     }
 };
 
 const createCanvas = () => {
     log.debug('Creating control canvas');
+
     $('<canvas>', {
-        class: Constants.CONTROL_CANVAS.substring(1)
+        class: Constants.CONTROL_CANVAS.substring(1),
     }).appendTo(Constants.CONTENT_DIV);
+
     const canvas = $(Constants.CONTROL_CANVAS)[0];
     canvas.height = window.ove.geometry.section.h;
     canvas.width = window.ove.geometry.section.w;
 
     // D3 is used for pan and zoom operations.
     log.debug('Registering pan/zoom listeners');
-    d3.select(Constants.CONTROL_CANVAS).call(d3.zoom().scaleExtent([1, Constants.MAX_ZOOM_LEVEL]).on('zoom', onZoom));
+    d3.select(Constants.CONTROL_CANVAS).call(window.ove.context.zoom);
 };
 
 getScalingFactor = function () {

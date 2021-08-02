@@ -5,6 +5,7 @@ initView = function () {
 };
 
 const initThenUpdatePDF = async function () {
+    if (window.ove.state.current.isTransform) return;
     if (!window.ove.context.isCommonInitialized) {
         window.ove.context.isCommonInitialized = true;
         initCommon();

@@ -187,6 +187,7 @@ const renderPage = async function (pdf, page, scale, dim, firstPage, pageGap) {
         position: 'absolute',
         marginLeft: marginX / context.factor,
         marginTop: marginY / context.factor
+        // opacity: 0
     };
 
     let pageCanvas = $(Constants.PAGE_CANVAS_NAME_PREFIX + i);
