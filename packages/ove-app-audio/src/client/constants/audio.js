@@ -9,6 +9,7 @@ const Constants = {
                               Controller
     **************************************************************/
     DEFAULT_STATE_NAME: 'WikiCommonsGoingHome',
+    CONTROLLER: '.operations',
 
     /**************************************************************
                              Video Player
@@ -51,6 +52,16 @@ Constants.Operation = {
     VOLUME_UP: 'volUp',
     VOLUME_DOWN: 'volDown',
     BUFFER_STATUS: 'bufferStatus'
+};
+
+Constants.Button = {
+    PLAY: '#btnPlay',
+    STOP: '#btnStop',
+    MUTE: '#btnMute'
+};
+
+Constants.State = {
+    ACTIVE: 'active'
 };
 
 Constants.BufferStatus = {

@@ -129,6 +129,9 @@ const getClock = function () {
 };
 const clock = getClock();
 
+log.debug('Using module:', 'fontawesome-free');
+app.use('/images', express.static(path.join(nodeModules, '@fortawesome', 'fontawesome-free', 'svgs', 'solid')));
+
 for (const mod of ['howler']) {
     log.debug('Using module:', mod);
     app.use('/', express.static(path.join(nodeModules, mod, 'dist')));

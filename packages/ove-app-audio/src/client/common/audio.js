@@ -14,11 +14,59 @@ $(function () {
     });
 });
 
+const _handleOperation = op => {
+    const context = window.ove.context;
+    switch (op.name) {
+        case Constants.Operation.PLAY:
+            log.info('Starting audio playback ' + (op.loop ? 'with' : 'without') + ' loop and ' + (op.volume === undefined ? 'without' : 'with ' + op.volume) + ' volume ');
+            context.player.play(op.loop, op.volume);
+            break;
+        case Constants.Operation.PAUSE:
+            log.info('Pausing audio playback');
+            context.player.pause();
+            break;
+        case Constants.Operation.STOP:
+            log.info('Stopping audio playback');
+            context.player.stop();
+            break;
+        case Constants.Operation.SEEK:
+            log.info('Seeking to time:', op.time);
+            context.player.seekTo(op.time);
+            break;
+        case Constants.Operation.MUTE:
+            log.info('muting audio playback');
+            context.player.mute();
+            break;
+        case Constants.Operation.UNMUTE:
+            log.info('unmuting audio playback');
+            context.player.unmute();
+            break;
+        case Constants.Operation.SET_VOLUME:
+            log.info('Setting volume  ' + op.volume);
+            context.player.setVolume(op.volume);
+            break;
+        case Constants.Operation.SET_POSITION:
+            log.info('Setting audio position x:' + op.x + ' y:' + op.y + ' z:' + op.z);
+            context.player.setPosition(op.x, op.y, op.z);
+            break;
+        case Constants.Operation.VOLUME_UP:
+            log.info('increasing volume');
+            context.player.volUp();
+            break;
+        case Constants.Operation.VOLUME_DOWN:
+            log.info('decreasing volume');
+            context.player.volDown();
+            break;
+        default:
+            log.warn('Ignoring unknown operation:', op.name);
+    }
+};
+
 // Initialization that is common to viewers and controllers.
 initCommon = function () {
     const context = window.ove.context;
-    window.ove.socket.on(function (message) {
-        // We can receive a stat update before the application has been initialized.
+    window.ove.socket.addEventListener(function (message) {
+        // We can receive a state update before the application has been initialized.
         // this happens for controller-initiated flows.
         if (message.state) {
             log.debug('Got state change request: ', message.state);
@@ -28,60 +76,11 @@ initCommon = function () {
             log.debug('Got buffer status change request: ', message.bufferStatus);
             handleBufferStatusChange(message.bufferStatus);
             return;
-        }
+        } else if (!message.operation || !context.isInitialized) return;
 
-        if (message.operation && context.isInitialized) {
-            log.debug('Got invoke operation request: ', message.operation);
-            const op = message.operation;
-
-            setTimeout(function () {
-                switch (op.name) {
-                    case Constants.Operation.PLAY:
-                        log.info('Starting audio playback ' + (op.loop ? 'with' : 'without') + ' loop and ' + (op.volume === undefined ? 'without' : 'with ' + op.volume) + ' volume ');
-                        context.player.play(op.loop, op.volume);
-                        break;
-                    case Constants.Operation.PAUSE:
-                        log.info('Pausing audio playback');
-                        context.player.pause();
-                        break;
-                    case Constants.Operation.STOP:
-                        log.info('Stopping audio playback');
-                        context.player.stop();
-                        break;
-                    case Constants.Operation.SEEK:
-                        log.info('Seeking to time:', op.time);
-                        context.player.seekTo(op.time);
-                        break;
-                    case Constants.Operation.MUTE:
-                        log.info('muting audio playback');
-                        context.player.mute();
-                        break;
-                    case Constants.Operation.UNMUTE:
-                        log.info('unmuting audio playback');
-                        context.player.unmute();
-                        break;
-                    case Constants.Operation.SET_VOLUME:
-                        log.info('Setting volume  ' + op.volume);
-                        context.player.setVolume(op.volume);
-                        break;
-                    case Constants.Operation.SET_POSITION:
-                        log.info('Setting audio position x:' + op.x + ' y:' + op.y + ' z:' + op.z);
-                        context.player.setPosition(op.x, op.y, op.z);
-                        break;
-                    case Constants.Operation.VOLUME_UP:
-                        log.info('increasing volume');
-                        context.player.volUp();
-                        break;
-                    case Constants.Operation.VOLUME_DOWN:
-                        log.info('decreasing volume');
-                        context.player.volDown();
-                        break;
-                    default:
-                        log.warn('Ignoring unknown operation:', op.name);
-                }
-                // Run operation precisely at the same time
-            }, op.executionTime - window.ove.clock.getTime());
-        }
+        log.debug('Got invoke operation request: ', message.operation);
+        // Run operation precisely at the same time
+        setTimeout(() => _handleOperation(message.operation), message.operation.executionTime - window.ove.clock.getTime());
     });
 };
 
@@ -121,6 +120,10 @@ handleStateChange = function (state) {
         };
 
         if (!context.isInitialized) {
+            const url = context.hostname + '/sections/' + OVE.Utils.getSectionId();
+            $.ajax({ url: url, dataType: 'json' }).done(section => {
+                context.appUrl = section.app.url;
+            });
             // load a player
             context.player = new window.OVEHowlerPlayer();
 
@@ -163,21 +166,18 @@ handleBufferStatusChange = function (status) {
         log.debug('Got buffer status update from client:', status.clientId,
             ', percentage:', status.percentage, ', duration:', status.duration);
 
-        if (status.percentage >= Constants.MIN_BUFFERED_PERCENTAGE ||
-            status.duration >= Constants.MIN_BUFFERED_DURATION) {
-            // Clients are dequeued from the status update queue when they have buffered a sufficient
-            // percentage or duration of the audio.
-            log.debug('Removing client from status update queue:', status.clientId);
-            context.bufferStatus.clients.splice(context.bufferStatus.clients.indexOf(status.clientId), 1);
+        if (status.percentage < Constants.MIN_BUFFERED_PERCENTAGE && status.duration < Constants.MIN_BUFFERED_DURATION) return;
+        // Clients are dequeued from the status update queue when they have buffered a sufficient
+        // percentage or duration of the audio.
+        log.debug('Removing client from status update queue:', status.clientId);
+        context.bufferStatus.clients.splice(context.bufferStatus.clients.indexOf(status.clientId), 1);
 
-            if (context.bufferStatus.clients.length === 0) {
-                log.info('audio buffering complete');
-                context.player.ready();
+        if (context.bufferStatus.clients.length !== 0) return;
+        log.info('audio buffering complete');
+        context.player.ready();
 
-                log.debug('Displaying audio player');
-                $(Constants.CONTENT_DIV).show();
-                refresh();
-            }
-        }
+        log.debug('Displaying audio player');
+        $(Constants.CONTENT_DIV).show();
+        refresh();
     }
 };

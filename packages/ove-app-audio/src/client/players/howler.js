@@ -74,6 +74,8 @@ function OVEHowlerPlayer () {
 
     this.setPosition = function (x, y, z) {
         log.debug('setting audio position to x:', x, ' y:', y, ' z:', z);
+        const geometry = window.ove.geometry;
+        if (!geometry.x || !geometry.y) return;
         // The position is always set relative to the top-left of the space.
         // We then compute the offset of each screen with respect to the space.
         // If a space spans more than a single screen, then a scaling factor is also computed.
@@ -81,8 +83,8 @@ function OVEHowlerPlayer () {
             OVE.Utils.Coordinates.SCREEN, OVE.Utils.Coordinates.SECTION);
         const offset = { x: coords[0] / window.outerWidth, y: coords[1] / window.outerWidth };
         const scale = {
-            x: window.ove.geometry.space.w / window.outerWidth,
-            y: window.ove.geometry.space.h / window.outerHeight };
+            x: geometry.space.w / window.outerWidth,
+            y: geometry.space.h / window.outerHeight };
         log.debug('Using offset:', offset, 'and scale:', scale);
         this.player.pos(parseFloat(x) * (scale.x > 1 ? scale.x : 1) - offset.x,
             parseFloat(y) * (scale.y > 1 ? scale.y : 1) - offset.y, parseFloat(z));
