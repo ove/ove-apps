@@ -20,14 +20,19 @@ const _handleOperation = op => {
         case Constants.Operation.PLAY:
             log.info('Starting audio playback ' + (op.loop ? 'with' : 'without') + ' loop and ' + (op.volume === undefined ? 'without' : 'with ' + op.volume) + ' volume ');
             context.player.play(op.loop, op.volume);
+            $(Constants.Button.PLAY).addClass(Constants.State.ACTIVE);
+            $(Constants.Button.STOP).addClass(Constants.State.ACTIVE);
             break;
         case Constants.Operation.PAUSE:
             log.info('Pausing audio playback');
             context.player.pause();
+            $(Constants.Button.PLAY).removeClass(Constants.State.ACTIVE);
             break;
         case Constants.Operation.STOP:
             log.info('Stopping audio playback');
             context.player.stop();
+            $(Constants.Button.PLAY).removeClass(Constants.State.ACTIVE);
+            $(Constants.Button.STOP).removeClass(Constants.State.ACTIVE);
             break;
         case Constants.Operation.SEEK:
             log.info('Seeking to time:', op.time);
@@ -36,10 +41,12 @@ const _handleOperation = op => {
         case Constants.Operation.MUTE:
             log.info('muting audio playback');
             context.player.mute();
+            $(Constants.Button.MUTE).addClass(Constants.State.ACTIVE);
             break;
         case Constants.Operation.UNMUTE:
             log.info('unmuting audio playback');
             context.player.unmute();
+            $(Constants.Button.MUTE).removeClass(Constants.State.ACTIVE);
             break;
         case Constants.Operation.SET_VOLUME:
             log.info('Setting volume  ' + op.volume);
