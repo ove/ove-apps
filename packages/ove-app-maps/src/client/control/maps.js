@@ -1,4 +1,4 @@
-initControl = function (data) {
+initControl = async function (data) {
     const context = window.ove.context;
     context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
@@ -18,80 +18,79 @@ initControl = function (data) {
         context.updateFlag = false;
     });
 
-    initCommon().then(function () {
-        // We make sure both controller and viewer have received their layers
-        OVE.Utils.broadcastState();
-        if (context.layers.length === 0) {
-            log.fatal('Map layers not available. Cannot load application');
-            return;
-        }
-        const enabledLayers = OVE.Utils.getQueryParam('layers', '0').split(',');
-        if (window.ove.state.current.position && enabledLayers !== window.ove.state.current.enabledLayers) {
-            // If the layers have changed, clear the cached position to force a broadcast.
-            window.ove.state.current.position = null;
-        }
-        window.ove.state.current.enabledLayers = enabledLayers;
-        // Make enabled layers visible.
-        window.ove.state.current.enabledLayers.forEach(function (e) {
-            log.debug('Setting visible for layer:', e);
-            context.library.showLayer(context.layers[e]);
-        });
-        if (data.scripts && data.scripts.length !== 0) {
-            const first = $('script:first');
-            data.scripts.forEach(function (e) {
-                $('<script>', { src: e }).insertBefore(first);
-            });
-            window.ove.state.current.scripts = data.scripts;
-        }
-
-        const config = {
-            center: data.center,
-            resolution: data.resolution,
-            zoom: data.zoom
-        };
-
-        const loadMap = function () {
-            // The resolution can be scaled to match the section's dimensions, or it could be
-            // the original resolution intended for the controller. The data.scaled property
-            // is used to determine the option.
-            const outer = $('.outer');
-            const scaleFactor = (data.scaled ? Math.sqrt(g.section.w * g.section.h /
-                (parseInt(outer.css('width'), 10) * parseInt(outer.css('height'), 10))) : 1.0);
-            const resolution = config.resolution ? +(config.resolution) * scaleFactor : undefined;
-            const zoom = config.resolution ? +(config.zoom) : (+(config.zoom) - Math.log2(scaleFactor));
-            context.map = context.library.initialize({
-                center: [+(config.center[0]), +(config.center[1])],
-                resolution: resolution,
-                zoom: zoom,
-                enableRotation: false
-            });
-            // We force the setting of the zoom.
-            context.library.setZoom(zoom);
-            uploadMapPosition();
-            context.isInitialized = true;
-            context.library.registerHandlerForEvents(uploadMapPosition, () => { return window.ove.context.updateFlag; });
-        };
-
-        let url = OVE.Utils.getURLQueryParam();
-        if (!url) {
-            // If not, the URL could also have been provided as a part of the state configuration.
-            // We don't care to test if 'data.url' was set or not, since it will be tested below
-            // anyway.
-            url = data.url;
-        }
-        if (url) {
-            log.debug('Loading configuration from URL:', url);
-            $.ajax({ url: url, dataType: 'json' }).always(function (data) {
-                config.center = data.center || config.center;
-                config.resolution = data.resolution || config.resolution;
-                config.zoom = data.zoom || config.zoom;
-                log.debug('Using center:', config.center, 'resolution:', config.resolution, 'and zoom:', config.zoom);
-                loadMap();
-            });
-        } else {
-            loadMap();
-        }
+    await initCommon();
+    // We make sure both controller and viewer have received their layers
+    OVE.Utils.broadcastState();
+    if (context.layers.length === 0) {
+        log.fatal('Map layers not available. Cannot load application');
+        return;
+    }
+    const enabledLayers = OVE.Utils.getQueryParam('layers', '0').split(',');
+    if (window.ove.state.current.position && enabledLayers !== window.ove.state.current.enabledLayers) {
+        // If the layers have changed, clear the cached position to force a broadcast.
+        window.ove.state.current.position = null;
+    }
+    window.ove.state.current.enabledLayers = enabledLayers;
+    // Make enabled layers visible.
+    window.ove.state.current.enabledLayers.forEach(function (e) {
+        log.debug('Setting visible for layer:', e);
+        context.library.showLayer(context.layers[e]);
     });
+    if (data.scripts && data.scripts.length !== 0) {
+        const first = $('script:first');
+        data.scripts.forEach(function (e) {
+            $('<script>', { src: e }).insertBefore(first);
+        });
+        window.ove.state.current.scripts = data.scripts;
+    }
+
+    const config = {
+        center: data.center,
+        resolution: data.resolution,
+        zoom: data.zoom
+    };
+
+    const loadMap = function () {
+        // The resolution can be scaled to match the section's dimensions, or it could be
+        // the original resolution intended for the controller. The data.scaled property
+        // is used to determine the option.
+        const outer = $('.outer');
+        const scaleFactor = (data.scaled ? Math.sqrt(g.section.w * g.section.h /
+            (parseInt(outer.css('width'), 10) * parseInt(outer.css('height'), 10))) : 1.0);
+        const resolution = config.resolution ? +(config.resolution) * scaleFactor : undefined;
+        const zoom = config.resolution ? +(config.zoom) : (+(config.zoom) - Math.log2(scaleFactor));
+        context.map = context.library.initialize({
+            center: [+(config.center[0]), +(config.center[1])],
+            resolution: resolution,
+            zoom: zoom,
+            enableRotation: false
+        });
+        // We force the setting of the zoom.
+        context.library.setZoom(zoom);
+        uploadMapPosition();
+        context.isInitialized = true;
+        context.library.registerHandlerForEvents(uploadMapPosition, () => { return window.ove.context.updateFlag; });
+    };
+
+    let url = OVE.Utils.getURLQueryParam();
+    if (!url) {
+        // If not, the URL could also have been provided as a part of the state configuration.
+        // We don't care to test if 'data.url' was set or not, since it will be tested below
+        // anyway.
+        url = data.url;
+    }
+    if (url) {
+        log.debug('Loading configuration from URL:', url);
+        $.ajax({ url: url, dataType: 'json' }).always(function (data) {
+            config.center = data.center || config.center;
+            config.resolution = data.resolution || config.resolution;
+            config.zoom = data.zoom || config.zoom;
+            log.debug('Using center:', config.center, 'resolution:', config.resolution, 'and zoom:', config.zoom);
+            loadMap();
+        });
+    } else {
+        loadMap();
+    }
 };
 
 uploadMapPosition = function () {
