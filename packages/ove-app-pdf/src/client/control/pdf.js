@@ -72,7 +72,7 @@ const createCanvas = () => {
     log.debug('Creating control canvas');
 
     $('<canvas>', {
-        class: Constants.CONTROL_CANVAS.substring(1),
+        class: Constants.CONTROL_CANVAS.substring(1)
     }).appendTo(Constants.CONTENT_DIV);
 
     const canvas = $(Constants.CONTROL_CANVAS)[0];
