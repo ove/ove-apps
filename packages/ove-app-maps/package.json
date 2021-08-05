@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "@carto/carto.js": "4.2.1",
-    "@ove-lib/appbase": "0.6.1",
+    "@ove-lib/appbase": "0.6.2",
     "leaflet": "1.7.1",
     "jquery": "3.6.0",
     "ol": "6.5.0",

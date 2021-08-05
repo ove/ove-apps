@@ -18,7 +18,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@ove-lib/appbase": "0.6.1",
+    "@ove-lib/appbase": "0.6.2",
     "howler": "2.2.1",
     "http-status-codes": "2.1.4",
     "jquery": "3.6.0",
