@@ -12,6 +12,7 @@ const Constants = {
     **************************************************************/
     HTTP_HEADER_CONTENT_TYPE: 'Content-Type',
     HTTP_CONTENT_TYPE_JS: 'application/javascript',
+    HTTP_CONTENT_TYPE_JSON: 'application/json',
     UTF8: 'utf8',
 
     /**************************************************************
@@ -31,6 +32,15 @@ const Constants = {
 Constants.Scrolling = {
     VERTICAL: 'vertical',
     HORIZONTAL: 'horizontal'
+};
+Constants.Operation = {
+    PAN: 'pan',
+    ZOOM: 'zoom'
+};
+Constants.Events = {
+    EVENT: 'event',
+    UPDATE: 'update',
+    UUID: 'uuid'
 };
 
 exports.Constants = Constants;

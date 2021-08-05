@@ -32,6 +32,8 @@
             "files": [ "**/*.js" ],
             "globals": {
                 "beginInitialization": true,
+                "initCommon": true,
+                "triggerUpdate": true,
                 "getScalingFactor": true,
                 "updatePDF": true
             }

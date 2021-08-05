@@ -1,7 +1,7 @@
 {
   "name": "@ove/ove-app-qrcode",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.6.0",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"No tests specified\" && exit 0",
@@ -15,7 +15,7 @@
   "author": "James Scott-Brown <james.scott-brown@imperial.ac.uk>",
   "license": "MIT",
   "dependencies": {
-    "@ove-lib/appbase": "0.5.0",
+    "@ove-lib/appbase": "0.6.1",
     "jquery": "3.6.0",
     "qrious": "4.0.2"
   }

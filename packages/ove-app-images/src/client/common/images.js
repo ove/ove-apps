@@ -1,11 +1,11 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
-
 $(function () {
     // This is what happens first. After OVE is loaded, either the viewer or controller
     // will be initialized. Application specific context variables are also initialized at this point.
     $(document).ready(function () {
         log.debug('Starting application');
         window.ove = new OVE(Constants.APP_NAME);
+        log.debug('UUID: ', window.ove.context.uuid);
         log.debug('Completed loading OVE');
         window.ove.context.isInitialized = false;
         window.ove.context.osd = undefined;
@@ -16,13 +16,11 @@ $(function () {
 initCommon = function () {
     const context = window.ove.context;
 
-    window.ove.socket.on(function (message) {
-        if (!message.operation || !context.isInitialized) return;
+    window.ove.socket.addEventListener(message => {
+        if (!context.isInitialized || !message.operation) return;
         log.debug('Got invoke operation request: ', message.operation);
 
-        setTimeout(function () {
-            buildViewport(message.operation, context);
-        });
+        buildViewport(message.operation, context);
     });
 };
 
@@ -34,18 +32,16 @@ const buildViewport = function (op, context) {
 
     switch (op.name) {
         case Constants.Operation.PAN:
-            log.info('Panning');
-
+            // The viewport information sent across includes bounds and zoom level.
             viewport = {
                 bounds: { x: op.x, y: op.y, w: bounds.width, h: bounds.height },
                 zoom: zoom,
                 dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
             };
 
-            updatePosition(window.ove.state.current, { viewport: viewport }, context, true)();
+            updatePosition(window.ove.state.current, { viewport: viewport }, context)();
             break;
         case Constants.Operation.ZOOM:
-            log.info('Zooming');
             // The viewport information sent across includes bounds and zoom level.
             viewport = {
                 bounds: { x: bounds.x, y: bounds.y, w: bounds.width, h: bounds.height },
@@ -53,10 +49,11 @@ const buildViewport = function (op, context) {
                 dimensions: { w: window.ove.geometry.section.w, h: window.ove.geometry.section.h }
             };
 
-            updatePosition(window.ove.state.current, { viewport: viewport }, context, true)();
+            updatePosition(window.ove.state.current, { viewport: viewport }, context)();
             break;
         default:
             log.warn('Ignoring unknown operation:', op.name);
+            break;
     }
 };
 

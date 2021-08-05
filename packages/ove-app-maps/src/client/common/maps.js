@@ -10,6 +10,7 @@ $(function () {
         log.debug('Completed loading OVE');
         const context = window.ove.context;
         context.isInitialized = false;
+        context.updateFlag = false;
         context.layers = [];
         context.map = undefined;
         beginInitialization();
@@ -19,15 +20,14 @@ $(function () {
 const buildViewport = function (op, context) {
     switch (op.name) {
         case Constants.Operation.PAN:
-            log.info('Panning');
             context.library.setCenter([op.x, op.y]);
             break;
         case Constants.Operation.ZOOM:
-            log.info('Zooming');
             context.library.setZoom(op.zoom);
             break;
         default:
             log.warn('Ignoring unknown operation:', op.name);
+            break;
     }
 };
 
@@ -48,15 +48,10 @@ initCommon = async function () {
         context.layers = await context.library.loadLayers(layers);
     };
 
-    window.ove.socket.on(function (message) {
-        if (message.operation && context.isInitialized) {
-            log.debug('Got invoke operation request: ', message.operation);
-            const op = message.operation;
-
-            setTimeout(function () {
-                buildViewport(op, context);
-            });
-        }
+    window.ove.socket.addEventListener(message => {
+        if (!context.isInitialized || !message.operation) return;
+        log.debug('Got invoke operation request: ', message.operation);
+        buildViewport(message.operation, context);
     });
 
     log.debug('Starting to fetch map layer configurations');
@@ -66,18 +61,18 @@ initCommon = async function () {
             const config = JSON.parse(text);
             if (config.layers) {
                 log.debug('Loading map configuration from URL:', state.url);
-                loadLayers(config.layers);
+                await loadLayers(config.layers);
             } else {
                 return fetch('layers.json').then(r => r.text()).then(async text => {
                     log.debug('Parsing map layer configurations');
-                    loadLayers(JSON.parse(text));
+                    await loadLayers(JSON.parse(text));
                 });
             }
         });
     }
     return fetch('layers.json').then(r => r.text()).then(async text => {
         log.debug('Parsing map layer configurations');
-        loadLayers(JSON.parse(text));
+        await loadLayers(JSON.parse(text));
     });
 };
 /* jshint ignore:end */

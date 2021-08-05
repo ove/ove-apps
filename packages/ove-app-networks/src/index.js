@@ -144,6 +144,6 @@ base.operations.validateState = function (state) {
     ]);
 };
 
-const port = process.env.PORT || 8080;
+const port = Number(process.env.PORT) || 8080;
 server.listen(port);
 log.info(Constants.APP_NAME, 'application started, port:', port);

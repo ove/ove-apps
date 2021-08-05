@@ -29,7 +29,9 @@ const Constants = {
      Server
      **************************************************************/
     HTTP_HEADER_CONTENT_TYPE: 'Content-Type',
-    HTTP_CONTENT_TYPE_JSON: 'application/json'
+    HTTP_CONTENT_TYPE_JSON: 'application/json',
+
+    CORE: 'core'
 };
 
 /**************************************************************
@@ -38,6 +40,10 @@ const Constants = {
 Constants.Operation = {
     PAN: 'pan',
     ZOOM: 'zoom'
+};
+
+Constants.Action = {
+    CONNECT: 'connect'
 };
 
 exports.Constants = Constants;

@@ -9,7 +9,7 @@ initView = function () {
             // no video is loaded as yet.
             if (context.player && context.player.isAudioLoaded()) {
                 // The status update includes a UUID that is unique to this peer
-                // along with a loaded percentage. Updates are broadcasted as per
+                // along with a loaded percentage. Updates are broadcast as per
                 // BUFFER_STATUS_BROADCAST_FREQUENCY.
                 const status = {
                     type: { update: true },

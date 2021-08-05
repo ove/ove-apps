@@ -6,6 +6,7 @@ const { express, app, Utils, log, nodeModules, config } = base;
 const request = require('request');
 const fs = require('fs');
 const server = require('http').createServer(app);
+const WebSocket = require('ws');
 
 let layers = [];
 // The map layers can be provided as an embedded JSON data structure or as a URL pointing
@@ -175,7 +176,7 @@ setTimeout(function () {
     const getSocket = function () {
         const socketURL = 'ws://' + Utils.getOVEHost();
         log.debug('Establishing WebSocket connection with:', socketURL);
-        let socket = new (require('ws'))(socketURL);
+        let socket = new WebSocket(socketURL);
         ws = Utils.getSafeSocket(socket);
         socket.on('open', function () {
             log.debug('WebSocket connection made with:', socketURL);
@@ -187,10 +188,6 @@ setTimeout(function () {
             setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
         });
         socket.on('error', log.error);
-        socket.on('message', function (msg) {
-            let m = JSON.parse(msg);
-            log.info(m);
-        });
     };
     getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);
@@ -230,6 +227,6 @@ const handleOperation = function (req, res) {
 const operationsList = Object.values(Constants.Operation);
 app.post('/operation/:name(' + operationsList.join('|') + ')', handleOperation);
 
-const port = process.env.PORT || 8080;
+const port = Number(process.env.PORT) || 8080;
 server.listen(port);
 log.info(Constants.APP_NAME, 'application started, port:', port);

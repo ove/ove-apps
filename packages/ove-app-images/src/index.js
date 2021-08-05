@@ -4,7 +4,6 @@ const path = require('path');
 const base = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const { express, app, Utils, log, nodeModules } = base;
 const server = require('http').createServer(app);
-
 log.debug('Using module:', 'openseadragon');
 app.use('/', express.static(path.join(nodeModules, 'openseadragon', 'build', 'openseadragon')));
 
@@ -103,10 +102,6 @@ setTimeout(function () {
             setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
         });
         socket.on('error', log.error);
-        socket.on('message', function (msg) {
-            let m = JSON.parse(msg);
-            log.info(m);
-        });
     };
     getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);
@@ -127,8 +122,6 @@ const handleOperation = function (req, res) {
         // We assume that the viewport's pan properties are properly set instead of enforcing any strict type checks.
         message.operation.x = req.query.x;
         message.operation.y = req.query.y;
-        message.operation.w = req.query.w;
-        message.operation.h = req.query.h;
     } else if (name === Constants.Operation.ZOOM) {
         // We assume that the zoom property is properly set instead of enforcing any strict type checks.
         message.operation.zoom = req.query.zoom;
@@ -162,6 +155,6 @@ base.operations.validateState = function (state) {
         Utils.validateState(state, [{ prefix: ['state.tileSources'] }]);
 };
 
-const port = process.env.PORT || 8080;
+const port = Number(process.env.PORT) || 8080;
 server.listen(port);
 log.info(Constants.APP_NAME, 'application started, port:', port);

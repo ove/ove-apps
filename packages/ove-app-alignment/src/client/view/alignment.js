@@ -2,7 +2,8 @@ initPage = function () {
     window.ove.context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 
-    window.ove.socket.on(function (message) {
+    window.ove.socket.addEventListener(function (message) {
+        if (!message) return;
         if (message.hasOwnProperty('monitors')) {
             log.debug('Received message:', message);
 

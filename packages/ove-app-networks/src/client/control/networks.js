@@ -6,6 +6,12 @@ initControl = function (data) {
     log.debug('Restoring state:', data);
     window.ove.state.current = data;
 
+    OVE.Utils.setOnStateUpdateController(() => {
+        window.ove.context.updateFlag = true;
+        window.ove.context.sigma.camera.goTo(window.ove.state.current.coordinates);
+        refreshSigma(window.ove.context.sigma);
+    });
+
     let url = OVE.Utils.getURLQueryParam();
     // If a URL was passed, the URLs of the loaded state would be overridden.
     if (!url && !data.jsonURL && !data.gexfURL) {
@@ -32,26 +38,25 @@ initControl = function (data) {
     loadSigma();
     log.debug('Broadcasting state');
     OVE.Utils.broadcastState();
-    window.ove.socket.on(function (message) {
-        if (message.operation) {
-            // We first of all need to know if the operation was known
-            if (!Object.values(Constants.Operation).includes(message.operation)) {
-                // This can only happen due to a user error
-                log.warn('Ignoring unknown operation:', message.operation);
-                return;
-            }
-
-            runOperation(message);
-            if (message.operation === Constants.Operation.RESET) {
-                if (window.ove.state.current.operation) {
-                    delete window.ove.state.current.operation;
-                }
-            } else {
-                window.ove.state.current.operation = message;
-            }
-            // Cache state for later use.
-            window.ove.state.cache();
+    window.ove.socket.addEventListener('message', function (message) {
+        if (!window.ove.context.isInitialized || !message) return;
+        // We first of all need to know if the operation was known
+        if (!Object.values(Constants.Operation).includes(message.operation)) {
+            // This can only happen due to a user error
+            log.warn('Ignoring unknown operation:', message.operation);
+            return;
         }
+
+        runOperation(message);
+        if (message.operation === Constants.Operation.RESET) {
+            if (window.ove.state.current.operation) {
+                delete window.ove.state.current.operation;
+            }
+        } else {
+            window.ove.state.current.operation = message;
+        }
+        // Cache state for later use.
+        window.ove.state.cache();
     });
 };
 
@@ -68,7 +73,7 @@ setupCoordinatesUpdateEventListener = function (sigma) {
     log.debug('Calculated scaling factor:', factor);
 
     // Camera position changes trigger COORDINATES_UPDATED_EVENT
-    let camera = sigma.camera;
+    const camera = sigma.camera;
     camera.bind(Constants.COORDINATES_UPDATED_EVENT, function () {
         window.ove.context.coordinates = {
             x: camera.x * factor,
@@ -83,6 +88,7 @@ setupCoordinatesUpdateEventListener = function (sigma) {
             !OVE.Utils.JSON.equals(window.ove.context.coordinates, window.ove.state.current.coordinates)) {
             window.ove.state.current.coordinates = window.ove.context.coordinates;
             OVE.Utils.broadcastState();
+            window.ove.context.updateFlag = false;
         }
     }, Constants.COORDINATES_UPDATE_TIMEOUT);
     log.debug('Registered coordinates update event listener');
