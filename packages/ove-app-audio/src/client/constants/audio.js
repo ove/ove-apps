@@ -57,7 +57,8 @@ Constants.Operation = {
 Constants.Button = {
     PLAY: '#btnPlay',
     STOP: '#btnStop',
-    MUTE: '#btnMute'
+    MUTE: '#btnMute',
+    LOOP: '#btnLoop'
 };
 
 Constants.State = {

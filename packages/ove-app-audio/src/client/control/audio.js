@@ -1,5 +1,6 @@
 initControl = function (data) {
     window.ove.context.isInitialized = false;
+    window.ove.context.loop = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
     initCommon();
     log.debug('Restoring state:', data);
@@ -31,7 +32,7 @@ const _stopControl = () => {
     $(Constants.Button.STOP).removeClass(Constants.State.ACTIVE);
     $.ajax({
         url: window.ove.context.appUrl + '/operation/stop' +
-            '?oveSectionId' + OVE.Utils.getSectionId(),
+            '?oveSectionId=' + OVE.Utils.getSectionId(),
         type: 'POST',
         data: {},
         contentType: Constants.HTTP_CONTENT_TYPE_JSON
@@ -47,7 +48,7 @@ const _muteControl = () => {
     }
     $.ajax({
         url: window.ove.context.appUrl + '/operation/mute?mute=' + !isActive +
-            '&oveSectionId' + OVE.Utils.getSectionId(),
+            '&oveSectionId=' + OVE.Utils.getSectionId(),
         type: 'POST',
         data: {},
         contentType: Constants.HTTP_CONTENT_TYPE_JSON
@@ -64,12 +65,24 @@ const _playControl = () => {
     }
     $.ajax({
         url: window.ove.context.appUrl + '/operation/' + (isActive ? 'pause' : 'play') +
-            '?oveSectionId' + OVE.Utils.getSectionId(),
+            '?oveSectionId=' + OVE.Utils.getSectionId() + _getLoop(),
         type: 'POST',
         data: {},
         contentType: Constants.HTTP_CONTENT_TYPE_JSON
     }).catch(log.error);
 };
+
+const _loopControl = () => {
+    const isActive = $(Constants.Button.LOOP).hasClass(Constants.State.ACTIVE);
+    if (isActive) {
+        $(Constants.Button.LOOP).removeClass(Constants.State.ACTIVE);
+    } else {
+        $(Constants.Button.LOOP).addClass(Constants.State.ACTIVE);
+    }
+    window.ove.context.loop = !isActive;
+};
+
+const _getLoop = () => window.ove.context.loop ? '&loop=true' : '';
 
 loadControls = function () {
     log.debug('Displaying controller');
@@ -82,6 +95,7 @@ loadControls = function () {
     $(Constants.Button.PLAY).click(_playControl);
     $(Constants.Button.MUTE).click(_muteControl);
     $(Constants.Button.STOP).click(_stopControl);
+    $(Constants.Button.LOOP).click(_loopControl);
 };
 
 doRegistration = function () {
