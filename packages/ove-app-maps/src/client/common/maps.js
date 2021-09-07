@@ -57,22 +57,19 @@ initCommon = async function () {
     log.debug('Starting to fetch map layer configurations');
     // The map layer configuration can be specified as a URL
     if (state && state.url) {
-        return fetch(state.url).then(r => r.text()).then(async text => {
-            const config = JSON.parse(text);
-            if (config.layers) {
-                log.debug('Loading map configuration from URL:', state.url);
-                await loadLayers(config.layers);
-            } else {
-                return fetch('layers.json').then(r => r.text()).then(async text => {
-                    log.debug('Parsing map layer configurations');
-                    await loadLayers(JSON.parse(text));
-                });
-            }
-        });
+        const config = JSON.parse(await (await fetch(state.url)).text());
+
+        if (config.layers) {
+            log.debug('Loading map configuration from URL:', state.url);
+            await loadLayers(config.layers);
+        } else {
+            log.debug('Parsing map layer configurations');
+            await loadLayers(JSON.parse(await (await fetch('layers.json')).text()));
+        }
+        return;
     }
-    return fetch('layers.json').then(r => r.text()).then(async text => {
-        log.debug('Parsing map layer configurations');
-        await loadLayers(JSON.parse(text));
-    });
+
+    log.debug('Parsing map layer configurations');
+    await loadLayers(JSON.parse(await (await fetch('layers.json')).text()));
 };
 /* jshint ignore:end */

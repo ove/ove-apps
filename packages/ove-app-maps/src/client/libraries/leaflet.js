@@ -45,9 +45,11 @@ function OVELeafletMap () {
             zoomControl: false,
             attributionControl: false
         });
-        __private.initialLayers.forEach(function (e) {
-            showLayer(e);
-        });
+
+        for (const e of __private.initialLayers) {
+            this.showLayer(e);
+        }
+
         return __private.map;
     };
 
@@ -146,24 +148,23 @@ function OVELeafletMap () {
         return undefined;
     };
 
-    const showLayer = function (layer) {
+    this.showLayer = async function (layer) {
         // Some layers such as GeoJSON and TopoJSON vector layers may take time to load
         // if the data needs to be fetched from a URL.
         if (layer.type === 'L.geoJSON' || layer.type === 'L.topoJSON') {
             if (__private.layersLoading) {
-                new Promise(function (resolve) {
+                await new Promise(function (resolve) {
                     const x = setInterval(function () {
                         if (!__private.layersLoading) {
                             clearInterval(x);
                             resolve('layers loaded');
                         }
                     }, Constants.LEAFLET_LAYER_LOAD_DELAY);
-                }).then(function () {
-                    if (layer.layer) {
-                        layer = layer.layer;
-                    }
-                    showLayer(layer);
                 });
+                if (layer.layer) {
+                    layer = layer.layer;
+                }
+                this.showLayer(layer);
                 return;
             } else if (layer.layer) {
                 layer = layer.layer;
@@ -208,26 +209,23 @@ function OVELeafletMap () {
         }
     };
 
-    this.showLayer = showLayer;
-
-    const hideLayer = function (layer) {
+    this.hideLayer = async function (layer) {
         // Some layers such as GeoJSON and TopoJSON vector layers may take time to load
         // if the data needs to be fetched from a URL.
         if (layer.type === 'L.geoJSON' || layer.type === 'L.topoJSON') {
             if (__private.layersLoading) {
-                new Promise(function (resolve) {
+                await new Promise(function (resolve) {
                     const x = setInterval(function () {
                         if (!__private.layersLoading) {
                             clearInterval(x);
                             resolve('layers loaded');
                         }
                     }, Constants.LEAFLET_LAYER_LOAD_DELAY);
-                }).then(function () {
-                    if (layer.layer) {
-                        layer = layer.layer;
-                    }
-                    hideLayer(layer);
                 });
+                if (layer.layer) {
+                    layer = layer.layer;
+                }
+                this.hideLayer(layer);
                 return;
             } else if (layer.layer) {
                 layer = layer.layer;
@@ -255,6 +253,4 @@ function OVELeafletMap () {
             __private.map.removeLayer(layer);
         }
     };
-
-    this.hideLayer = hideLayer;
 }

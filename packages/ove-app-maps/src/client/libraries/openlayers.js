@@ -63,7 +63,7 @@ function OVEOpenLayersMap () {
                 this._map = map;
 
                 if (map) {
-                    var overlayContainer = this._map.getViewport().getElementsByClassName('ol-overlaycontainer')[0];
+                    const overlayContainer = this._map.getViewport().getElementsByClassName('ol-overlaycontainer')[0];
                     overlayContainer.appendChild(this.root_);
 
                     this.pointdragKey_ = map.on('pointerdrag', this._render, this);
@@ -107,11 +107,12 @@ function OVEOpenLayersMap () {
             ]),
             view: new window.ol.View(config)
         });
-        otherLayers.forEach(function (e) {
+
+        for (const e of otherLayers) {
             if (e.visible) {
-                showLayer(e);
+                this.showLayer(e);
             }
-        });
+        }
         return __private.map;
     };
 
@@ -235,7 +236,7 @@ function OVEOpenLayersMap () {
         return +(__private.map.getView().getResolution());
     };
 
-    const showLayer = function (layer) {
+    this.showLayer = function (layer) {
         if (layer.type === 'ol.TorqueLayer') {
             layer.visible = true;
             if (__private.map) {
@@ -246,8 +247,6 @@ function OVEOpenLayersMap () {
             layer.setVisible(true);
         }
     };
-
-    this.showLayer = showLayer;
 
     this.hideLayer = function (layer) {
         if (layer.type === 'ol.TorqueLayer') {
