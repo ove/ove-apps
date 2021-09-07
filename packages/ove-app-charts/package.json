@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"No tests specified\" && exit 0",
     "clean": "npx rimraf dist",
-    "build": "npx babel-cli src --out-dir dist --copy-files",
+    "build": "npx babel src --out-dir dist --copy-files",
     "start": "node dist/index.js --color",
     "start:dev": "babel-node src/index.js",
     "lint": "eslint src/. --ext .js"
@@ -15,6 +15,10 @@
   "author": "James Scott-Brown <james.scott-brown@imperial.ac.uk>",
   "license": "MIT",
   "dependencies": {
+    "@babel/core": "7.15.5",
+    "@babel/cli": "7.15.4",
+    "@babel/preset-env": "7.15.4",
+    "@babel/node": "7.15.4",
     "@ove-lib/appbase": "0.6.1",
     "d3-dsv": "2.0.0",
     "jquery": "3.6.0",
