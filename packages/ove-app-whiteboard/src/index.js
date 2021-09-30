@@ -6,6 +6,6 @@ const server = require('http').createServer(app);
 log.debug('Using module:', 'fontawesome-free');
 app.use('/images', express.static(path.join(nodeModules, '@fortawesome', 'fontawesome-free', 'svgs', 'solid')));
 
-const port = process.env.PORT || 8080;
+const port = parseInt(process.env.PORT || 8080, 10);
 server.listen(port);
 log.info(Constants.APP_NAME, 'application started, port:', port);

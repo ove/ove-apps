@@ -1,4 +1,4 @@
-initControl = function (data) {
+initControl = data => {
     window.ove.context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
     log.debug('Restoring state:', data);
@@ -14,13 +14,15 @@ initControl = function (data) {
     } else {
         url = data.url;
     }
+
     log.debug('Caching state');
     window.ove.state.cache();
 
     loadSVGFrame();
     log.info('Loading URL:', url);
-    $.get({ url: '//' + Constants.TUORIS_HOST + '/command?mount=' + url }).done(function () {
-        setTimeout(function () {
+
+    $.get({ url: '//' + Constants.TUORIS_HOST + '/command?mount=' + url }).done(() => {
+        setTimeout(() => {
             $(Constants.SVG_FRAME).attr('src', '//' + Constants.TUORIS_HOST + '/control/');
             window.ove.context.isInitialized = true;
             log.debug('Application is initialized:', window.ove.context.isInitialized);
@@ -29,13 +31,11 @@ initControl = function (data) {
     }).catch(log.error);
 };
 
-getCSS = function () {
-    // Unlike most apps, the SVG app's controller renders the HTML page at a fixed
-    // height and width.
-    return { width: '100vw', height: '60vh' };
-};
+// Unlike most apps, the SVG app's controller renders the HTML page at a fixed
+// height and width.
+getCSS = () => ({ width: '100vw', height: '60vh' });
 
-beginInitialization = function () {
+beginInitialization = () => {
     log.debug('Starting controller initialization');
     OVE.Utils.initControl(Constants.DEFAULT_STATE_NAME, initControl);
 };

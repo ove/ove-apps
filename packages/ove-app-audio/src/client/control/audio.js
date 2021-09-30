@@ -1,24 +1,27 @@
-initControl = function (data) {
+initControl = data => {
     window.ove.context.isInitialized = false;
     window.ove.context.loop = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
+
     initCommon();
+
     log.debug('Restoring state:', data);
     window.ove.state.current = data;
+
     const url = OVE.Utils.getURLQueryParam();
     if (url) {
         log.debug('New URL at controller:', url);
         // If a URL was passed, the URL of the loaded state would be overridden.
         window.ove.state.current.url = url;
     }
+
     loadURL();
     loadControls();
 };
 
-refresh = function () {
-}; // View-only operation
+refresh = () => {}; // View-only operation
 
-requestRegistration = function () {
+requestRegistration = () => {
     // Broadcast a registration request along with a state update such that viewers
     // then replicate the state.
     log.debug('Sending registration request and broadcasting state');
@@ -84,7 +87,7 @@ const _loopControl = () => {
 
 const _getLoop = () => window.ove.context.loop ? '&loop=true' : '';
 
-loadControls = function () {
+loadControls = () => {
     log.debug('Displaying controller');
     const scale = Math.min(Math.min(document.documentElement.clientWidth, window.innerWidth) / 1440,
         Math.min(document.documentElement.clientHeight, window.innerHeight) / 720);
@@ -98,10 +101,9 @@ loadControls = function () {
     $(Constants.Button.LOOP).click(_loopControl);
 };
 
-doRegistration = function () {
-}; // View-only operation
+doRegistration = () => {}; // View-only operation
 
-beginInitialization = function () {
+beginInitialization = () => {
     log.debug('Starting controller initialization');
     OVE.Utils.initControl(Constants.DEFAULT_STATE_NAME, initControl);
 };

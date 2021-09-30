@@ -1,10 +1,10 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME);
 
-$(function () {
+$(() => {
     // This is what happens first. After OVE is loaded, either the viewer or controller
     // will be initialized. The viewer or controller has the freedom to call the initCommon
     // at any point. Application specific context variables are also initialized at this point.
-    $(document).ready(function () {
+    $(document).ready(() => {
         log.debug('Starting application');
         window.ove = new OVE(Constants.APP_NAME);
         log.debug('Completed loading OVE');
@@ -70,9 +70,9 @@ const _handleOperation = op => {
 };
 
 // Initialization that is common to viewers and controllers.
-initCommon = function () {
+initCommon = () => {
     const context = window.ove.context;
-    window.ove.socket.addEventListener(function (message) {
+    window.ove.socket.addEventListener(message => {
         // We can receive a state update before the application has been initialized.
         // this happens for controller-initiated flows.
         if (message.state) {
@@ -91,13 +91,11 @@ initCommon = function () {
     });
 };
 
-loadURL = function () {
-    // The current state would have been set when this method is called, but there
-    // is no incoming state, as when we receive a message. Therefore, passing null.
-    handleStateChange(null);
-};
+// The current state would have been set when this method is called, but there
+// is no incoming state, as when we receive a message. Therefore, passing null.
+loadURL = () => handleStateChange(null);
 
-handleStateChange = function (state) {
+handleStateChange = state => {
     let current = {};
     if (!state) {
         // If incoming state is null, we don't need to care about current state.
@@ -111,12 +109,12 @@ handleStateChange = function (state) {
 
     if (current.url !== state.url) {
         log.info('Got new audio URL:', state.url);
-        let context = window.ove.context;
+        const context = window.ove.context;
 
         // The way we load the player doesn't change even if the application was
         // not initialized - the only difference is the need to wait for the
         // initialization to complete.
-        const loadPlayer = function () {
+        const loadPlayer = () => {
             log.debug('Hiding audio player');
             $(Constants.CONTENT_DIV).hide();
 
@@ -134,7 +132,7 @@ handleStateChange = function (state) {
             // load a player
             context.player = new window.OVEHowlerPlayer();
 
-            context.player.initialize().then(function () {
+            context.player.initialize().then(() => {
                 context.isInitialized = true;
                 log.debug('Application is initialized:', context.isInitialized);
                 loadPlayer();
@@ -145,18 +143,18 @@ handleStateChange = function (state) {
     }
 };
 
-handleBufferStatusChange = function (status) {
-    // The handling of the buffer status updates operates in a model as noted below:
-    //   1. One or more peers in a group receives a new audio URL
-    //   2. They then send a request for registration to all peers belonging to the same
-    //      section.
-    //   3. When one or more peers respond, their responses will then be received as
-    //      registration responses. If a peer does not respond, the rest of the system
-    //      will not wait. If a peer is late to respond, they may join the group later on,
-    //      but this will not stop a audio that is already playing.
-    //   4. After the above steps are completed peers start broadcasting their buffer statuses.
-    //   5. If at least 15% of a audio is buffered across all peers synchronized playback
-    //      can begin and the audio will be displayed.
+/* The handling of the buffer status updates operates in a model as noted below:
+     1. One or more peers in a group receives a new audio URL
+     2. They then send a request for registration to all peers belonging to the same
+        section.
+     3. When one or more peers respond, their responses will then be received as
+        registration responses. If a peer does not respond, the rest of the system
+        will not wait. If a peer is late to respond, they may join the group later on,
+        but this will not stop a audio that is already playing.
+     4. After the above steps are completed peers start broadcasting their buffer statuses.
+     5. If at least 15% of a audio is buffered across all peers synchronized playback
+        can begin and the audio will be displayed. */
+handleBufferStatusChange = status => {
     const context = window.ove.context;
     if (status.type.requestRegistration) {
         // This code is executed when this instance of the application receives a

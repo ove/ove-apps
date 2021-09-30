@@ -7,7 +7,7 @@ $(function () {
         log.debug('Starting application');
         window.ove = new OVE(Constants.APP_NAME);
         log.debug('Completed loading OVE');
-        let context = window.ove.context;
+        const context = window.ove.context;
         if (!context.isInitialized) {
             const url = context.hostname + '/sections/' + OVE.Utils.getSectionId();
             $.ajax({ url: url, dataType: 'json' }).done(section => {
@@ -22,8 +22,8 @@ $(function () {
 });
 
 updateSession = function () {
-    let context = window.ove.context;
-    let state = window.ove.state.current;
+    const context = window.ove.context;
+    const state = window.ove.state.current;
     if (state.sessionActive && !context.session) {
         log.debug('Activating Session:', state.sessionId);
         context.session = context.ov.initSession();

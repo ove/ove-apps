@@ -1,9 +1,9 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
 
-$(function () {
+$(() => {
     // This is what happens first. After OVE is loaded, either the viewer or controller
     // will be initialized. Application specific context variables are also initialized at this point.
-    $(document).ready(function () {
+    $(document).ready(() => {
         log.debug('Starting application');
         window.ove = new OVE(Constants.APP_NAME);
         log.debug('Completed loading OVE');
@@ -13,52 +13,54 @@ $(function () {
     });
 });
 
-runOperation = function (message) {
+runOperation = message => {
     // Helper method to retrieve a property from an element
-    const getFromElement = function (element, propertyName) {
+    const getFromElement = (element, propertyName) => {
         if (!propertyName || !propertyName.includes('.')) {
             return element[propertyName] ||
                 (element.attributes ? element.attributes[propertyName] : undefined);
         }
+
         const firstPart = propertyName.substring(0, propertyName.indexOf('.'));
         const otherParts = propertyName.substring(propertyName.indexOf('.') + 1);
         const childElement = element[firstPart] ||
             (element.attributes ? element.attributes[firstPart] : undefined);
+
         return getFromElement(childElement, otherParts);
     };
 
     // Helper method to retrieve a property from a message
-    const getFromMessage = function (message, p1, p2) {
-        return message[p1] ? message[p1][p2] : undefined;
-    };
+    const getFromMessage = (message, p1, p2) => message[p1] ? message[p1][p2] : undefined;
 
     // IMPORTANT: There are no logs within the filter evaluation operations to ensure
     // the most optimum performance. The logs corresponding to the operation carried out
     // can be used for debugging purposes.
-    const evaluate = function (element, filter) {
+    // noinspection EqualityComparisonWithCoercionJS
+    const evaluate = (element, filter) => {
         // Evaluate as a number
-        const evaluateN = function (element, filter) {
-            return +(evaluate(element, filter));
-        };
+        const evaluateN = (element, filter) => +(evaluate(element, filter));
         // Evaluate as a string
-        const evaluateS = function (element, filter) {
+        const evaluateS = (element, filter) => {
             const res = evaluate(element, filter);
             return res || res === 0 ? res.toString() : undefined;
         };
         // Evaluate a function
-        const evaluateF = function (element, func, args) {
+        const evaluateF = (element, func, args) => {
             const firstArg = evaluateS(element, args[0]);
             if (firstArg === undefined) {
                 return undefined;
             }
+
             const secondArg = args.length > 1 ? evaluateS(element, args[1]) : undefined;
             if (secondArg === undefined && args.length > 1) {
                 return undefined;
             }
+
             const thirdArg = args.length > 2 ? evaluateS(element, args[2]) : undefined;
             if (thirdArg === undefined && args.length > 2) {
                 return undefined;
             }
+
             switch (func) {
                 case Constants.Evaluation.Function.SUBSTRING:
                     // Unable to use secondArg and thirdArg as the replace method expects
@@ -89,12 +91,13 @@ runOperation = function (message) {
                     return firstArg.trim();
                 case Constants.Evaluation.Function.CONCAT:
                     return firstArg + secondArg;
-                default:
+                default: {
                     // The specification is large and we don't support all types of
                     // operators/functions
                     const err = 'Unable to evaluate unknown function: ' + func;
                     log.error(err);
                     throw Error(err);
+                }
             }
         };
 
@@ -113,6 +116,7 @@ runOperation = function (message) {
 
         let left = filter.left ? evaluate(element, filter.left) : undefined;
         let right = filter.right ? evaluate(element, filter.right) : undefined;
+
         switch (filter.type) {
             case Constants.Evaluation.EQUALS:
                 // We don't want to force type comparisons in this case.
@@ -133,6 +137,7 @@ runOperation = function (message) {
 
         left = filter.left ? evaluateN(element, filter.left) : undefined;
         right = filter.right ? evaluateN(element, filter.right) : undefined;
+
         switch (filter.type) {
             case Constants.Evaluation.LESS_THAN:
                 return left < right;
@@ -159,10 +164,10 @@ runOperation = function (message) {
         throw Error(err);
     };
 
-    (function () {
+    (() => {
         // This function resets colors and labels to the original state before
         // running any further filtering. We expect only nodes to have labels by default.
-        const reset = function (n, hasLabels) {
+        const reset = (n, hasLabels) => {
             let ln = n.length;
             while (ln) {
                 ln--;
@@ -188,6 +193,7 @@ runOperation = function (message) {
                 }
             }
         };
+
         const graph = window.ove.context.sigma.graph;
         reset(graph.nodes(), true);
         reset(graph.edges(), false);
@@ -202,25 +208,23 @@ runOperation = function (message) {
     switch (message.operation) {
         case Constants.Operation.SHOW_ONLY:
             filter = filter.undo();
+
             if (nodeFilter) {
                 log.debug('Filtering nodes using filter:', nodeFilter);
-                filter = filter.nodesBy(function (n) {
-                    return evaluate(n, nodeFilter);
-                });
+                filter = filter.nodesBy(n => evaluate(n, nodeFilter));
             }
             if (edgeFilter) {
                 log.debug('Filtering edges using filter:', edgeFilter);
-                filter = filter.edgesBy(function (n) {
-                    return evaluate(n, edgeFilter);
-                });
+                filter = filter.edgesBy(n => evaluate(n, edgeFilter));
             }
+
             filter.apply();
             break;
         case Constants.Operation.COLOR:
             if (nodeFilter) {
                 const nodeColor = getFromMessage(message, 'node', 'color');
                 log.debug('Changing color:', nodeColor, 'on all nodes matching filter:', nodeFilter);
-                filter = filter.nodesBy(function (n) {
+                filter = filter.nodesBy(n => {
                     if (evaluate(n, nodeFilter)) {
                         n.color = nodeColor;
                     }
@@ -232,7 +236,7 @@ runOperation = function (message) {
             if (edgeFilter) {
                 const edgeColor = getFromMessage(message, 'edge', 'color');
                 log.debug('Changing color:', edgeColor, 'on all edges matching filter:', edgeFilter);
-                filter = filter.edgesBy(function (n) {
+                filter = filter.edgesBy(n => {
                     if (evaluate(n, edgeFilter)) {
                         n.color = edgeColor;
                     }
@@ -241,13 +245,14 @@ runOperation = function (message) {
                     return true;
                 });
             }
+
             filter.apply();
             break;
         case Constants.Operation.LABEL:
             if (nodeFilter) {
                 const nodeLabel = getFromMessage(message, 'node', 'label');
                 log.debug('Changing label:', nodeLabel, 'on all nodes matching filter:', nodeFilter);
-                filter = filter.nodesBy(function (n) {
+                filter = filter.nodesBy(n => {
                     if (evaluate(n, nodeFilter)) {
                         n.label = getFromElement(n, nodeLabel);
                     }
@@ -258,20 +263,22 @@ runOperation = function (message) {
             } else {
                 const nodeLabel = getFromMessage(message, 'node', 'label');
                 log.debug('Changing label:', nodeLabel, 'on all nodes');
-                filter = filter.nodesBy(function (n) {
+                filter = filter.nodesBy(n => {
                     n.label = getFromElement(n, nodeLabel);
                     // We only want to change the label of all nodes in here.
                     // We select all nodes, so none are hidden.
                     return true;
                 });
             }
+
             filter.apply();
             break;
-        case Constants.Operation.NEIGHBORS_OF:
+        case Constants.Operation.NEIGHBORS_OF: {
             const nodeName = getFromMessage(message, 'node', 'name');
             log.debug('Displaying neighbors of node:', nodeName);
             filter.undo().neighborsOf(nodeName).apply();
             break;
+        }
         case Constants.Operation.RESET:
             log.debug('Successfully reset graph');
             filter.undo().apply();
@@ -280,7 +287,7 @@ runOperation = function (message) {
     }
 };
 
-refreshSigma = function (sigma) {
+refreshSigma = sigma => {
     log.debug('Refreshing Sigma');
     sigma.refresh();
     log.trace('Completed refreshing Sigma');
@@ -290,8 +297,8 @@ refreshSigma = function (sigma) {
     }
 };
 
-loadSigma = function () {
-    let context = window.ove.context;
+loadSigma = () => {
+    const context = window.ove.context;
 
     const overlap = ((window.ove.state.current.neo4j && window.ove.state.current.neo4j.overlap) || 1) / 100;
     if (!context.isInitialized) {
@@ -316,6 +323,7 @@ loadSigma = function () {
         // We render on WebGL by default, but this can be overridden for a specific visualization.
         const renderer = window.ove.state.current.renderer || 'webgl';
         const settings = window.ove.state.current.settings || { autoRescale: true, clone: false };
+
         log.debug('Creating Sigma instance with renderer:', renderer, ', settings:', settings);
         context.sigma = new sigma({
             renderers: [{ type: renderer, container: $(Constants.CONTENT_DIV)[0] }],
@@ -346,24 +354,24 @@ loadSigma = function () {
     // on the type of url specified in the state configuration. Alternatively, a Neo4j configuration
     // can also be passed.
     if (window.ove.state.current.jsonURL) {
-        let url = getClientSpecificURL(window.ove.state.current.jsonURL);
+        const url = getClientSpecificURL(window.ove.state.current.jsonURL);
         log.info('Loading content of format:', 'JSON', ', URL:', url);
         sigma.parsers.json(url, context.sigma, refreshSigma);
     } else if (window.ove.state.current.gexfURL) {
-        let url = getClientSpecificURL(window.ove.state.current.gexfURL);
+        const url = getClientSpecificURL(window.ove.state.current.gexfURL);
         log.info('Loading content of format:', 'GEXF', ', URL:', url);
         sigma.parsers.gexf(url, context.sigma, refreshSigma);
     } else if (window.ove.state.current.neo4j) {
-        let config = window.ove.state.current.neo4j;
+        const config = window.ove.state.current.neo4j;
         const g = window.ove.geometry;
         const transformX = config.x && (config.x.min !== undefined) && (config.x.max !== undefined);
         const transformY = config.y && (config.y.min !== undefined) && (config.y.max !== undefined);
 
         // Custom parse function that builds nodes and edges from the contents of the Graph database
         sigma.neo4j.cypher_parse = function (result) {
-            let graph = { nodes: [], edges: [] };
-            let nodesMap = {};
-            let edgesMap = {};
+            const graph = { nodes: [], edges: [] };
+            const nodesMap = {};
+            const edgesMap = {};
 
             if (transformX && transformY) {
                 log.debug('Transforming X and Y coordinates');
@@ -373,16 +381,20 @@ loadSigma = function () {
                 log.debug('Transforming Y coordinates');
             }
 
-            result.results[0].data.forEach(function (data) {
-                data.graph.nodes.forEach(function (node) {
+            result.results[0].data.forEach(data => {
+                data.graph.nodes.forEach(node => {
                     const id = node.id;
                     if (!(id in nodesMap)) {
                         nodesMap[id] = {
                             id: node.id,
-                            x: transformX ? ((node.properties.x - config.x.min) /
-                                (config.x.max - config.x.min)) * g.section.w : node.properties.x,
-                            y: transformY ? ((node.properties.y - config.y.min) /
-                                (config.y.max - config.y.min)) * g.section.h : node.properties.y,
+                            x: transformX
+                                ? ((node.properties.x - config.x.min) /
+                                (config.x.max - config.x.min)) * g.section.w
+                                : node.properties.x,
+                            y: transformY
+                                ? ((node.properties.y - config.y.min) /
+                                (config.y.max - config.y.min)) * g.section.h
+                                : node.properties.y,
                             size: node.properties.size,
                             color: node.properties.color,
                             attributes: node.properties
@@ -390,7 +402,7 @@ loadSigma = function () {
                     }
                 });
 
-                data.graph.relationships.forEach(function (edge) {
+                data.graph.relationships.forEach(edge => {
                     const id = edge.id;
                     if (!(id in edgesMap)) {
                         edgesMap[id] = {
@@ -406,13 +418,13 @@ loadSigma = function () {
 
             log.debug('Populating graph with nodes and edges');
             let maxId = -1;
-            for (let key in nodesMap) {
+            for (const key in nodesMap) {
                 // The maximum node-id is required to know which is the starting id for the nodes
                 // that form the bounding box.
-                maxId = Math.max(maxId, key);
+                maxId = Math.max(maxId, parseInt(key, 10));
                 graph.nodes.push(nodesMap[key]);
             }
-            for (let key in edgesMap) {
+            for (const key in edgesMap) {
                 graph.edges.push(edgesMap[key]);
             }
 
@@ -438,20 +450,22 @@ loadSigma = function () {
         };
 
         let query = config.query;
+
         if (transformX) {
-            let range = {
+            const range = {
                 min: g.x !== undefined ? ((g.x - g.w * overlap) / g.section.w * (config.x.max - config.x.min) + config.x.min) : config.x.min,
                 max: g.x !== undefined ? ((g.x + g.w * (1 + overlap)) / g.section.w * (config.x.max - config.x.min) + config.x.min) : config.x.max
             };
             query = query.replace(/X_MIN/g, range.min).replace(/X_MAX/g, range.max);
         }
         if (transformY) {
-            let range = {
+            const range = {
                 min: g.y !== undefined ? ((g.y - g.h * overlap) / g.section.h * (config.y.max - config.y.min) + config.y.min) : config.y.min,
                 max: g.y !== undefined ? ((g.y + g.h * (1 + overlap)) / g.section.h * (config.y.max - config.y.min) + config.y.min) : config.y.max
             };
             query = query.replace(/Y_MIN/g, range.min).replace(/Y_MAX/g, range.max);
         }
+
         log.info('Loading content from Neo4j database:', config.db.url, ', with query:', query);
         sigma.neo4j.cypher(config.db, query, context.sigma, refreshSigma);
     }

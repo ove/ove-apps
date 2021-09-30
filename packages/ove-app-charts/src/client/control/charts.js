@@ -1,4 +1,4 @@
-initControl = function (data) {
+initControl = data => {
     window.ove.context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 
@@ -6,18 +6,19 @@ initControl = function (data) {
     log.debug('Restoring state:', data);
     window.ove.state.current = data;
 
-    let url = OVE.Utils.getURLQueryParam();
+    const url = OVE.Utils.getURLQueryParam();
     if (url) {
         log.debug('New URL at controller:', url);
         window.ove.state.current.url = url;
     }
 
     loadVega();
+
     log.debug('Broadcasting state');
     OVE.Utils.broadcastState();
 };
 
-beginInitialization = function () {
+beginInitialization = () => {
     log.debug('Starting controller initialization');
     OVE.Utils.initControl(Constants.DEFAULT_STATE_NAME, initControl);
 };

@@ -1,21 +1,21 @@
-initView = function () {
+initView = () => {
     window.ove.context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
-    window.ove.socket.on(function (message) {
+    window.ove.socket.addEventListener(message => {
         if (message.refreshClients) {
             loadTuorisClient();
         }
     });
 };
 
-loadTuorisClient = function () {
+loadTuorisClient = () => {
     loadSVGFrame();
     $(Constants.SVG_FRAME).attr('src', '//' + Constants.TUORIS_HOST);
     window.ove.context.isInitialized = true;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 };
 
-getCSS = function () {
+getCSS = () => {
     const g = window.ove.geometry;
     // The web page is plotted across the entire section and then
     // moved into place based on the client's coordinates.
@@ -29,7 +29,7 @@ getCSS = function () {
     return css;
 };
 
-beginInitialization = function () {
+beginInitialization = () => {
     log.debug('Starting viewer initialization');
     OVE.Utils.initView(initView, loadTuorisClient);
 };

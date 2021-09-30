@@ -66,7 +66,7 @@ changeUserData = function (connection, video) {
         }
         log.debug('Computed columns to rows ratio:', ratio);
 
-        let dim = {
+        const dim = {
             c: Math.ceil(Math.sqrt(maxSessions * ratio)),
             r: Math.ceil(Math.sqrt(maxSessions / ratio))
         };
@@ -74,13 +74,13 @@ changeUserData = function (connection, video) {
         dim.h = Math.floor(height / dim.r) - gap;
         log.debug('Computed dimensions:', dim);
 
-        let count = $(Constants.VIDEO_CONTAINER).children('video').length;
+        const count = $(Constants.VIDEO_CONTAINER).children('video').length;
         if (count > maxSessions) {
             video.remove();
             return;
         }
 
-        let req = {
+        const req = {
             c: Math.ceil(Math.sqrt(count * dim.c / dim.r)),
             r: Math.ceil(Math.sqrt(count * dim.r / dim.c))
         };
@@ -121,53 +121,56 @@ changeUserData = function (connection, video) {
     }
 };
 
+const _createControl = () => {
+    if (!window.ove.state.current.sessionId) {
+        window.ove.state.current.sessionId = prompt('Please provide the Session Id');
+    }
+    if (window.ove.state.current.sessionId && !$(Constants.Button.CREATE).hasClass(Constants.State.INACTIVE)) {
+        $(Constants.Button.CREATE).addClass(Constants.State.INACTIVE);
+        $(Constants.Button.END).addClass(Constants.State.ACTIVE);
+        $(Constants.Background.END).addClass(Constants.State.ACTIVE);
+        // If the Session Id was random we generate a 10 character string.
+        if (window.ove.state.current.randomSessionId ||
+            window.ove.state.current.sessionId.toLowerCase() === Constants.RANDOM_SESSION) {
+            const getRandomString = function (length) {
+                const chars = String.fromCharCode.apply(null,
+                    Array.from({ length: 26 }, (_v, k) => k + 'A'.charCodeAt(0)).concat(
+                        Array.from({ length: 26 }, (_v, k) => k + 'a'.charCodeAt(0)))) + '_-';
+                return Array.from({ length: length },
+                    () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
+            };
+            window.ove.state.current.randomSessionId = true;
+            window.ove.state.current.sessionId = getRandomString(10);
+            log.debug('Generated Session Id:', window.ove.state.current.sessionId);
+        }
+        window.ove.state.current.sessionActive = true;
+        log.debug('OpenVidu section is active:', window.ove.state.current.sessionActive);
+        log.debug('Broadcasting state');
+        OVE.Utils.broadcastState();
+        updateSession();
+    }
+};
+
+const _endControl = () => {
+    if ($(Constants.Button.END).hasClass(Constants.State.ACTIVE)) {
+        $(Constants.Button.CREATE).removeClass(Constants.State.INACTIVE);
+        $(Constants.Button.END).removeClass(Constants.State.ACTIVE);
+        $(Constants.Background.END).removeClass(Constants.State.ACTIVE);
+        $(Constants.NOTICE).html('');
+        window.ove.state.current.sessionActive = false;
+        log.debug('OpenVidu section is active:', window.ove.state.current.sessionActive);
+        log.debug('Broadcasting state');
+        OVE.Utils.broadcastState();
+        updateSession();
+    }
+};
+
 loadControls = function () {
     log.debug('Displaying controller');
     const scale = Math.min(Math.min(document.documentElement.clientWidth, window.innerWidth) / 1440,
         Math.min(document.documentElement.clientHeight, window.innerHeight) / 720);
     $(Constants.CONTROLLER).css({ display: 'block', transformOrigin: '50% 50%', transform: 'scale(' + scale + ')' });
 
-    $(Constants.Button.CREATE).click(function () {
-        if (!window.ove.state.current.sessionId) {
-            window.ove.state.current.sessionId = prompt('Please provide the Session Id');
-        }
-        if (window.ove.state.current.sessionId && !$(Constants.Button.CREATE).hasClass(Constants.State.INACTIVE)) {
-            $(Constants.Button.CREATE).addClass(Constants.State.INACTIVE);
-            $(Constants.Button.END).addClass(Constants.State.ACTIVE);
-            $(Constants.Background.END).addClass(Constants.State.ACTIVE);
-            // If the Session Id was random we generate a 10 character string.
-            if (window.ove.state.current.randomSessionId ||
-                window.ove.state.current.sessionId.toLowerCase() === Constants.RANDOM_SESSION) {
-                const getRandomString = function (length) {
-                    const chars = String.fromCharCode.apply(null,
-                        Array.from({ length: 26 }, (_v, k) => k + 'A'.charCodeAt()).concat(
-                            Array.from({ length: 26 }, (_v, k) => k + 'a'.charCodeAt()))) + '_-';
-                    return Array.from({ length: length },
-                        () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
-                };
-                window.ove.state.current.randomSessionId = true;
-                window.ove.state.current.sessionId = getRandomString(10);
-                log.debug('Generated Session Id:', window.ove.state.current.sessionId);
-            }
-            window.ove.state.current.sessionActive = true;
-            log.debug('OpenVidu section is active:', window.ove.state.current.sessionActive);
-            log.debug('Broadcasting state');
-            OVE.Utils.broadcastState();
-            updateSession();
-        }
-    });
-
-    $(Constants.Button.END).click(function () {
-        if ($(Constants.Button.END).hasClass(Constants.State.ACTIVE)) {
-            $(Constants.Button.CREATE).removeClass(Constants.State.INACTIVE);
-            $(Constants.Button.END).removeClass(Constants.State.ACTIVE);
-            $(Constants.Background.END).removeClass(Constants.State.ACTIVE);
-            $(Constants.NOTICE).html('');
-            window.ove.state.current.sessionActive = false;
-            log.debug('OpenVidu section is active:', window.ove.state.current.sessionActive);
-            log.debug('Broadcasting state');
-            OVE.Utils.broadcastState();
-            updateSession();
-        }
-    });
+    $(Constants.Button.CREATE).click(_createControl);
+    $(Constants.Button.END).click(_endControl);
 };

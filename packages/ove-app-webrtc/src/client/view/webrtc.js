@@ -32,7 +32,7 @@ loadVideo = function () {
 
             // A refresh operation takes place when a player is loaded or when a video is
             // ready to be played. This ensures that proper CSS settings are applied.
-            let context = window.ove.context;
+            const context = window.ove.context;
             if (context.scale !== 1) {
                 $(Constants.CONTENT_DIV).css('transform', 'scale(' + (context.scale + 0.001) + ')');
                 setTimeout(function () {
@@ -63,12 +63,12 @@ changeUserData = function (connection, video) {
 beginInitialization = function () {
     log.debug('Starting viewer initialization');
     OVE.Utils.initView(initView, updateSession, function () {
-        let context = window.ove.context;
+        const context = window.ove.context;
         const g = window.ove.geometry;
         // Appropriately scaling and positioning the player is necessary.
         context.scale = Math.min(g.section.w / g.w, g.section.h / g.h);
-        let width = (g.section.w / context.scale) + 'px';
-        let height = (g.section.h / context.scale) + 'px';
+        const width = (g.section.w / context.scale) + 'px';
+        const height = (g.section.h / context.scale) + 'px';
         log.debug('Scaling viewer:', context.scale, ', height:', height, ', width:', width);
         if (context.scale === 1) {
             $(Constants.CONTENT_DIV).css({

@@ -1,12 +1,10 @@
-initView = function () {
+initView = () => {
     window.ove.context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
     OVE.Utils.setOnStateUpdate(loadVega);
 };
 
-beginInitialization = function () {
+beginInitialization = () => {
     log.debug('Starting viewer initialization');
-    OVE.Utils.initView(initView, loadVega, function () {
-        OVE.Utils.resizeViewer(Constants.CONTENT_DIV);
-    });
+    OVE.Utils.initView(initView, loadVega, () => OVE.Utils.resizeViewer(Constants.CONTENT_DIV));
 };

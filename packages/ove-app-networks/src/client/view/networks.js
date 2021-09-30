@@ -1,8 +1,10 @@
-initView = function () {
+initView = () => {
     const context = window.ove.context;
+
     context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
-    window.ove.socket.on(function (message) {
+
+    window.ove.socket.on(message => {
         if (message.operation) {
             // We first of all need to know if the operation was known
             if (!Object.values(Constants.Operation).includes(message.operation)) {
@@ -30,23 +32,24 @@ initView = function () {
     });
 };
 
-getClientSpecificURL = function (url) {
+getClientSpecificURL = url => {
     // Fix for chrome unable to load large images (#54)
-    let csURL = url + '?nonce=' + OVE.Utils.getViewId();
+    const csURL = url + '?nonce=' + OVE.Utils.getViewId();
     log.debug('Using client-specific URL:', csURL);
     return csURL;
 };
 
-setupCoordinatesUpdateEventListener = function () {}; // Control-only operation
+setupCoordinatesUpdateEventListener = () => {}; // Control-only operation
 
-beginInitialization = function () {
+beginInitialization = () => {
     log.debug('Starting viewer initialization');
-    OVE.Utils.initView(initView, loadSigma, function () {
+    OVE.Utils.initView(initView, loadSigma, () => {
         const g = window.ove.geometry;
         const css = {
             width: g.w + 'px',
             height: g.h + 'px'
         };
+
         log.debug('Resizing viewer with height:', css.height, ', width:', css.width);
         $(Constants.CONTENT_DIV).css(css);
     });

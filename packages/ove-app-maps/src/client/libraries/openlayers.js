@@ -1,6 +1,6 @@
 function OVEOpenLayersMap () {
     const log = OVE.Utils.Logger('OpenLayers', Constants.LOG_LEVEL);
-    let __private = {};
+    const __private = {};
 
     // TWEAK: Resolution to https://github.com/CartoDB/torque/issues/302
     if (window.ol.TorqueLayer) {
@@ -20,17 +20,17 @@ function OVEOpenLayersMap () {
             const _that = this;
             this._map = map;
             this._view = map.getView();
-            this._centerChangedId = this._view.on('change:center', function (e) {
+            this._centerChangedId = this._view.on('change:center', () => {
                 _that._updateTiles();
             }, this);
 
             this._postcomposeKey = undefined;
 
-            this._resolutionChangedId = this._view.on('change:resolution', function (evt) {
+            this._resolutionChangedId = this._view.on('change:resolution', () => {
                 _that._currentResolution = _that._view.getResolution();
                 if (_that._postcomposeKey) return;
                 _that.fire('mapZoomStart');
-                _that._postcomposeKey = _that._map.on('postcompose', function (evt) {
+                _that._postcomposeKey = _that._map.on('postcompose', evt => {
                     if (evt.frameState.viewState.resolution === _that._currentResolution) {
                         _that._updateTiles();
                         _that._map.un('postcompose', _that._postcomposeKey, _that);
@@ -82,15 +82,17 @@ function OVEOpenLayersMap () {
     this.initialize = function (config) {
         // Initialization code for Open Layers
         log.info('Loading OpenLayers with view configuration:', config);
-        let attachedLayers = [];
-        let otherLayers = [];
-        __private.layers.forEach(function (e) {
+        const attachedLayers = [];
+        const otherLayers = [];
+
+        __private.layers.forEach(e => {
             if (e.type === 'ol.TorqueLayer') {
                 otherLayers.push(e);
             } else {
                 attachedLayers.push(e);
             }
         });
+
         __private.map = new window.ol.Map({
             target: 'map',
             controls: [],
@@ -113,11 +115,12 @@ function OVEOpenLayersMap () {
                 this.showLayer(e);
             }
         }
+
         return __private.map;
     };
 
-    this.registerHandlerForEvents = function (eventHandler, isUpdate) {
-        const changeEvent = function () {
+    this.registerHandlerForEvents = (eventHandler, isUpdate) => {
+        const changeEvent = () => {
             // it takes a while for the all attributes of the map to be updated, especially after
             // a resolution/zoom-level change.
             if (isUpdate()) return;
@@ -134,7 +137,7 @@ function OVEOpenLayersMap () {
         }
     };
 
-    this.loadLayers = function (config) {
+    this.loadLayers = config => {
         // The most complex operation in the initialization process is building
         // the layers of OpenLayers based on the JSON configuration model of the
         // layers. Tile and Vector layers are supported by the app. There is
@@ -144,7 +147,7 @@ function OVEOpenLayersMap () {
         // Open Geospatial Consortium as well as the proprietary OSM, IGC and Esri
         // formats. The fill and stroke styles are configurable.
         __private.layers = [];
-        $.each(config, function (i, e) {
+        $.each(config, (i, e) => {
             if (e.type === 'ol.layer.Tile') {
                 log.trace('Loading layer of type:', 'Tile', ', with source:',
                     e.source.type, ', using config:', e);
@@ -186,57 +189,39 @@ function OVEOpenLayersMap () {
             }
             __private.layers[i].wms = e.wms;
         });
-        setTimeout(function () {
+
+        setTimeout(() => {
             // Give some time for the layers to load for the first time, and then keep checking.
-            setInterval(function () {
-                __private.layers.forEach(function (e, i) {
-                    if (e.bingMapsSource && e.getSource().getState() !== 'ready') {
-                        log.warn('Reloading BingMaps layer id:', i);
-                        e.setSource(new window.ol.source.BingMaps(JSON.stringify(e.bingMapsSource.config)));
-                    }
+            setInterval(() => {
+                __private.layers.forEach((e, i) => {
+                    if (!e.bingMapsSource || e.getSource().getState() === 'ready') return;
+                    log.warn('Reloading BingMaps layer id:', i);
+                    e.setSource(new window.ol.source.BingMaps(JSON.stringify(e.bingMapsSource.config)));
                 });
             }, Constants.BING_MAPS_RELOAD_INTERVAL);
         }, Constants.OL_LOAD_WAIT_TIME);
         return __private.layers;
     };
 
-    this.setZoom = function (zoom) {
-        __private.map.getView().setZoom(zoom);
-    };
+    this.setZoom = zoom => __private.map.getView().setZoom(zoom);
 
-    this.getZoom = function () {
-        return __private.map.getView().getZoom();
-    };
+    this.getZoom = () => __private.map.getView().getZoom();
 
-    this.setCenter = function (center) {
-        __private.map.getView().setCenter(center);
-    };
+    this.setCenter = center => __private.map.getView().setCenter(center);
 
-    this.getCenter = function () {
-        return __private.map.getView().getCenter();
-    };
+    this.getCenter = () => __private.map.getView().getCenter();
 
-    this.getTopLeft = function () {
-        return __private.map.getCoordinateFromPixel([0, 0]);
-    };
+    this.getTopLeft = () => __private.map.getCoordinateFromPixel([0, 0]);
 
-    this.getBottomRight = function () {
-        return __private.map.getCoordinateFromPixel(__private.map.getSize());
-    };
+    this.getBottomRight = () => __private.map.getCoordinateFromPixel(__private.map.getSize());
 
-    this.getSize = function () {
-        return __private.map.getSize();
-    };
+    this.getSize = () => __private.map.getSize();
 
-    this.setResolution = function (resolution) {
-        __private.map.getView().setResolution(resolution);
-    };
+    this.setResolution = resolution => __private.map.getView().setResolution(resolution);
 
-    this.getResolution = function () {
-        return +(__private.map.getView().getResolution());
-    };
+    this.getResolution = () => +(__private.map.getView().getResolution());
 
-    this.showLayer = function (layer) {
+    this.showLayer = layer => {
         if (layer.type === 'ol.TorqueLayer') {
             layer.visible = true;
             if (__private.map) {
@@ -248,7 +233,7 @@ function OVEOpenLayersMap () {
         }
     };
 
-    this.hideLayer = function (layer) {
+    this.hideLayer = layer => {
         if (layer.type === 'ol.TorqueLayer') {
             // It is important to check if the layer was already visible as if not the map and view
             // objects would not have been set on the ol.TorqueLayer.

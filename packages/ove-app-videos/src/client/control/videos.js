@@ -1,38 +1,40 @@
-initControl = function (data) {
+initControl = async data => {
     window.ove.context.isInitialized = false;
     window.ove.context.loop = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
+
     initCommon();
+
     log.debug('Restoring state:', data);
     window.ove.state.current = data;
+
     const url = OVE.Utils.getURLQueryParam();
     if (url) {
         log.debug('New URL at controller:', url);
         // If a URL was passed, the URL of the loaded state would be overridden.
         window.ove.state.current.url = url;
     }
+
     loadURL();
-    waitForBufferComplete().then(loadControls);
+    await waitForBufferComplete();
+    loadControls();
 };
 
-waitForBufferComplete = function () {
-    return new Promise(function (resolve) {
-        let counter = 0;
-        const x = setInterval(function () {
-            counter++;
-            if ($(Constants.WAITING_MSG).is(':hidden') ||
-                counter === (Constants.SHOW_CONTROLLER_AFTER_DURATION /
-                    Constants.WAIT_FOR_BUFFERING_DURATION) | 0) {
-                clearInterval(x);
-                resolve('buffering complete');
-            }
-        }, Constants.WAIT_FOR_BUFFERING_DURATION);
-    });
-};
+waitForBufferComplete = () => new Promise(resolve => {
+    let counter = 0;
+    const x = setInterval(() => {
+        counter++;
+        if (!($(Constants.WAITING_MSG).is(':hidden') ||
+            counter === (Constants.SHOW_CONTROLLER_AFTER_DURATION /
+                Constants.WAIT_FOR_BUFFERING_DURATION) | 0)) return;
+        clearInterval(x);
+        resolve('buffering complete');
+    }, Constants.WAIT_FOR_BUFFERING_DURATION);
+});
 
-refresh = function () { }; // View-only operation
+refresh = () => {}; // View-only operation
 
-requestRegistration = function () {
+requestRegistration = () => {
     // Broadcast a registration request along with a state update such that viewers
     // then replicate the state.
     log.debug('Sending registration request and broadcasting state');
@@ -40,13 +42,11 @@ requestRegistration = function () {
     OVE.Utils.broadcastState({ state: window.ove.state.current });
 };
 
-displayWaitingMessage = function () {
-    $(Constants.WAITING_MSG).text('Waiting for viewers to load');
-};
+displayWaitingMessage = () => $(Constants.WAITING_MSG).text('Waiting for viewers to load');
 
-doRegistration = function () { }; // View-only operation
+doRegistration = () => {}; // View-only operation
 
-beginInitialization = function () {
+beginInitialization = () => {
     log.debug('Starting controller initialization');
     OVE.Utils.initControl(Constants.DEFAULT_STATE_NAME, initControl);
 };
@@ -66,11 +66,13 @@ const _stopControl = () => {
 
 const _muteControl = () => {
     const isActive = $(Constants.Button.MUTE).hasClass(Constants.State.ACTIVE);
+
     if (isActive) {
         $(Constants.Button.MUTE).removeClass(Constants.State.ACTIVE);
     } else {
         $(Constants.Button.MUTE).addClass(Constants.State.ACTIVE);
     }
+
     $.ajax({
         url: window.ove.context.appUrl + '/operation/mute?mute=' + !isActive +
             '&oveSectionId=' + OVE.Utils.getSectionId(),
@@ -82,12 +84,14 @@ const _muteControl = () => {
 
 const _playControl = () => {
     const isActive = $(Constants.Button.PLAY).hasClass(Constants.State.ACTIVE);
+
     if (isActive) {
         $(Constants.Button.PLAY).removeClass(Constants.State.ACTIVE);
     } else {
         $(Constants.Button.PLAY).addClass(Constants.State.ACTIVE);
         $(Constants.Button.STOP).addClass(Constants.State.ACTIVE);
     }
+
     $.ajax({
         url: window.ove.context.appUrl + '/operation/' + (isActive ? 'pause' : 'play') +
             '?oveSectionId=' + OVE.Utils.getSectionId() + _getLoop(),
@@ -99,17 +103,19 @@ const _playControl = () => {
 
 const _loopControl = () => {
     const isActive = $(Constants.Button.LOOP).hasClass(Constants.State.ACTIVE);
+
     if (isActive) {
         $(Constants.Button.LOOP).removeClass(Constants.State.ACTIVE);
     } else {
         $(Constants.Button.LOOP).addClass(Constants.State.ACTIVE);
     }
+
     window.ove.context.loop = !isActive;
 };
 
 const _getLoop = () => window.ove.context.loop ? '&loop=true' : '';
 
-loadControls = function () {
+loadControls = () => {
     log.debug('Displaying controller');
     const scale = Math.min(Math.min(document.documentElement.clientWidth, window.innerWidth) / 1440,
         Math.min(document.documentElement.clientHeight, window.innerHeight) / 720);

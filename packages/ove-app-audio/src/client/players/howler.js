@@ -6,7 +6,7 @@ function OVEHowlerPlayer () {
 
     this.player = null;
     this.initialize = function () {
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve) {
             // we don't need any html but if we did here is where to add it
             OVE.Utils.logThenResolve(log.debug, resolve, 'audio player loaded');
         });
@@ -84,7 +84,8 @@ function OVEHowlerPlayer () {
         const offset = { x: coords[0] / window.outerWidth, y: coords[1] / window.outerWidth };
         const scale = {
             x: geometry.space.w / window.outerWidth,
-            y: geometry.space.h / window.outerHeight };
+            y: geometry.space.h / window.outerHeight
+        };
         log.debug('Using offset:', offset, 'and scale:', scale);
         this.player.pos(parseFloat(x) * (scale.x > 1 ? scale.x : 1) - offset.x,
             parseFloat(y) * (scale.y > 1 ? scale.y : 1) - offset.y, parseFloat(z));

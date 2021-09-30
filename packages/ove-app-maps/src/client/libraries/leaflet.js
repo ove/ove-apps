@@ -1,6 +1,6 @@
 function OVELeafletMap () {
     const log = OVE.Utils.Logger('Leaflet', Constants.LOG_LEVEL);
-    let __private = {
+    const __private = {
         projection: window.L.CRS.EPSG3857,
         initialLayers: []
     };
@@ -10,8 +10,8 @@ function OVELeafletMap () {
     window.L.topoJSON = window.L.GeoJSON.extend({
         addData: function (data) {
             if (data.type === 'Topology') {
-                for (let key in data.objects) {
-                    if (data.objects.hasOwnProperty(key)) {
+                for (const key in data.objects) {
+                    if (Object.hasOwn(data.objects, key)) {
                         window.L.GeoJSON.prototype.addData.call(this,
                             window.topojson.feature(data, data.objects[key]));
                     }
@@ -23,13 +23,13 @@ function OVELeafletMap () {
         }
     });
 
-    const fromEPSG3857toWGS84 = function (coords) {
+    const fromEPSG3857toWGS84 = coords => {
         const point = (coords.x && coords.y) ? coords : new window.L.point(coords[0], coords[1]);
         const latLng = __private.projection.unproject(point);
         return [latLng.lat, latLng.lng];
     };
 
-    const fromWGS84toEPSG3857 = function (coords) {
+    const fromWGS84toEPSG3857 = coords => {
         const latLng = (coords.lat && coords.lng) ? coords : new window.L.latLng(coords[0], coords[1]);
         const point = __private.projection.project(latLng);
         return [point.x, point.y];
@@ -53,7 +53,7 @@ function OVELeafletMap () {
         return __private.map;
     };
 
-    this.registerHandlerForEvents = function (eventHandler, _) {
+    this.registerHandlerForEvents = (eventHandler) => {
         // Handlers for Leaflet events.
         for (const e of Constants.LEAFLET_MONITORED_EVENTS) {
             __private.map.on(e, eventHandler);
@@ -63,15 +63,17 @@ function OVELeafletMap () {
 
     /* jshint ignore:start */
     // current version of JSHint does not support async/await
-    this.loadLayers = async function (config) {
+    this.loadLayers = async config => {
         // The most complex operation in the initialization process is building
         // the layers of Leaflet based on the JSON configuration model of the
         // layers. There is special handling for CARTO layers
         __private.layers = [];
-        $.each(config, async function (i, e) {
+        $.each(config, async (i, e) => {
             if (e.type === 'L.tileLayer') {
-                __private.layers[i] = e.wms ? new window.L.tileLayer.wms(
-                    e.url, e.options) : new window.L.tileLayer(e.url, e.options);
+                __private.layers[i] = e.wms
+                    ? new window.L.tileLayer.wms(
+                        e.url, e.options)
+                    : new window.L.tileLayer(e.url, e.options);
                 log.trace('Loading layer of type:', e.type + (e.wms ? '.wms' : ''), ', with url:',
                     e.url, ', and options:', e.options);
             } else if (e.type === 'L.imageOverlay' || e.type === 'L.videoOverlay') {
@@ -89,7 +91,7 @@ function OVELeafletMap () {
                     __private.layersLoading = true;
                     __private.layers[i] = { type: e.type };
                     const payload = await fetch(e.url);
-                    e.data = await payload.json().then(function (data) {
+                    e.data = await payload.json().then(data => {
                         delete __private.layersLoading;
                         return data;
                     });
@@ -110,61 +112,47 @@ function OVELeafletMap () {
     };
     /* jshint ignore:end */
 
-    this.setZoom = function (zoom) {
-        __private.map.setZoom(zoom, { animate: false });
-    };
+    this.setZoom = zoom => __private.map.setZoom(zoom, { animate: false });
 
-    this.getZoom = function () {
-        return __private.map.getZoom();
-    };
+    this.getZoom = () => __private.map.getZoom();
 
-    this.setCenter = function (center) {
-        __private.map.panTo(fromEPSG3857toWGS84(center));
-    };
+    this.setCenter = center => __private.map.panTo(fromEPSG3857toWGS84(center));
 
-    this.getCenter = function () {
-        return fromWGS84toEPSG3857(__private.map.getCenter());
-    };
+    this.getCenter = () => fromWGS84toEPSG3857(__private.map.getCenter());
 
-    this.getTopLeft = function () {
-        return fromWGS84toEPSG3857(__private.map.getBounds().getNorthWest());
-    };
+    this.getTopLeft = () => fromWGS84toEPSG3857(__private.map.getBounds().getNorthWest());
 
-    this.getBottomRight = function () {
-        return fromWGS84toEPSG3857(__private.map.getBounds().getSouthEast());
-    };
+    this.getBottomRight = () => fromWGS84toEPSG3857(__private.map.getBounds().getSouthEast());
 
-    this.getSize = function () {
+    this.getSize = () => {
         const point = __private.map.getSize();
         return [point.x, point.y];
     };
 
-    this.setResolution = function () {
-        // Leaflet does not implement this function.
-    };
+    // Leaflet does not implement this function.
+    this.setResolution = () => {};
 
-    this.getResolution = function () {
-        // Leaflet does not implement this function.
-        return undefined;
-    };
+    // Leaflet does not implement this function.
+    this.getResolution = () => undefined;
 
     this.showLayer = async function (layer) {
         // Some layers such as GeoJSON and TopoJSON vector layers may take time to load
         // if the data needs to be fetched from a URL.
         if (layer.type === 'L.geoJSON' || layer.type === 'L.topoJSON') {
             if (__private.layersLoading) {
-                await new Promise(function (resolve) {
-                    const x = setInterval(function () {
-                        if (!__private.layersLoading) {
-                            clearInterval(x);
-                            resolve('layers loaded');
-                        }
+                await new Promise(resolve => {
+                    const x = setInterval(() => {
+                        if (__private.layersLoading) return;
+                        clearInterval(x);
+                        resolve('layers loaded');
                     }, Constants.LEAFLET_LAYER_LOAD_DELAY);
                 });
+
                 if (layer.layer) {
                     layer = layer.layer;
                 }
-                this.showLayer(layer);
+
+                await this.showLayer(layer);
                 return;
             } else if (layer.layer) {
                 layer = layer.layer;
@@ -195,7 +183,7 @@ function OVELeafletMap () {
                 }
             } else {
                 const client = new window.carto.Client(layer.source);
-                layer.source.layers.forEach(function (e) {
+                layer.source.layers.forEach(e => {
                     client.addLayer(new window.carto.layer.Layer(
                         new window.carto.source.SQL(e.sql),
                         new window.carto.style.CartoCSS(e.cartocss)));
@@ -214,18 +202,19 @@ function OVELeafletMap () {
         // if the data needs to be fetched from a URL.
         if (layer.type === 'L.geoJSON' || layer.type === 'L.topoJSON') {
             if (__private.layersLoading) {
-                await new Promise(function (resolve) {
-                    const x = setInterval(function () {
-                        if (!__private.layersLoading) {
-                            clearInterval(x);
-                            resolve('layers loaded');
-                        }
+                await new Promise(resolve => {
+                    const x = setInterval(() => {
+                        if (__private.layersLoading) return;
+                        clearInterval(x);
+                        resolve('layers loaded');
                     }, Constants.LEAFLET_LAYER_LOAD_DELAY);
                 });
+
                 if (layer.layer) {
                     layer = layer.layer;
                 }
-                this.hideLayer(layer);
+
+                await this.hideLayer(layer);
                 return;
             } else if (layer.layer) {
                 layer = layer.layer;

@@ -28,7 +28,8 @@
             "globals": {
                 "beginInitialization": true,
                 "getCSS": true,
-                "updateURL": true
+                "updateURL": true,
+                "initCommon": true
             }
         }
     ],

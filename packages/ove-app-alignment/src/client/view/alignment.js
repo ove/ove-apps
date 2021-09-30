@@ -1,10 +1,10 @@
-initPage = function () {
+initPage = () => {
     window.ove.context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 
-    window.ove.socket.addEventListener(function (message) {
+    window.ove.socket.addEventListener(message => {
         if (!message) return;
-        if (message.hasOwnProperty('monitors')) {
+        if (Object.hasOwn(message, 'monitors')) {
             log.debug('Received message:', message);
 
             const svgEmpty = !document.getElementById('grid-group').innerHTML;
@@ -14,12 +14,11 @@ initPage = function () {
                 const maxX = d3.max(message.monitors.map(d => d.x + d.w));
                 const maxY = d3.max(message.monitors.map(d => d.y + d.h));
 
-                let drawingFunctions = { 'Grid': createGrid, 'Diagonal': createDiagonal, 'Triangles': createTriangles };
+                const drawingFunctions = { Grid: createGrid, Diagonal: createDiagonal, Triangles: createTriangles };
                 drawingFunctions[message.patternType](maxX, maxY);
             }
 
             window.ove.state.current = message;
-
             shiftGrid(message);
         }
     });
@@ -58,12 +57,12 @@ function createGrid (maxX, maxY) {
     resizeSVG();
     log.debug('Drawing grid');
 
-    let rows = [];
+    const rows = [];
     for (let i = 0; i < 2 * (maxY / Constants.GRID_SPACING); i++) {
         rows.push(i * Constants.GRID_SPACING);
     }
 
-    let cols = [];
+    const cols = [];
     for (let j = 0; j < 2 * (maxX / Constants.GRID_SPACING); j++) {
         cols.push(j * Constants.GRID_SPACING);
     }
@@ -77,34 +76,22 @@ function createGrid (maxX, maxY) {
         .append('line')
         .attr('x1', -maxX)
         .attr('x2', maxX)
-        .attr('y1', function (d) {
-            return d;
-        })
-        .attr('y2', function (d) {
-            return d;
-        })
+        .attr('y1', d => d)
+        .attr('y2', d => d)
         .style('stroke-width', '1px')
-        .style('stroke', function (d, i) {
-            return color(i % 10);
-        });
+        .style('stroke', (d, i) => color(i % 10));
 
     d3.select('#grid-group')
         .selectAll('.cols')
         .data(cols)
         .enter()
         .append('line')
-        .attr('x1', function (d) {
-            return d;
-        })
-        .attr('x2', function (d) {
-            return d;
-        })
+        .attr('x1', d => d)
+        .attr('x2', d => d)
         .attr('y1', -2 * maxY)
         .attr('y2', 2 * maxY)
         .style('stroke-width', '1px')
-        .style('stroke', function (d, i) {
-            return color(i % 10);
-        });
+        .style('stroke', (d, i) => color(i % 10));
 }
 
 function createDiagonal (maxX, maxY) {
@@ -115,7 +102,7 @@ function createDiagonal (maxX, maxY) {
 
     const size = Math.max(maxX, maxY);
 
-    let lines = [];
+    const lines = [];
     for (let i = -2 * (size / Constants.GRID_SPACING); i < 2 * (size / Constants.GRID_SPACING); i++) {
         lines.push(i * Constants.GRID_SPACING);
     }
@@ -129,16 +116,10 @@ function createDiagonal (maxX, maxY) {
         .append('line')
         .attr('x1', -size)
         .attr('x2', +size)
-        .attr('y1', function (d) {
-            return d + size;
-        })
-        .attr('y2', function (d) {
-            return d - size;
-        })
-        .style('stroke-width', function (_d, i) { return (i % 3) === 0 ? '4px' : '1px'; })
-        .style('stroke', function (_d, i) {
-            return color(i % 10);
-        });
+        .attr('y1', d => d + size)
+        .attr('y2', d => d - size)
+        .style('stroke-width', (_d, i) => (i % 3) === 0 ? '4px' : '1px')
+        .style('stroke', (_d, i) => color(i % 10));
 }
 
 function createTriangles () {
@@ -147,27 +128,23 @@ function createTriangles () {
     log.debug('Drawing triangles');
 
     // We need to load Spaces.json, as we want to position right-angled triangles so that they cross each screen's edge
-    d3.json(buildSpacesURL()).then(function (spaces) {
+    d3.json(buildSpacesURL()).then(spaces => {
         const id = OVE.Utils.getSpace();
 
         // Construct list of points at the midpoint of the right edge of each screen
         // l is a property that sets the size of triangle that will be drawn on each edge
-        let rightMiddlePoints = spaces[id].map(function (d) {
-            return { cx: d.x + d.w, cy: d.y + d.h / 2, l: d.h / 2 };
-        });
+        const rightMiddlePoints = spaces[id].map(d => ({ cx: d.x + d.w, cy: d.y + d.h / 2, l: d.h / 2 }));
 
         // Construct list of points at the midpoint of the bottom edge of each screen
-        let bottomMiddlePoints = spaces[id].map(function (d) {
-            return { cx: d.x + d.w / 2, cy: d.y + d.h, l: d.h / 2 };
-        });
-        let allPoints = rightMiddlePoints.concat(bottomMiddlePoints);
+        const bottomMiddlePoints = spaces[id].map(d => ({ cx: d.x + d.w / 2, cy: d.y + d.h, l: d.h / 2 }));
+        const allPoints = rightMiddlePoints.concat(bottomMiddlePoints);
 
         d3.select('#grid-group')
             .selectAll('.triangles')
             .data(allPoints)
             .enter()
             .append('polygon')
-            .attr('points', function (d) {
+            .attr('points', d => {
                 const vertex1 = (d.cx - d.l / 2) + ',' + (d.cy + d.l / 2);
                 const vertex2 = (d.cx - d.l / 2) + ',' + (d.cy - d.l / 2);
                 const vertex3 = (d.cx + d.l / 2) + ',' + (d.cy + d.l / 2);

@@ -1,9 +1,9 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
 
-$(function () {
+$(() => {
     // This is what happens first. After OVE is loaded, either the viewer or controller
     // will be initialized.
-    $(document).ready(function () {
+    $(document).ready(() => {
         log.debug('Starting application');
         window.ove = new OVE(Constants.APP_NAME);
         log.debug('Completed loading OVE');
@@ -12,7 +12,7 @@ $(function () {
     });
 });
 
-updatePDF = async function () {
+updatePDF = async () => {
     window.ove.context.renderingInProgress = true;
     const context = window.ove.context;
     const state = window.ove.state.current;
@@ -31,21 +31,21 @@ updatePDF = async function () {
     }
 
     if (context.url !== state.url || !context.pdf) {
+        // If not already loaded
         log.debug('Fetching document from url:', state.url);
-        let pdf = await pdfjsLib.getDocument(state.url).promise;
+        const pdf = await pdfjsLib.getDocument(state.url).promise;
         context.url = state.url;
         context.pdf = pdf;
         await renderPDF(context.pdf);
-    } else {
-        // The document was already fetched, it can be reused. This will enhance performance.
-        await renderPDF(context.pdf);
     }
+
+    await renderPDF(context.pdf);
 
     log.debug('Finished updating PDF');
     context.renderingInProgress = false;
 };
 
-const onGetPage = async function (pdf, firstPage) {
+const onGetPage = async (pdf, firstPage) => {
     const state = window.ove.state.current;
     const g = window.ove.geometry;
     const pageGap = parseInt(state.settings.pageGap || Constants.DEFAULT_PAGE_GAP, 10);
@@ -56,23 +56,25 @@ const onGetPage = async function (pdf, firstPage) {
     const scale = state.scale || state.settings.scale || Constants.DEFAULT_SCALE;
     log.trace('Using scale:', scale);
 
-    let viewport = firstPage.getViewport({ scale: scale });
-    let dim = {
+    const viewport = firstPage.getViewport({ scale: scale });
+    const dim = {
         c: Math.floor(g.section.w / (viewport.width + pageGap)),
         r: Math.floor(g.section.h / (viewport.height + pageGap)),
         w: viewport.width,
         h: viewport.height
     };
+
     dim.border = {
         x: (g.section.w - (viewport.width + pageGap) * dim.c - pageGap) / 2,
         y: (g.section.h - (viewport.height + pageGap) * dim.r - pageGap) / 2
     };
+
     log.trace('Computed page dimensions:', dim);
     const page = await pdf.getPage(firstPage.pageNumber);
     await renderPage(pdf, page, scale, dim, firstPage, pageGap);
 };
 
-const panPage = async function (x, y) {
+const panPage = async (x, y) => {
     const state = window.ove.state.current;
     const context = window.ove.context;
     if (context.renderingInProgress) return;
@@ -81,34 +83,32 @@ const panPage = async function (x, y) {
     state.offset.y = y * getScalingFactor();
 
     log.debug('Updating offset:', state.offset);
-    if (!OVE.Utils.JSON.equals(context.state, state)) {
-        context.state = JSON.parse(JSON.stringify(state));
-        await triggerUpdate();
-    }
+    if (OVE.Utils.JSON.equals(context.state, state)) return;
+    context.state = JSON.parse(JSON.stringify(state));
+    await triggerUpdate();
 };
 
-triggerUpdate = async function () {
+triggerUpdate = async () => {
     log.debug('Broadcasting state');
     OVE.Utils.broadcastState();
     await updatePDF();
 };
 
-const zoomPage = async function (zoom) {
+const zoomPage = async zoom => {
     const state = window.ove.state.current;
     const context = window.ove.context;
     if (context.renderingInProgress) return;
     state.scale = zoom * (state.settings.scale || Constants.DEFAULT_SCALE);
 
     log.debug('Updating scale:', state.scale);
-    if (!OVE.Utils.JSON.equals(context.state, state)) {
-        // We only trigger updates if the state has really changed.
-        context.state = JSON.parse(JSON.stringify(state));
-        await triggerUpdate();
-    }
+    // We only trigger updates if the state has really changed.
+    if (OVE.Utils.JSON.equals(context.state, state)) return;
+    context.state = JSON.parse(JSON.stringify(state));
+    await triggerUpdate();
 };
 
-initCommon = function () {
-    window.ove.socket.addEventListener(async function (message) {
+initCommon = () => {
+    window.ove.socket.addEventListener(async message => {
         if (!message || !window.ove.context.isInitialized || !message.operation) return;
         if (message.operation.zoom) {
             await zoomPage(message.operation.zoom);
@@ -118,13 +118,14 @@ initCommon = function () {
     });
 };
 
-const renderPage = async function (pdf, page, scale, dim, firstPage, pageGap) {
+const renderPage = async (pdf, page, scale, dim, firstPage, pageGap) => {
     const i = page.pageNumber;
     const state = window.ove.state.current;
     const context = window.ove.context;
 
     let viewport = page.getViewport({ scale: scale });
-    let pageDim = { border: { x: 0, y: 0 } };
+    const pageDim = { border: { x: 0, y: 0 } };
+
     if (viewport.width !== dim.w || viewport.height !== dim.h) {
         log.trace('The size or aspect ratio is different on page:', i);
         if (viewport.width / dim.w > viewport.height / dim.h) {
@@ -143,6 +144,7 @@ const renderPage = async function (pdf, page, scale, dim, firstPage, pageGap) {
             pageDim.border.x = (dim.w - viewport.width) / 2;
         }
     }
+
     pageDim.h = viewport.height;
     pageDim.w = viewport.width;
 
@@ -202,22 +204,23 @@ const renderPage = async function (pdf, page, scale, dim, firstPage, pageGap) {
         log.trace('Repositioned canvas of page');
     }
 
-    if (context.scale !== scale) {
-        log.trace('Resizing canvas for page:', i);
-        pageCanvas[0].height = pageDim.h;
-        pageCanvas[0].width = pageDim.w;
-
-        await page.render({
-            canvasContext: pageCanvas[0].getContext('2d'),
-            viewport: viewport
-        }).promise;
-        context.scale = scale;
-    } else {
+    if (context.scale === scale) {
         context.renderingInProgress = false;
+        return;
     }
+
+    log.trace('Resizing canvas for page:', i);
+    pageCanvas[0].height = pageDim.h;
+    pageCanvas[0].width = pageDim.w;
+
+    await page.render({
+        canvasContext: pageCanvas[0].getContext('2d'),
+        viewport: viewport
+    }).promise;
+    context.scale = scale;
 };
 
-renderPDF = async function (pdf) {
+renderPDF = async pdf => {
     log.debug('Starting PDF rendering');
     const state = window.ove.state.current;
 

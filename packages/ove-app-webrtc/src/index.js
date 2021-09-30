@@ -40,10 +40,8 @@ if (!Constants.OPENVIDU_HOST) {
 }
 
 log.debug('Setting up state validation operation');
-base.operations.validateState = function (state) {
-    return Utils.validateState(state, [ { value: ['state.sessionId'] }, { prefix: ['state.maxSessions'] } ]);
-};
+base.operations.validateState = state => Utils.validateState(state, [{ value: ['state.sessionId'] }, { prefix: ['state.maxSessions'] }]);
 
 const port = process.env.PORT || 8080;
-server.listen(port);
+server.listen(parseInt(port, 10));
 log.info(Constants.APP_NAME, 'application started, port:', port);

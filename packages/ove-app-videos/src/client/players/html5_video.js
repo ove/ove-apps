@@ -1,50 +1,44 @@
 function OVEHTML5VideoPlayer () {
     const log = OVE.Utils.Logger('HTML5VideoPlayer', Constants.LOG_LEVEL);
 
-    const getPlayer = function () {
-        return $('#video')[0];
-    };
+    const getPlayer = () => $('#video')[0];
 
-    this.initialize = function () {
-        return new Promise(function (resolve) {
-            $('<video>', {
-                id: 'video',
-                muted: true,
-                autoplay: false,
-                controls: false
-            }).css({ width: '100%', height: '100%' }).appendTo(Constants.CONTENT_DIV);
-            OVE.Utils.logThenResolve(log.debug, resolve, 'video player loaded');
-        });
-    };
+    this.initialize = () => new Promise(resolve => {
+        $('<video>', {
+            id: 'video',
+            muted: true,
+            autoplay: false,
+            controls: false
+        }).css({ width: '100%', height: '100%' }).appendTo(Constants.CONTENT_DIV);
+        OVE.Utils.logThenResolve(log.debug, resolve, 'video player loaded');
+    });
 
-    this.load = function (config) {
+    this.load = config => {
         log.debug('Loading video at URL:', config.url);
         getPlayer().src = config.url + '?nonce=' + OVE.Utils.getViewId();
-        setTimeout(function () {
+        setTimeout(() => {
             // Wait for the player to be ready.
             getPlayer().playbackRate = Constants.STANDARD_RATE;
         }, Constants.VIDEO_READY_TIMEOUT);
     };
 
-    this.play = function (loop) {
+    this.play = loop => {
         log.debug('Playing video', 'loop:', loop);
         getPlayer().loop = loop;
         // Chrome autoplay features have kept changing over time and below is so that
         // we are aware if anything doesn't work for some reason.
-        let playPromise = getPlayer().play();
+        const playPromise = getPlayer().play();
         if (playPromise !== undefined) {
-            playPromise.catch(function (e) {
-                log.error('Unexpected error:', e.message);
-            });
+            playPromise.catch(e => log.error('Unexpected error:', e.message));
         }
     };
 
-    this.pause = function () {
+    this.pause = () => {
         log.debug('Pausing video');
         getPlayer().pause();
     };
 
-    this.seekTo = function (time) {
+    this.seekTo = time => {
         log.debug('Seeking to time:', time);
         getPlayer().currentTime = time;
     };
@@ -57,26 +51,20 @@ function OVEHTML5VideoPlayer () {
         this.seekTo(Constants.STARTING_TIME);
     };
 
-    this.mute = function (mute) {
+    this.mute = mute => {
         getPlayer().muted = mute;
     };
 
     // The ready function is similar to the stop function in this case.
     this.ready = this.stop;
 
-    this.isVideoLoaded = function () {
-        return getPlayer() && getPlayer().duration > 0;
-    };
+    this.isVideoLoaded = () => getPlayer() && getPlayer().duration > 0;
 
-    this.getLoadedPercentage = function () {
-        return getPlayer().seekable.end(getPlayer().seekable.length - 1) * 100 / getPlayer().duration;
-    };
+    this.getLoadedPercentage = () => getPlayer().seekable.end(getPlayer().seekable.length - 1) * 100 / getPlayer().duration;
 
     this.getLoadedDuration = function () {
         return getPlayer().duration * this.getLoadedPercentage() / 100;
     };
 
-    this.getCurrentTime = function () {
-        return getPlayer().currentTime;
-    };
+    this.getCurrentTime = () => getPlayer().currentTime;
 }

@@ -10,10 +10,9 @@ for (const mod of ['vega', 'vega-lite', 'vega-embed']) {
 }
 
 log.debug('Setting up state validation operation');
-base.operations.validateState = function (state) {
-    return Utils.validateState(state, [ { value: ['state.url'] } ]) || Utils.validateState(state, [ { value: ['state.spec'] } ]);
-};
+base.operations.validateState = state => Utils.validateState(state, [{ value: ['state.url'] }]) ||
+    Utils.validateState(state, [{ value: ['state.spec'] }]);
 
-const port = process.env.PORT || 8080;
+const port = parseInt(process.env.PORT || 8080, 10);
 server.listen(port);
 log.info(Constants.APP_NAME, 'application started, port:', port);

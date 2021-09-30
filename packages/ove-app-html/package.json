@@ -20,7 +20,7 @@
     "@babel/preset-env": "7.15.6",
     "@babel/node": "7.15.4",
     "@fortawesome/fontawesome-free": "5.15.4",
-    "@ove-lib/appbase": "0.6.2",
+    "@ove-lib/appbase": "../../../ove/packages/ove-lib-appbase",
     "http-status-codes": "2.1.4",
     "jquery": "3.6.0",
     "request": "2.88.2"

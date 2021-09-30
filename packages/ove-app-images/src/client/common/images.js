@@ -1,8 +1,8 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
-$(function () {
+$(() => {
     // This is what happens first. After OVE is loaded, either the viewer or controller
     // will be initialized. Application specific context variables are also initialized at this point.
-    $(document).ready(function () {
+    $(document).ready(() => {
         log.debug('Starting application');
         window.ove = new OVE(Constants.APP_NAME);
         log.debug('UUID: ', window.ove.context.uuid);
@@ -13,7 +13,7 @@ $(function () {
     });
 });
 
-initCommon = function () {
+initCommon = () => {
     const context = window.ove.context;
 
     window.ove.socket.addEventListener(message => {
@@ -24,7 +24,7 @@ initCommon = function () {
     });
 };
 
-const buildViewport = function (op, context) {
+const buildViewport = (op, context) => {
     const bounds = context.osd.viewport.getBounds();
     const zoom = context.osd.viewport.getZoom();
 
@@ -57,17 +57,20 @@ const buildViewport = function (op, context) {
     }
 };
 
-loadOSD = function (state) {
-    // Returns a promise such that subsequent tasks can happen following this.
-    return new Promise(function (resolve, reject) {
-        let config = JSON.parse(JSON.stringify(state));
+// Returns a promise such that subsequent tasks can happen following this.
+loadOSD = state =>
+    new Promise((resolve, reject) => {
+        const config = JSON.parse(JSON.stringify(state));
+
         config.id = Constants.CONTENT_DIV.substring(1);
         config.prefixUrl = 'images/';
         config.animationTime = 0;
+
         if (config.tileSources && config.tileSources.getTileUrl) {
             config.tileSources.getTileUrl =
                 new Function('level', 'x', 'y', 'return ' + config.tileSources.getTileUrl + ';'); /* jshint ignore:line */ // eslint-disable-line
         }
+
         try {
             log.info('Loading OpenSeadragon with config:', config);
             window.ove.context.osd = window.OpenSeadragon(config);
@@ -78,4 +81,3 @@ loadOSD = function (state) {
             OVE.Utils.logThenReject(log.error, reject, 'OSD failed to load', e);
         }
     });
-};

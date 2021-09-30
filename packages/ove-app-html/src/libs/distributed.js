@@ -1,6 +1,6 @@
 const log = OVE.Utils.Logger('DistributedJS');
 
-$(function () {
+$(() => {
     const Constants = {
         APP_NAME: 'DistributedJS',
         CALL_OVERHEAD: 50, // Unit: milliseconds
@@ -10,29 +10,30 @@ $(function () {
     };
 
     // Common function to handle an operation
-    const handleOperation = function (op) {
+    const handleOperation = op => {
         const context = window.ove.context;
-        if (!context.eventHandlers.hasOwnProperty(op.name)) {
+        if (!Object.hasOwn(context.eventHandlers, op.name)) {
             log.warn('No event handler found with name:', op.name);
-        } else if (op.type !== window.Distributed.SCHEDULE) {
-            log.debug('Invoking event handler:', op.name);
-            switch (op.type) {
-                case window.Distributed.IMMEDIATE:
-                case window.Distributed.TIMEOUT:
-                    setTimeout(context.eventHandlers[op.name], op.runAt - window.ove.clock.getTime());
-                    break;
-                case window.Distributed.INTERVAL:
-                    setTimeout(function () {
-                        setInterval(context.eventHandlers[op.name], op.timeout);
-                    }, op.runAt - window.ove.clock.getTime());
-                    break;
-                default:
-                    log.warn('Ignoring unknown operation:', op.type);
-            }
+            return;
+        } else if (op.type === window.Distributed.SCHEDULE) return;
+
+        log.debug('Invoking event handler:', op.name);
+        switch (op.type) {
+            case window.Distributed.IMMEDIATE:
+            case window.Distributed.TIMEOUT:
+                setTimeout(context.eventHandlers[op.name], op.runAt - window.ove.clock.getTime());
+                break;
+            case window.Distributed.INTERVAL:
+                setTimeout(function () {
+                    setInterval(context.eventHandlers[op.name], op.timeout);
+                }, op.runAt - window.ove.clock.getTime());
+                break;
+            default:
+                log.warn('Ignoring unknown operation:', op.type);
         }
     };
 
-    const distribute = function (callback, type, timeout) {
+    function distribute (callback, type, timeout) {
         const op = {
             name: callback.name,
             type: arguments.length > 1 ? type : window.Distributed.SCHEDULE,
@@ -42,14 +43,15 @@ $(function () {
         log.debug('Forwarding event:', op);
         window.ove.socket.send({ operation: op });
         return op;
-    };
+    }
 
     // This is what happens first. After OVE is loaded, the system will be ready for distributed operation.
-    $(document).ready(function () {
+    $(document).ready(() => {
         log.debug('Starting library');
         window.ove = new OVE(Constants.APP_NAME, '__OVEHOST__', window.name.substring(window.name.lastIndexOf('/') + 1).split('-')[1]);
         log.debug('Completed loading OVE');
-        let context = window.ove.context;
+
+        const context = window.ove.context;
         // Within the OVE context, this application stores shared operations, event handlers and state.
         context.handleOperation = handleOperation;
         context.distribute = distribute;
@@ -58,36 +60,38 @@ $(function () {
         context.watching = [];
         context.operations = [];
         context.isController = (window.name.substring(window.name.lastIndexOf('/') + 1).split('-')[0] === Constants.CONTROLLER_WINDOW_NAME);
-        if (context.isController) {
-            context.isInitialized = false;
-            setTimeout(function () {
-                // We wait until the entire system is ready for a distributed operation.
-                while (context.operations.length > 0) {
-                    const op = context.operations.shift();
-                    context.handleOperation(context.distribute(op.callback, op.type, op.timeout));
-                }
-                context.isInitialized = true;
-                log.debug('Application is initialized:', context.isInitialized);
-            }, Constants.CONTROL_ACTIVATION_DELAY);
-            setInterval(function () {
-                // State is broadcast if there were any updates.
-                const state = window.ove.state.current;
-                if (!OVE.Utils.JSON.equals(state, context.state)) {
-                    log.debug('Broadcasting state:', state);
-                    window.ove.socket.send({ state: state });
-                    context.state = JSON.parse(JSON.stringify(state));
-                }
-            }, Constants.STATE_BROADCAST_FREQUENCY);
-        } else {
-            context.isInitialized = true;
-        }
-        window.ove.socket.on(function (message) {
+
+        window.ove.socket.addEventListener(message => {
             if (message.operation) {
                 handleOperation(message.operation);
             } else if (message.state) {
                 window.ove.state.current = message.state;
             }
         });
+
+        if (!context.isController) {
+            context.isInitialized = true;
+            return;
+        }
+
+        context.isInitialized = false;
+        setTimeout(function () {
+            // We wait until the entire system is ready for a distributed operation.
+            while (context.operations.length > 0) {
+                const op = context.operations.shift();
+                context.handleOperation(context.distribute(op.callback, op.type, op.timeout));
+            }
+            context.isInitialized = true;
+            log.debug('Application is initialized:', context.isInitialized);
+        }, Constants.CONTROL_ACTIVATION_DELAY);
+        setInterval(() => {
+            // State is broadcast if there were any updates.
+            const state = window.ove.state.current;
+            if (OVE.Utils.JSON.equals(state, context.state)) return;
+            log.debug('Broadcasting state:', state);
+            window.ove.socket.send({ state: state });
+            context.state = JSON.parse(JSON.stringify(state));
+        }, Constants.STATE_BROADCAST_FREQUENCY);
     });
 });
 
@@ -112,7 +116,7 @@ window.Distributed = {
  *                            Could also use the Distributed enumeration
  * @param {number} timeout    Time in milliseconds
  */
-window.setDistributed = function (callback, type, timeout) {
+window.setDistributed = async function (callback, type, timeout) {
     const Constants = {
         OVE_LOADED_DELAY: 50 // Unit: milliseconds
     };
@@ -127,30 +131,29 @@ window.setDistributed = function (callback, type, timeout) {
         type: arguments.length === 1 ? window.Distributed.IMMEDIATE : type,
         timeout: timeout
     };
-    new Promise(function (resolve) {
-        const x = setInterval(function () {
+    await new Promise(resolve => {
+        const x = setInterval(() => {
             // Test for whether OVE has been loaded.
             if (window.ove !== undefined && window.ove.context !== undefined) {
                 clearInterval(x);
                 resolve('ove loaded');
             }
         }, Constants.OVE_LOADED_DELAY);
-    }).then(function () {
-        const context = window.ove.context;
-        log.debug('Registering callback:', __self.callback.name);
-        // The callback can only be registered once OVE has been loaded
-        context.eventHandlers[__self.callback.name] = __self.callback;
-        // We only run operations from the controller. Operations would be queued until the
-        // controller is ready to distribute their execution.
-        if (context.isController) {
-            if (!context.isInitialized) {
-                context.operations.push(__self);
-            } else {
-                context.handleOperation(context.distribute(
-                    __self.callback, __self.type, __self.timeout));
-            }
-        }
     });
+
+    const context = window.ove.context;
+    log.debug('Registering callback:', __self.callback.name);
+    // The callback can only be registered once OVE has been loaded
+    context.eventHandlers[__self.callback.name] = __self.callback;
+    // We only run operations from the controller. Operations would be queued until the
+    // controller is ready to distribute their execution.
+    if (!context.isController) return;
+    if (!context.isInitialized) {
+        context.operations.push(__self);
+    } else {
+        context.handleOperation(context.distribute(
+            __self.callback, __self.type, __self.timeout));
+    }
 };
 
 /**
@@ -159,7 +162,7 @@ window.setDistributed = function (callback, type, timeout) {
  * @param {object} property  Getter/Setter related to property in the { get: fn(), set: fn() } format
  * @param {number} frequency Frequency in milliseconds - set this to zero/null or do not pass this to stop watching
  */
-window.watch = function (name, property, frequency) {
+window.watch = async function (name, property, frequency) {
     const Constants = {
         OVE_LOADED_DELAY: 50 // Unit: milliseconds
     };
@@ -177,43 +180,43 @@ window.watch = function (name, property, frequency) {
     };
 
     if (__self.property !== undefined && __self.property.get !== undefined && __self.property.set !== undefined) {
-        new Promise(function (resolve) {
-            const x = setInterval(function () {
+        await new Promise(resolve => {
+            const x = setInterval(() => {
                 // Test for whether OVE has been loaded and initialized.
                 if (window.ove !== undefined && window.ove.context !== undefined && window.ove.context.isInitialized) {
                     clearInterval(x);
                     resolve('ove initialized');
                 }
             }, Constants.OVE_LOADED_DELAY);
-        }).then(function () {
-            const context = window.ove.context;
-            // Update watch when it is reset.
-            if (context.eventHandlers.hasOwnProperty(__self.name)) {
-                log.debug('No longer watching:', __self.name);
-                clearInterval(context.watching[__self.name]);
-                if (!__self.frequency) {
-                    // No longer watching
-                    return;
-                }
-            } else if (!__self.frequency) {
-                const err = 'Invalid frequency';
-                log.error(err);
-                throw Error(err);
-            }
-            log.debug('Started watching:', __self.name, 'with frequency:', __self.frequency);
-            context.watching[__self.name] = setInterval(function () {
-                if (context.isController) {
-                    window.ove.state.current[__self.name] = __self.property.get();
-                    return;
-                }
-
-                const state = window.ove.state.current;
-                if (!OVE.Utils.JSON.equals(state[__self.name], context.state[__self.name])) {
-                    log.debug('Detected state change - updating variable:', __self.name);
-                    __self.property.set(state[__self.name]);
-                    context.state[__self.name] = JSON.parse(JSON.stringify(state))[__self.name];
-                }
-            }, __self.frequency);
         });
+
+        const context = window.ove.context;
+        // Update watch when it is reset.
+        if (Object.hasOwn(context.eventHandlers, __self.name)) {
+            log.debug('No longer watching:', __self.name);
+            clearInterval(context.watching[__self.name]);
+            if (!__self.frequency) {
+                // No longer watching
+                return;
+            }
+        } else if (!__self.frequency) {
+            const err = 'Invalid frequency';
+            log.error(err);
+            throw Error(err);
+        }
+
+        log.debug('Started watching:', __self.name, 'with frequency:', __self.frequency);
+        context.watching[__self.name] = setInterval(function () {
+            if (context.isController) {
+                window.ove.state.current[__self.name] = __self.property.get();
+                return;
+            }
+
+            const state = window.ove.state.current;
+            if (OVE.Utils.JSON.equals(state[__self.name], context.state[__self.name])) return;
+            log.debug('Detected state change - updating variable:', __self.name);
+            __self.property.set(state[__self.name]);
+            context.state[__self.name] = JSON.parse(JSON.stringify(state))[__self.name];
+        }, __self.frequency);
     }
 };

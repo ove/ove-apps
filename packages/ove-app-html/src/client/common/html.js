@@ -1,9 +1,9 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
 
-$(function () {
+$(() => {
     // This is what happens first. After OVE is loaded, either the viewer or controller
     // will be initialized.
-    $(document).ready(function () {
+    $(document).ready(() => {
         log.debug('Starting application');
         window.ove = new OVE(Constants.APP_NAME);
         log.debug('Completed loading OVE');
@@ -12,7 +12,18 @@ $(function () {
     });
 });
 
-updateURL = function () {
+initCommon = () => {
+    window.ove.socket.addEventListener(message => {
+        if (message.operation !== Constants.Operation.REFRESH) {
+            window.ove.state.current = message;
+        } else {
+            window.ove.state.current.changeAt = message.changeAt;
+        }
+        updateURL();
+    });
+};
+
+updateURL = () => {
     // This method will also handle the refresh operation in the same way it handles
     // the original loading operation.
     if (!window.ove.context.isInitialized) {
@@ -42,10 +53,10 @@ updateURL = function () {
     const timeUntilChange = (state.changeAt || window.ove.clock.getTime()) - window.ove.clock.getTime();
 
     log.info('Loading URL:', state.url, ', launch delay:', launchDelay, ', time until change:', timeUntilChange);
-    setTimeout(function () {
+    setTimeout(() => {
         if (launchDelay > 0) {
             log.debug('Displaying content iFrame');
-            setTimeout(function () { $(Constants.HTML_FRAME).show(); }, launchDelay);
+            setTimeout(() => $(Constants.HTML_FRAME).show(), launchDelay);
         }
         $(Constants.HTML_FRAME).attr('src', state.url);
     }, timeUntilChange);

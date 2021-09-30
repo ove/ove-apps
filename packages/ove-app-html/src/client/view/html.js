@@ -1,17 +1,10 @@
-initView = function () {
+initView = () => {
     window.ove.context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
-    window.ove.socket.on(function (message) {
-        if (message.operation !== Constants.Operation.REFRESH) {
-            window.ove.state.current = message;
-        } else {
-            window.ove.state.current.changeAt = message.changeAt;
-        }
-        updateURL();
-    });
+    initCommon();
 };
 
-getCSS = function () {
+getCSS = () => {
     const g = window.ove.geometry;
     // The web page is plotted across the entire section and then
     // moved into place based on the client's coordinates.
@@ -25,7 +18,7 @@ getCSS = function () {
     return css;
 };
 
-beginInitialization = function () {
+beginInitialization = () => {
     log.debug('Starting viewer initialization');
     OVE.Utils.initView(initView, updateURL);
 };

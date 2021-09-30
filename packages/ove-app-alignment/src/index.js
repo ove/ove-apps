@@ -6,6 +6,6 @@ const server = require('http').createServer(app);
 log.debug('Using module:', 'd3');
 app.use('/', express.static(path.join(nodeModules, 'd3', 'dist')));
 
-const port = process.env.PORT || 8080;
+const port = parseInt(process.env.PORT || 8080, 10);
 server.listen(port);
 log.info(Constants.APP_NAME, 'application started, port:', port);

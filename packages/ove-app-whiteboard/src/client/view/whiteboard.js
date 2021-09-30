@@ -1,17 +1,17 @@
-initView = function () {
+initView = () => {
     window.ove.context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 };
 
-beginInitialization = function () {
+beginInitialization = () => {
     log.debug('Starting viewer initialization');
-    OVE.Utils.initView(initView, function () {}, function () {
+    OVE.Utils.initView(initView, () => {}, () => {
         OVE.Utils.resizeViewer(Constants.CONTENT_DIV);
         updateCanvas();
     });
 };
 
-initializePlotter = function () {
+initializePlotter = () => {
     const context = window.ove.context;
 
     // Initialization of canvas
@@ -28,7 +28,7 @@ initializePlotter = function () {
     log.debug('Successfully configured 2D context');
 
     // Operation to draw on canvas
-    const drawOnCanvas = function (color, lineWidth, plots) {
+    const drawOnCanvas = (color, lineWidth, plots) => {
         context._2d.strokeStyle = color;
         context._2d.lineWidth = lineWidth;
         context._2d.beginPath();
@@ -37,13 +37,15 @@ initializePlotter = function () {
         for (let i = 1; i < plots.length; i++) {
             context._2d.lineTo(plots[i].x, plots[i].y);
         }
+
         context._2d.stroke();
     };
 
-    window.ove.socket.on(function (operation) {
+    window.ove.socket.addEventListener(operation => {
         if (operation.paint) {
             const data = operation.paint;
             context._2d.restore();
+
             if (data.plots && data.plots.length >= 1) {
                 log.trace('Painting line with color:', data.color, 'along points:', data.plots);
                 // An iterative redraw required in order to ensure the same thickness is obtained as source.

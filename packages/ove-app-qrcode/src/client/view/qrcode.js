@@ -1,8 +1,8 @@
 const log = OVE.Utils.Logger(Constants.APP_NAME, Constants.LOG_LEVEL);
 
-$(function () {
+$(() => {
     // This is what happens first. After OVE is loaded, the viewer will be initialized.
-    $(document).ready(function () {
+    $(document).ready(() => {
         log.debug('Starting application');
         window.ove = new OVE(Constants.APP_NAME);
         log.debug('Completed loading OVE');
@@ -11,17 +11,17 @@ $(function () {
     });
 });
 
-beginInitialization = function () {
+beginInitialization = () => {
     log.debug('Starting viewer initialization');
     OVE.Utils.initView(init, updateURL);
 };
 
-const init = function () {
+const init = () => {
     window.ove.context.isInitialized = false;
     log.debug('Application is initialized:', window.ove.context.isInitialized);
 };
 
-updateURL = function () {
+updateURL = () => {
     const state = window.ove.state.current;
 
     window.ove.context.qrious = new QRious({
@@ -40,7 +40,7 @@ updateURL = function () {
     $(Constants.CONTENT_DIV).css(getCSS());
 };
 
-getCSS = function () {
+getCSS = () => {
     const g = window.ove.geometry;
     // The web page is plotted across the entire section and then
     // moved into place based on the client's coordinates.
@@ -49,7 +49,9 @@ getCSS = function () {
         width: g.section.w + 'px',
         height: g.section.h + 'px'
     };
+
     log.debug('Resizing viewer with height:', css.height, ', width:', css.width);
     log.debug('Performing CSS transform on viewer', css.transform);
+
     return css;
 };

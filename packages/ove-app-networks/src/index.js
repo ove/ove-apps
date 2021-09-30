@@ -5,29 +5,34 @@ const parser = require('odata-parser');
 const base = require('@ove-lib/appbase')(__dirname, Constants.APP_NAME);
 const { express, app, log, nodeModules, Utils } = base;
 const server = require('http').createServer(app);
+const WebSocket = require('ws');
 
 log.debug('Using module:', 'sigma');
 app.use('/', express.static(path.join(nodeModules, 'sigma', 'build')));
 
 let ws;
-setTimeout(function () {
-    const getSocket = function () {
+setTimeout(() => {
+    const getSocket = () => {
         const socketURL = 'ws://' + Utils.getOVEHost();
+        const socket = new WebSocket(socketURL);
+
         log.debug('Establishing WebSocket connection with:', socketURL);
-        let socket = new (require('ws'))(socketURL);
-        socket.on('close', function (code) {
+        ws = Utils.getSafeSocket(socket);
+
+        socket.on('close', code => {
             log.warn('Lost websocket connection: closed with code:', code);
             log.warn('Attempting to reconnect in ' + Constants.SOCKET_REFRESH_DELAY + 'ms');
             // If the socket is closed, we try to refresh it.
             setTimeout(getSocket, Constants.SOCKET_REFRESH_DELAY);
         });
+
         socket.on('error', log.error);
-        ws = Utils.getSafeSocket(socket);
     };
+
     getSocket();
 }, Constants.SOCKET_READY_WAIT_TIME);
 
-const handleOperation = function (req, res) {
+const handleOperation = (req, res) => {
     const sectionId = req.query.oveSectionId;
     const operation = req.params.name;
 
@@ -39,7 +44,7 @@ const handleOperation = function (req, res) {
     const nodeName = req.query.node;
     const nodeLabel = req.query.property;
 
-    let message = { operation: operation };
+    const message = { operation: operation };
     // The showOnly operation sets either or both of the node and edge filters. The color
     // operation also sets the colors in addition to the filters, it is possible to have
     // separate node and edge colors. The neighborsOf operation sets the name of the
@@ -112,25 +117,26 @@ const handleOperation = function (req, res) {
 
     // If the section id is not set the message will be available to all the sections.
     if (sectionId) {
-        ws.safeSend(JSON.stringify({ appId: Constants.APP_NAME, sectionId: sectionId, message: message }));
+        const m = { appId: Constants.APP_NAME, sectionId: sectionId, message: message };
+        ws.safeSend(JSON.stringify(m));
+        Utils.sendEvent(m);
     } else {
         ws.safeSend(JSON.stringify({ appId: Constants.APP_NAME, message: message }));
     }
+
     res.status(HttpStatus.OK).set(Constants.HTTP_HEADER_CONTENT_TYPE,
         Constants.HTTP_CONTENT_TYPE_JSON).send(Utils.JSON.EMPTY);
 };
 
-let operationsList = Object.values(Constants.Operation);
+const operationsList = Object.values(Constants.Operation);
 app.post('/operation/:name(' + operationsList.join('|') + ')', handleOperation);
 
 // BACKWARDS-COMPATIBILITY: For <= v0.2.0
 app.get('/operation/:name(' + operationsList.join('|') + ')', handleOperation);
 
 log.debug('Setting up state validation operation');
-base.operations.validateState = function (state) {
-    return Utils.validateState(state, [
-        { value: ['state.jsonURL'] }, { prefix: ['state.settings'] }, { prefix: ['state.renderer'] }
-    ]) ||
+base.operations.validateState = state => Utils.validateState(state, [
+    { value: ['state.jsonURL'] }, { prefix: ['state.settings'] }, { prefix: ['state.renderer'] }]) ||
     Utils.validateState(state, [
         { value: ['state.gexfURL'] }, { prefix: ['state.settings'] }, { prefix: ['state.renderer'] }
     ]) ||
@@ -142,8 +148,7 @@ base.operations.validateState = function (state) {
         { prefix: ['state.neo4j.x'], value: ['state.neo4j.x.min', 'state.neo4j.x.max'] },
         { prefix: ['state.neo4j.y'], value: ['state.neo4j.y.min', 'state.neo4j.y.max'] }
     ]);
-};
 
-const port = Number(process.env.PORT) || 8080;
+const port = parseInt(process.env.PORT || 8080, 10);
 server.listen(port);
 log.info(Constants.APP_NAME, 'application started, port:', port);
