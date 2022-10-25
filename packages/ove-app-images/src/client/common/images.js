@@ -63,6 +63,7 @@ loadOSD = function (state) {
         let config = JSON.parse(JSON.stringify(state));
         config.id = Constants.CONTENT_DIV.substring(1);
         config.prefixUrl = 'images/';
+        config.subPixelRoundingForTransparency = window.OpenSeadragon.SUBPIXEL_ROUNDING_OCCURRENCES.ALWAYS;
         config.animationTime = 0;
         if (config.tileSources && config.tileSources.getTileUrl) {
             config.tileSources.getTileUrl =
