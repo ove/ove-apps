@@ -23,7 +23,7 @@
     "@ove-lib/appbase": "0.6.2",
     "http-status-codes": "2.1.4",
     "jquery": "3.6.0",
-    "openvidu-browser": "2.20.0",
-    "openvidu-node-client": "2.20.1"
+    "openvidu-browser": "2.27.0",
+    "openvidu-node-client": "2.27.0"
   }
 }
