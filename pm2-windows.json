@@ -97,7 +97,7 @@
       "env": {
           "PORT": "8089",
           "OVE_HOST": "localhost:8080",
-          "TUORIS_HOST": "localhost:7080"
+          "TUORIS_HOST": "localhost:8080"
       }
     },
     {
