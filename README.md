@@ -1,3 +1,10 @@
+🚨 This repository has been replaced and is no longer actively maintained.
+
+Please use the new repository instead:
+https://github.com/dsi-icl/vizzy-studio/
+
+Please direct all future development, issues, and contributions there.
+
 # Open Visualisation Environment - Apps
 
 There are several applications designed to run within [Open Visualisation Environment (OVE)](https://github.com/ove/ove):
